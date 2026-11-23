@@ -4,6 +4,9 @@ extends Node
 var frames: int = 0
 var prepared: bool = false
 
+func _ready() -> void:
+	main.start_game()
+
 func _process(_delta: float) -> void:
 	var manager := main.get_node("ZoneManager") as ZoneManager
 	if not prepared and manager.current_zone != null and manager.state == ZoneManager.State.IDLE:

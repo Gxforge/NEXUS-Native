@@ -7,6 +7,7 @@ var stage := 0
 var frames := 0
 
 func _ready() -> void:
+	main.start_game()
 	manager = main.get_node("ZoneManager") as ZoneManager
 	camera = main.get_node("PersistentWorld/Player/Camera3D") as Camera3D
 

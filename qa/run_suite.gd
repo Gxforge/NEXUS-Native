@@ -104,6 +104,9 @@ func _run() -> void:
 	var main := packed.instantiate()
 	root.add_child(main)
 	var manager := main.get_node("ZoneManager") as ZoneManager
+	_check(main.get_node("UI/MainMenu").visible, "main menu is visible before loading")
+	_check(main.start_game(), "main menu starts real C-04 preload")
+	_check(main.get_node("UI/LoadingScreen").visible, "loading screen is visible during preload")
 	var active := main.get_node("ActiveZones")
 	var player := main.get_node("PersistentWorld/Player") as NexusPlayer
 	_check(await _wait_idle(manager), "initial threaded load completes")
