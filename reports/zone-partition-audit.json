@@ -1,0 +1,29 @@
+{
+  "classification": "world-space AABB center against original ZoneCache bounds",
+  "mesh_instances": {
+    "a01": 366,
+    "c04": 365,
+    "crioteca": 48,
+    "electricidad": 96,
+    "galeria": 74,
+    "registros": 132,
+    "shared_or_unassigned": 805,
+    "turbinas": 212,
+    "vigilancia": 267
+  },
+  "schema": 1,
+  "source": "assets/generated/source-batch/laboratory_all_sectors.glb",
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "vertices": {
+    "a01": 273770,
+    "c04": 89933,
+    "crioteca": 26621,
+    "electricidad": 37132,
+    "galeria": 25068,
+    "registros": 31560,
+    "shared_or_unassigned": 308839,
+    "turbinas": 1258542,
+    "vigilancia": 201262
+  },
+  "warning": "This is an ownership audit only; functional parent hierarchies must be retained during export."
+}
