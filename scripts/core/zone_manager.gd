@@ -20,6 +20,8 @@ var _request_path := ""
 var _target_id: StringName
 var _target_socket: StringName
 var _preloaded_paths: Dictionary = {}
+var last_released_zone: WeakRef
+var last_loaded_scene: WeakRef
 
 func configure(p_catalog: ZoneCatalog, p_state: GameState) -> void:
 	catalog = p_catalog
@@ -31,7 +33,9 @@ func preload_zone(zone_id: StringName) -> bool:
 	var path := catalog.zone(zone_id).scene_path
 	var status := ResourceLoader.load_threaded_get_status(path)
 	if status == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
-		if ResourceLoader.load_threaded_request(path, "PackedScene") != OK:
+		if ResourceLoader.load_threaded_request(
+			path, "PackedScene", true, ResourceLoader.CACHE_MODE_IGNORE
+		) != OK:
 			return false
 	_preloaded_paths[zone_id] = path
 	return true
@@ -55,7 +59,9 @@ func transition_to(zone_id: StringName, socket: StringName = &"entry") -> bool:
 	state = State.REQUESTING
 	var status := ResourceLoader.load_threaded_get_status(_request_path)
 	if status == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
-		var error := ResourceLoader.load_threaded_request(_request_path, "PackedScene")
+		var error := ResourceLoader.load_threaded_request(
+			_request_path, "PackedScene", true, ResourceLoader.CACHE_MODE_IGNORE
+		)
 		if error != OK:
 			_fail(zone_id, "Threaded request failed: %s" % error)
 			return false
@@ -84,6 +90,7 @@ func _stage_loaded_zone() -> void:
 	if packed == null:
 		_fail(_target_id, "Loaded resource is not a PackedScene")
 		return
+	last_loaded_scene = weakref(packed)
 	var next_zone := packed.instantiate() as ZoneRoot
 	if next_zone == null or next_zone.zone_id != _target_id:
 		if next_zone != null: next_zone.queue_free()
@@ -112,6 +119,7 @@ func _transfer(next_zone: ZoneRoot) -> void:
 	if previous != null:
 		state = State.RELEASING
 		var old_id := previous.zone_id
+		last_released_zone = weakref(previous)
 		previous.tree_exited.connect(_on_previous_zone_exited.bind(old_id), Object.CONNECT_ONE_SHOT)
 		previous.deactivate()
 		previous.queue_free()

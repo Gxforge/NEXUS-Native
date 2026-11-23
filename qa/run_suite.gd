@@ -129,6 +129,8 @@ func _run() -> void:
 	_check(manager.current_zone.zone_id == &"a01", "A-01 becomes current")
 	_check(active.get_child_count() == 1, "C-04 unloaded after transfer")
 	_check(old_zone.get_ref() == null, "old zone instance is freed")
+	_check(manager.last_released_zone != null and manager.last_released_zone.get_ref() == null, "manager releases its zone reference")
+	_check(not ResourceLoader.has_cached(manager.catalog.zone(&"c04").scene_path), "unloaded zone PackedScene is not retained in resource cache")
 	_check(player.get_parent().name == &"PersistentWorld", "player was not duplicated or reparented")
 
 	_check(not manager.transition_to(&"missing_zone"), "unknown zone is rejected")
