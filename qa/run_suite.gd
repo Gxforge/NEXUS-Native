@@ -111,6 +111,10 @@ func _run() -> void:
 	_check(active.get_child_count() == 1, "one active zone after boot")
 	_check(get_nodes_in_group(&"zone_manager").size() == 1, "one ZoneManager")
 	_check(player != null, "one persistent player exists")
+	var experience := main.get_node("PersistentWorld/SceneExperience") as SceneExperienceController
+	_check(experience != null, "one persistent SceneExperience controller exists")
+	_check(experience.survey.get_parent() == experience, "survey system is owned by persistent controller")
+	_check(experience.contact_fx.get_parent() == experience, "contact effects are owned by persistent controller")
 
 	var portal_a01 := manager.current_zone.get_node("PortalA01") as StreamingSectorDoor
 	_check(portal_a01 != null, "real A-01 portal is integrated into C-04 slice")

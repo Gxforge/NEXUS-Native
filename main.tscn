@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/core/main.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/core/zone_catalog.gd" id="2"]
 [ext_resource type="Script" path="res://scripts/core/game_state.gd" id="3"]
 [ext_resource type="Script" path="res://scripts/core/zone_manager.gd" id="4"]
 [ext_resource type="Script" path="res://scripts/world/player.gd" id="5"]
+[ext_resource type="Script" path="res://scripts/core/scene_experience_controller.gd" id="6"]
 [sub_resource type="CapsuleShape3D" id="PlayerShape"]
 radius = 0.34
 height = 1.82
@@ -27,6 +28,11 @@ shape = SubResource("PlayerShape")
 [node name="Camera3D" type="Camera3D" parent="PersistentWorld/Player"]
 position = Vector3(0, 1.72, 0)
 current = true
+
+[node name="SceneExperience" type="Node" parent="PersistentWorld"]
+script = ExtResource("6")
+camera_path = NodePath("../Player/Camera3D")
+game_state_path = NodePath("../../GameState")
 
 [node name="ActiveZones" type="Node3D" parent="."]
 
