@@ -1,7 +1,7 @@
 {
   "command": "python3 tools/export_all_assets.py",
   "coverage": {
-    "implemented_source_files": 7,
+    "implemented_source_files": 8,
     "inventoried_source_files": 28
   },
   "implemented_source_files": [
@@ -11,6 +11,7 @@
     "src/scene/Monster.ts",
     "src/scene/OcularSurface.ts",
     "src/scene/Sectors.ts",
+    "src/scene/Tentacles.ts",
     "src/scene/materials.ts"
   ],
   "outputs": [
@@ -45,6 +46,11 @@
       "sha256": "deae609e2528c64dc1c8a6280456d5da84349d82253e9b636ff556e4b116c40e"
     },
     {
+      "bytes": 1251772,
+      "path": "assets/generated/w01_tentacles.glb",
+      "sha256": "e950ad693601988bb4e4b68c673089a019ba67fac6544102e395863ead984207"
+    },
+    {
       "bytes": 93154,
       "path": "assets/generated/textures/nexus_floor.png",
       "sha256": "a387b19570342bc1561ea4da7b22bdec3b5363d5c61fb2d4cc2f5706496bdd1b"
@@ -74,7 +80,6 @@
     "src/scene/SceneExperience.ts",
     "src/scene/Survey.ts",
     "src/scene/TelemetryScreen.ts",
-    "src/scene/Tentacles.ts",
     "src/scene/Touch.ts",
     "src/scene/Transit.ts",
     "src/scene/Vault.ts",

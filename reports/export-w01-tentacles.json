@@ -1,0 +1,14 @@
+{
+  "bytes": 1251772,
+  "limitations": [
+    "baseline rest curves exported; runtime locomotion and collision response remain native rig work",
+    "sucker facing is updated dynamically in source and remains runtime rig work"
+  ],
+  "nodes": 302,
+  "output": "assets/generated/w01_tentacles.glb",
+  "sha256": "e950ad693601988bb4e4b68c673089a019ba67fac6544102e395863ead984207",
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "suckers": 87,
+  "tentacles": 20,
+  "visible_mesh_instances": 194
+}
