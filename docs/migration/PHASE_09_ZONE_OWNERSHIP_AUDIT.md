@@ -24,4 +24,16 @@ La categoría compartida exige clasificación jerárquica adicional; no puede re
 - 202 mallas todavía anónimas.
 - 37 mallas cuya AABB cruza más de una zona.
 
-`Transit` y `ZoneGates` no deben cortarse como estáticos por centro: requieren escenas controladoras con transferencia/estado. Las 37 AABB multizona deben revisarse como conexiones o geometría fronteriza. El script `qa/audit_zone_partition.gd` regenera `reports/zone-partition-audit.json` y no modifica el GLB fuente.
+`Transit` y `ZoneGates` no deben cortarse como estáticos por centro: requieren escenas controladoras con transferencia/estado. Las 37 AABB multizona deben revisarse como conexiones o geometría fronteriza.
+
+La auditoría detallada de las 202 mallas anónimas determinó:
+
+- 169 no intersectan ningún volumen interno: pertenecen a corredores, iluminación longitudinal o infraestructura común.
+- 5 tocan únicamente A-01 y 7 únicamente C-04; son candidatas a propiedad local tras revisar su ancestro.
+- 4 tocan únicamente Vigilancia.
+- 5 cruzan A-01/C-04.
+- 4 cruzan Electricidad/Vigilancia.
+- 3 cruzan A-01/Vigilancia y 3 C-04/Electricidad.
+- 2 abarcan A-01, C-04, Electricidad y Vigilancia.
+
+Cada rama anónima registra ahora AABB, número de mallas y zonas intersectadas en el JSON. El script `qa/audit_zone_partition.gd` regenera `reports/zone-partition-audit.json` y no modifica el GLB fuente.
