@@ -26,8 +26,10 @@
 - [x] Inventario reproducible de 28 archivos con geometría, materiales o texturas.
 - [x] Piel, iris y suelo exportados a PNG con semillas y hashes registrados.
 - [x] Verificación byte a byte de dos exportaciones consecutivas.
-- [ ] Integrar piel/iris en los GLB y materiales orgánicos de W-01.
-- [ ] Exportar las familias de geometría restantes según el inventario.
+- [x] Integrar piel en el GLB del núcleo orgánico W-01.
+- [x] Exportar cabeza, encía, garganta, 26 dientes, collar y hombros con tres morph targets.
+- [ ] Integrar iris y exportar los siete ojos, párpados y venas.
+- [ ] Exportar los 20 tentáculos, ventosas y familias de geometría restantes.
 - [ ] Comparación gráfica contra Canvas2D/Three.js antes de declarar paridad final.
 
 ## No iniciado

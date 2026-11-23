@@ -1,0 +1,11 @@
+{
+  "bytes": 1485960,
+  "embedded_textures": 1,
+  "meshes": 7,
+  "morph_targets": 3,
+  "nodes": 33,
+  "output": "assets/generated/w01_core.glb",
+  "sha256": "ff3ea58a51617fb6c45d983efce3994fb1248de05a7ab7a81bc0a76ec151cb8d",
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "teeth": 26
+}
