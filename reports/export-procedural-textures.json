@@ -1,0 +1,44 @@
+{
+  "assets": [
+    {
+      "color_space": "sRGB",
+      "height": 512,
+      "path": "assets/generated/textures/nexus_skin.png",
+      "repeat": [
+        1.5,
+        1.15
+      ],
+      "seed": 151001,
+      "sha256": "6f919e8c4db4cab2abb0b25cfddf33947f75380ee515a4941ba01ac450629588",
+      "width": 1024
+    },
+    {
+      "color_space": "sRGB",
+      "height": 512,
+      "path": "assets/generated/textures/nexus_iris.png",
+      "repeat": [
+        1,
+        1
+      ],
+      "seed": 151002,
+      "sha256": "02c11ce7caac41cdf27b083ea4a5c03be8e8cda22d4f1f689e3792d6001e3bbb",
+      "width": 512
+    },
+    {
+      "color_space": "sRGB",
+      "height": 512,
+      "path": "assets/generated/textures/nexus_floor.png",
+      "repeat": [
+        6,
+        6
+      ],
+      "seed": 151003,
+      "sha256": "a387b19570342bc1561ea4da7b22bdec3b5363d5c61fb2d4cc2f5706496bdd1b",
+      "width": 512
+    }
+  ],
+  "random_policy": "Python MT19937 fixed seeds; formulas and draw order ported from source; rasterizer is Pillow rather than browser Canvas2D",
+  "schema": 1,
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "source_file": "src/scene/materials.ts"
+}

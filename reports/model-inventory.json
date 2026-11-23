@@ -1,0 +1,674 @@
+{
+  "coordinate_policy": "Y-up; source units retained as metres; validate Z orientation per asset",
+  "files": [
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": false,
+      "geometry_constructor_lines": [],
+      "geometry_constructors": {},
+      "material_constructors": {
+        "MeshBasicMaterial": 1
+      },
+      "render_objects": {},
+      "sha256": "7673fbe4b6418454bca135d9499380b9ced6d265b9d6d113ce9bf98a74ecfba0",
+      "source_file": "src/scene/BenchCycle.ts",
+      "texture_constructors": {},
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [],
+      "geometry_constructors": {},
+      "material_constructors": {},
+      "render_objects": {},
+      "sha256": "a785cfc23def1e7842e1e9c97974306d4fd68fb5130c6146c33489e302400649",
+      "source_file": "src/scene/Contacts.ts",
+      "texture_constructors": {
+        "CanvasTexture": 1
+      },
+      "uses_math_random": true
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": false,
+      "geometry_constructor_lines": [
+        25
+      ],
+      "geometry_constructors": {
+        "PlaneGeometry": 1
+      },
+      "material_constructors": {
+        "MeshBasicMaterial": 1
+      },
+      "render_objects": {
+        "Mesh": 1
+      },
+      "sha256": "05d6ac4f5e1d3a18b96e26181e6604dbbcc1ce42bd0b5cf305a08588f004f372",
+      "source_file": "src/scene/Displays.ts",
+      "texture_constructors": {
+        "CanvasTexture": 1
+      },
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 1,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [
+        23
+      ],
+      "geometry_constructors": {
+        "BufferGeometry": 1
+      },
+      "material_constructors": {
+        "PointsMaterial": 1
+      },
+      "render_objects": {
+        "Points": 1
+      },
+      "sha256": "08f13a944c1522a25ac168d0c4a52d0b6cfde45659a4921eaf4d6e085a53ee5b",
+      "source_file": "src/scene/Effects.ts",
+      "texture_constructors": {
+        "CanvasTexture": 1
+      },
+      "uses_math_random": true
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": false,
+      "geometry_constructor_lines": [
+        26,
+        42
+      ],
+      "geometry_constructors": {
+        "BoxGeometry": 1,
+        "PlaneGeometry": 1
+      },
+      "material_constructors": {
+        "MeshPhysicalMaterial": 1,
+        "MeshStandardMaterial": 1
+      },
+      "render_objects": {
+        "Mesh": 2
+      },
+      "sha256": "688513adf8ba74f283a8218c141cf91b21cc2586968376e8c7d5a8096c10ff94",
+      "source_file": "src/scene/Environment.ts",
+      "texture_constructors": {},
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [
+        61,
+        68,
+        76,
+        100,
+        144
+      ],
+      "geometry_constructors": {
+        "SphereGeometry": 3,
+        "TorusGeometry": 1,
+        "TubeGeometry": 1
+      },
+      "material_constructors": {},
+      "render_objects": {
+        "Mesh": 7
+      },
+      "sha256": "617cc968971f3e13b68a3ef59c6d82b0f573f311cfeb5411cef35172f97f5991",
+      "source_file": "src/scene/EyeSystem.ts",
+      "texture_constructors": {},
+      "uses_math_random": true
+    },
+    {
+      "custom_buffer_geometries": 1,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [
+        16,
+        29,
+        81
+      ],
+      "geometry_constructors": {
+        "BufferGeometry": 1,
+        "CylinderGeometry": 1,
+        "SphereGeometry": 1
+      },
+      "material_constructors": {},
+      "render_objects": {
+        "Mesh": 3
+      },
+      "sha256": "93e543dfbad9512db1164fef7f68020485b70671e95deb6aa57f43b5e367b3a6",
+      "source_file": "src/scene/Glove.ts",
+      "texture_constructors": {},
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 1,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [
+        33,
+        131
+      ],
+      "geometry_constructors": {
+        "BufferGeometry": 1,
+        "ConeGeometry": 1
+      },
+      "material_constructors": {},
+      "render_objects": {
+        "Mesh": 3
+      },
+      "sha256": "02aa6961efcbe512aa86d01b09d9995f97717423ac83aa17c7a0d3d541939d4f",
+      "source_file": "src/scene/Head.ts",
+      "texture_constructors": {},
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 1,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [
+        23,
+        99,
+        233
+      ],
+      "geometry_constructors": {
+        "BoxGeometry": 1,
+        "BufferGeometry": 1,
+        "TextGeometry": 1
+      },
+      "material_constructors": {
+        "MeshBasicMaterial": 4,
+        "MeshStandardMaterial": 2,
+        "PointsMaterial": 1
+      },
+      "render_objects": {
+        "Mesh": 3,
+        "Points": 1
+      },
+      "sha256": "284eccd8ff693833a375216cc447c65988535afc96dbb12380b667a0826a1349",
+      "source_file": "src/scene/Infrastructure.ts",
+      "texture_constructors": {},
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": false,
+      "geometry_constructor_lines": [
+        38,
+        59,
+        109
+      ],
+      "geometry_constructors": {
+        "CylinderGeometry": 1,
+        "PlaneGeometry": 1,
+        "RoundedBoxGeometry": 1
+      },
+      "material_constructors": {
+        "MeshBasicMaterial": 2
+      },
+      "render_objects": {
+        "Mesh": 1
+      },
+      "sha256": "c6254fa5459a4c099bbd0912a0c0e6fe351d8048b1aa2df8917f6275e48d16bb",
+      "source_file": "src/scene/Instruments.ts",
+      "texture_constructors": {
+        "CanvasTexture": 1
+      },
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 1,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [
+        5,
+        44,
+        71,
+        174,
+        243
+      ],
+      "geometry_constructors": {
+        "BufferGeometry": 1,
+        "CircleGeometry": 1,
+        "SphereGeometry": 2,
+        "TubeGeometry": 1
+      },
+      "material_constructors": {
+        "MeshBasicMaterial": 1,
+        "MeshPhysicalMaterial": 3,
+        "MeshStandardMaterial": 5
+      },
+      "render_objects": {
+        "Mesh": 5
+      },
+      "sha256": "fb0183e92d9c0562591b78210b5e4283ec783c1e7b06925c0c8a952d906ee84f",
+      "source_file": "src/scene/Larva.ts",
+      "texture_constructors": {},
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [
+        15,
+        86
+      ],
+      "geometry_constructors": {
+        "CircleGeometry": 1,
+        "SphereGeometry": 1
+      },
+      "material_constructors": {
+        "MeshBasicMaterial": 1
+      },
+      "render_objects": {
+        "Mesh": 3
+      },
+      "sha256": "37755e8b3c796285312f7ac258d924bb02e9a3274b57f09170aacd1c93bae0a5",
+      "source_file": "src/scene/Monster.ts",
+      "texture_constructors": {
+        "CanvasTexture": 1
+      },
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 1,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [
+        22,
+        36
+      ],
+      "geometry_constructors": {
+        "BufferGeometry": 1,
+        "PlaneGeometry": 1
+      },
+      "material_constructors": {},
+      "render_objects": {
+        "Mesh": 1
+      },
+      "sha256": "2472644d090c217156d0120ad7c1888b25adf0afd041e9e4c9226f161cec3d8f",
+      "source_file": "src/scene/OcularSurface.ts",
+      "texture_constructors": {},
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": false,
+      "geometry_constructor_lines": [
+        281,
+        320,
+        348
+      ],
+      "geometry_constructors": {
+        "PlaneGeometry": 3
+      },
+      "material_constructors": {
+        "MeshBasicMaterial": 3
+      },
+      "render_objects": {
+        "Mesh": 3
+      },
+      "sha256": "cc1cca7ba20c1dd403453cbd58440d0814c6bda65804254300549d508329a64d",
+      "source_file": "src/scene/Operations.ts",
+      "texture_constructors": {
+        "CanvasTexture": 2
+      },
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": false,
+      "geometry_constructor_lines": [
+        13
+      ],
+      "geometry_constructors": {
+        "SphereGeometry": 1
+      },
+      "material_constructors": {
+        "MeshBasicMaterial": 1,
+        "MeshStandardMaterial": 5
+      },
+      "render_objects": {
+        "Mesh": 1
+      },
+      "sha256": "208ad99753adf2d6633056684a77f61578793b806bf2a5b84e79a9a8fceaa0aa",
+      "source_file": "src/scene/Operator.ts",
+      "texture_constructors": {},
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": false,
+      "geometry_constructor_lines": [
+        44,
+        65
+      ],
+      "geometry_constructors": {
+        "SphereGeometry": 2
+      },
+      "material_constructors": {
+        "MeshBasicMaterial": 2
+      },
+      "render_objects": {
+        "Mesh": 2
+      },
+      "sha256": "403f0fcf40b538845c4405736fad132a691923165d752665b944f9d75db5e8c6",
+      "source_file": "src/scene/SceneExperience.ts",
+      "texture_constructors": {},
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [
+        38,
+        276,
+        281,
+        288,
+        303
+      ],
+      "geometry_constructors": {
+        "BoxGeometry": 1,
+        "CylinderGeometry": 2,
+        "ExtrudeGeometry": 1,
+        "TorusGeometry": 1
+      },
+      "material_constructors": {
+        "MeshBasicMaterial": 1,
+        "MeshStandardMaterial": 2
+      },
+      "render_objects": {
+        "Mesh": 9
+      },
+      "sha256": "d0f65768bbd1920703399b12e222be9c50182a3f02ba484f9fdac6ed6ff516e5",
+      "source_file": "src/scene/Sectors.ts",
+      "texture_constructors": {},
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": false,
+      "geometry_constructor_lines": [],
+      "geometry_constructors": {},
+      "material_constructors": {},
+      "render_objects": {
+        "Mesh": 1
+      },
+      "sha256": "533cd78721bcd445c3655e0e59764bf4391c45e34c02b510a11d4d6fdeed3c27",
+      "source_file": "src/scene/Survey.ts",
+      "texture_constructors": {},
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": false,
+      "geometry_constructor_lines": [
+        19
+      ],
+      "geometry_constructors": {
+        "PlaneGeometry": 1
+      },
+      "material_constructors": {
+        "MeshBasicMaterial": 1
+      },
+      "render_objects": {
+        "Mesh": 1
+      },
+      "sha256": "d02824091d7ee78b3116a9470d2a99cc403de30ef0ee9e52a03a7655f8aebe0d",
+      "source_file": "src/scene/TelemetryScreen.ts",
+      "texture_constructors": {
+        "CanvasTexture": 1
+      },
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 1,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [
+        85,
+        221,
+        231
+      ],
+      "geometry_constructors": {
+        "BufferGeometry": 1,
+        "SphereGeometry": 1,
+        "TorusGeometry": 1
+      },
+      "material_constructors": {},
+      "render_objects": {
+        "Mesh": 3
+      },
+      "sha256": "2b5aebcec9d86841d2f5d27e2714dcb23a6bd7b081bc3f1bbd65f8ff4f5fbdf5",
+      "source_file": "src/scene/Tentacles.ts",
+      "texture_constructors": {},
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": false,
+      "geometry_constructor_lines": [
+        64,
+        100
+      ],
+      "geometry_constructors": {
+        "LatheGeometry": 1,
+        "SphereGeometry": 1
+      },
+      "material_constructors": {
+        "MeshMatcapMaterial": 1
+      },
+      "render_objects": {
+        "Mesh": 2
+      },
+      "sha256": "a99fa6f9bf17417421df6fc958727aaefc5f13767f8889a6293a84ce11ddb747",
+      "source_file": "src/scene/Touch.ts",
+      "texture_constructors": {
+        "CanvasTexture": 1
+      },
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 2,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [
+        58,
+        347,
+        376
+      ],
+      "geometry_constructors": {
+        "BufferGeometry": 2,
+        "PlaneGeometry": 1
+      },
+      "material_constructors": {
+        "MeshBasicMaterial": 4,
+        "MeshStandardMaterial": 3
+      },
+      "render_objects": {
+        "Mesh": 3
+      },
+      "sha256": "ccc01b1afb7f8e21909387f83ca890c2510a3b94b424f2862347ed8886ee8fd9",
+      "source_file": "src/scene/Transit.ts",
+      "texture_constructors": {
+        "CanvasTexture": 1
+      },
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [
+        18,
+        19,
+        64,
+        135,
+        202,
+        272,
+        573
+      ],
+      "geometry_constructors": {
+        "BoxGeometry": 1,
+        "CylinderGeometry": 1,
+        "ExtrudeGeometry": 2,
+        "PlaneGeometry": 1,
+        "TorusGeometry": 2
+      },
+      "material_constructors": {
+        "MeshBasicMaterial": 2,
+        "MeshPhysicalMaterial": 1,
+        "MeshStandardMaterial": 1
+      },
+      "render_objects": {
+        "Mesh": 3
+      },
+      "sha256": "f7f0b0e171f2459ca0e636f633a6c05fafc84463264bada234ecd53458408ec4",
+      "source_file": "src/scene/Vault.ts",
+      "texture_constructors": {
+        "CanvasTexture": 1
+      },
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 1,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [
+        43,
+        57,
+        64,
+        102,
+        160,
+        378
+      ],
+      "geometry_constructors": {
+        "BufferGeometry": 1,
+        "CylinderGeometry": 1,
+        "ExtrudeGeometry": 1,
+        "TorusGeometry": 2,
+        "TubeGeometry": 1
+      },
+      "material_constructors": {
+        "MeshBasicMaterial": 1,
+        "MeshPhysicalMaterial": 2,
+        "MeshStandardMaterial": 1,
+        "PointsMaterial": 1
+      },
+      "render_objects": {
+        "Mesh": 1,
+        "Points": 1
+      },
+      "sha256": "e2630e273949902d01102e4c5e91d45ffb69c15ea2a97025504a7c55fc6ab3a9",
+      "source_file": "src/scene/Workshop.ts",
+      "texture_constructors": {},
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": false,
+      "geometry_constructor_lines": [],
+      "geometry_constructors": {},
+      "material_constructors": {
+        "MeshBasicMaterial": 1
+      },
+      "render_objects": {
+        "Mesh": 1
+      },
+      "sha256": "8cb89de9b3fbcfec4c6ac0a69cab716f15555aa8bc90a7c60d1beb3e14f5e95e",
+      "source_file": "src/scene/ZoneCache.ts",
+      "texture_constructors": {},
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [],
+      "geometry_constructors": {},
+      "material_constructors": {
+        "MeshBasicMaterial": 1,
+        "MeshPhysicalMaterial": 8,
+        "MeshStandardMaterial": 3
+      },
+      "render_objects": {},
+      "sha256": "0bd59ce8142723ac5abe42480a77ccae15cae5581476bf07dc6dd804efe0e9c3",
+      "source_file": "src/scene/materials.ts",
+      "texture_constructors": {
+        "CanvasTexture": 3
+      },
+      "uses_math_random": true
+    },
+    {
+      "custom_buffer_geometries": 0,
+      "dynamic_or_procedural": false,
+      "geometry_constructor_lines": [
+        41
+      ],
+      "geometry_constructors": {
+        "PlaneGeometry": 1
+      },
+      "material_constructors": {
+        "MeshBasicMaterial": 1
+      },
+      "render_objects": {
+        "Mesh": 1
+      },
+      "sha256": "91deb607d22dd8a5c2373c07c367c4e9956eb31cf33acb9cf7867afc2485b6e7",
+      "source_file": "src/vehicle/Cockpit.ts",
+      "texture_constructors": {
+        "CanvasTexture": 2
+      },
+      "uses_math_random": false
+    },
+    {
+      "custom_buffer_geometries": 1,
+      "dynamic_or_procedural": true,
+      "geometry_constructor_lines": [
+        26,
+        59,
+        247,
+        305,
+        312,
+        331
+      ],
+      "geometry_constructors": {
+        "BufferGeometry": 1,
+        "ConeGeometry": 1,
+        "CylinderGeometry": 2,
+        "TorusGeometry": 2
+      },
+      "material_constructors": {
+        "MeshBasicMaterial": 4,
+        "MeshPhysicalMaterial": 1,
+        "MeshStandardMaterial": 1
+      },
+      "render_objects": {
+        "Mesh": 6
+      },
+      "sha256": "61f0b0e8f6b3fd6be7edd1f91a1584279c10ada98852d78dc467d1a4150d44b2",
+      "source_file": "src/vehicle/VehicleModel.ts",
+      "texture_constructors": {},
+      "uses_math_random": false
+    }
+  ],
+  "files_with_model_or_material_code": 28,
+  "schema": 1,
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "source_root_policy": "read-only",
+  "totals": {
+    "custom_buffer_geometries": 11,
+    "geometry:BoxGeometry": 4,
+    "geometry:BufferGeometry": 11,
+    "geometry:CircleGeometry": 2,
+    "geometry:ConeGeometry": 2,
+    "geometry:CylinderGeometry": 8,
+    "geometry:ExtrudeGeometry": 4,
+    "geometry:LatheGeometry": 1,
+    "geometry:PlaneGeometry": 11,
+    "geometry:RoundedBoxGeometry": 1,
+    "geometry:SphereGeometry": 12,
+    "geometry:TextGeometry": 1,
+    "geometry:TorusGeometry": 9,
+    "geometry:TubeGeometry": 3,
+    "material:MeshBasicMaterial": 32,
+    "material:MeshMatcapMaterial": 1,
+    "material:MeshPhysicalMaterial": 16,
+    "material:MeshStandardMaterial": 24,
+    "material:PointsMaterial": 3,
+    "render_object_constructors": 69,
+    "texture:CanvasTexture": 16
+  }
+}

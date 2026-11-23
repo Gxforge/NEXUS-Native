@@ -22,6 +22,14 @@
 - [ ] Campo C-04, iluminación completa, texturas, archivos y mobiliario.
 - [ ] Comparación A/B con Three.js.
 
+## Inventario y texturas procedurales
+- [x] Inventario reproducible de 28 archivos con geometría, materiales o texturas.
+- [x] Piel, iris y suelo exportados a PNG con semillas y hashes registrados.
+- [x] Verificación byte a byte de dos exportaciones consecutivas.
+- [ ] Integrar piel/iris en los GLB y materiales orgánicos de W-01.
+- [ ] Exportar las familias de geometría restantes según el inventario.
+- [ ] Comparación gráfica contra Canvas2D/Three.js antes de declarar paridad final.
+
 ## No iniciado
 - [ ] W-01 nativo y resto de zonas.
 - [ ] UI, IA, audio/VFX completos.
