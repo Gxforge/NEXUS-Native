@@ -1,10 +1,11 @@
 {
   "command": "python3 tools/export_all_assets.py",
   "coverage": {
-    "implemented_source_files": 9,
+    "implemented_source_files": 10,
     "inventoried_source_files": 28
   },
   "implemented_source_files": [
+    "src/scene/Environment.ts",
     "src/scene/EyeSystem.ts",
     "src/scene/Head.ts",
     "src/scene/Infrastructure.ts",
@@ -57,6 +58,11 @@
       "sha256": "0a848c2ee7829183cf66a62b897eb12821e303da907d01a6ac9d65d7eb2ba72f"
     },
     {
+      "bytes": 96597,
+      "path": "assets/generated/environment.glb",
+      "sha256": "30669109b8edff9ab509c6b3618b61f18dfb4f37fc2d7fdcb0882a8fe090182e"
+    },
+    {
       "bytes": 93154,
       "path": "assets/generated/textures/nexus_floor.png",
       "sha256": "a387b19570342bc1561ea4da7b22bdec3b5363d5c61fb2d4cc2f5706496bdd1b"
@@ -77,7 +83,6 @@
     "src/scene/Contacts.ts",
     "src/scene/Displays.ts",
     "src/scene/Effects.ts",
-    "src/scene/Environment.ts",
     "src/scene/Glove.ts",
     "src/scene/Instruments.ts",
     "src/scene/Larva.ts",
