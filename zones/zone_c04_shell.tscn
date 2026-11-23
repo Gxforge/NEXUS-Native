@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
 [ext_resource type="PackedScene" path="res://assets/generated/c04_structural_shell.glb" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/entities/w01_actor.tscn" id="5"]
 [node name="C04StructuralSlice" type="Node3D"]
 script = ExtResource("1")
 zone_id = &"c04"
@@ -11,6 +12,10 @@ zone_id = &"c04"
 script = ExtResource("2")
 manifest_path = "res://manifests/migration/c04_structural_shell.json"
 [node name="Visual" parent="StructuralShell" instance=ExtResource("3")]
+[node name="W01" parent="." instance=ExtResource("5")]
+position = Vector3(0, 0, 22)
+look_target_path = NodePath("/root/Main/PersistentWorld/Player")
+
 [node name="PortalA01" parent="." instance=ExtResource("4")]
 target_zone = &"a01"
 target_socket = &"from_c04"

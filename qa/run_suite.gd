@@ -115,6 +115,11 @@ func _run() -> void:
 	_check(experience != null, "one persistent SceneExperience controller exists")
 	_check(experience.survey.get_parent() == experience, "survey system is owned by persistent controller")
 	_check(experience.contact_fx.get_parent() == experience, "contact effects are owned by persistent controller")
+	_check(player.camera != null, "persistent player has mouse-look camera")
+	var watcher := manager.current_zone.get_node("W01") as W01Actor
+	_check(watcher != null, "W-01 actor is integrated into C-04")
+	_check(watcher.get_node("Eyes/W01_Seven_Eyes").get_child_count() == 7, "W-01 actor contains seven eyes")
+	_check(watcher.get_node("Tentacles/W01_20_Tentacles").get_child_count() == 20, "W-01 actor contains twenty tentacles")
 
 	var portal_a01 := manager.current_zone.get_node("PortalA01") as StreamingSectorDoor
 	_check(portal_a01 != null, "real A-01 portal is integrated into C-04 slice")
