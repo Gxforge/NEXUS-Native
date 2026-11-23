@@ -1,0 +1,13 @@
+{
+  "checks": 30,
+  "failures": [],
+  "passed": true,
+  "godot": "4.4.1-stable (official)",
+  "leaf_glb_sha256": "04076072adb9fefefc8e751d97e63341fc95900a624fc713b3be3e5916cef787",
+  "closed_capture_sha256": "27442f55018f907b1f442fc2f93c6bb7a23dc09c312b66fb9b63acae8fde9927",
+  "open_capture_sha256": "81fb8210192c9594f2554c11ff0dfe7d3aab9bbae6251d8b3bf1d7450210c10e",
+  "resolution": [1280, 720],
+  "changed_pixels": 189318,
+  "renderer": "Forward Mobile / Vulkan / llvmpipe / Xvfb",
+  "scope": "Godot structural, physics motion and graphical capture; no Three.js A/B yet"
+}

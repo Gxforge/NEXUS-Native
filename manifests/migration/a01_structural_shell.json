@@ -1,0 +1,20 @@
+{
+  "asset_id":"a01_structural_shell","generator_version":1,
+  "source_commit":"f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "source_files":["src/scene/Environment.ts","src/scene/Sectors.ts"],
+  "coordinate_frame":{"world_origin":[-9,0,-14],"local_from_world":"x+9, y, z+14","units":"meters"},
+  "boxes":[
+    {"name":"floor","center":[-9,-0.035,-12],"size":[36,0.07,24],"material":"floor"},
+    {"name":"ceiling","center":[-9,9.2,-12],"size":[36,0.4,24],"material":"concrete"},
+    {"name":"west_wall","center":[-27,4.6,-12],"size":[0.5,9.2,24],"material":"concrete"},
+    {"name":"east_partition","center":[9,4.5,-12],"size":[0.45,9,24],"material":"concrete"},
+    {"name":"back_wall","center":[-9,4.6,-24],"size":[36,9.2,0.5],"material":"concrete"},
+    {"name":"front_wall_west","center":[-14.6,4.6,0],"size":[24.8,9.2,0.6],"material":"concrete"},
+    {"name":"front_wall_east","center":[5.6,4.6,0],"size":[6.8,9.2,0.6],"material":"concrete"}
+  ],
+  "materials":{
+    "floor":{"base_color":"#202323","metallic":0.18,"roughness":0.72},
+    "concrete":{"base_color":"#515957","metallic":0.12,"roughness":0.70}
+  },
+  "expected_bounds":{"min":[-27.25,-0.07,-24.25],"max":[9.225,9.4,0.3]}
+}

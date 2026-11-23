@@ -1,0 +1,13 @@
+{
+  "checks": 46,
+  "failures": [],
+  "passed": true,
+  "godot": "4.4.1-stable (official)",
+  "a01": {"boxes": 7, "mesh_nodes": 1, "aabb_m": [36.475, 9.47, 24.55], "sha256": "ffa686f12c393f237716491e31ef29b4673cc80a73f89b1ce78444c69c1c2dc0"},
+  "c04": {"boxes": 10, "mesh_nodes": 1, "aabb_m": [72.6, 9.47, 84.55], "sha256": "a2ed2e75957b9c07e285f35d80a31b9a41f69eae0c10baa8534bd54e2a792d47"},
+  "captures": {
+    "c04": "29db59e05b8a40844ea075fd76f392bea2a801c409907f9264572377448cb313",
+    "a01": "c7c9b541a1f0c76016996876df1b3c395dd53db5d3ea3bdcc99ce75b8129ca33"
+  },
+  "open_issue": "Standalone graphical capture exits with one RefCounted ObjectDB warning; zone WeakRef release test passes."
+}

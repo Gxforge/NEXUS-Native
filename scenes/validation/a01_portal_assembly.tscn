@@ -1,0 +1,59 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/zones/streaming_sector_door.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/generated/a01_portal_frame.glb" id="2"]
+[ext_resource type="PackedScene" path="res://assets/generated/a01_door_leaf.glb" id="3"]
+[sub_resource type="BoxShape3D" id="LeafCollision"]
+size = Vector3(2.19, 4.3, 0.35)
+[sub_resource type="BoxShape3D" id="LintelCollision"]
+size = Vector3(4.4, 4.8, 0.6)
+[sub_resource type="BoxShape3D" id="ProximityShape"]
+size = Vector3(6.8, 3.6, 8)
+[sub_resource type="BoxShape3D" id="ThresholdShape"]
+size = Vector3(4.4, 3.6, 0.5)
+
+[node name="A01PortalAssembly" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Frame" parent="." instance=ExtResource("2")]
+
+[node name="FrameCollision" type="StaticBody3D" parent="."]
+[node name="Lintel" type="CollisionShape3D" parent="FrameCollision"]
+position = Vector3(0, 6.8, 0)
+shape = SubResource("LintelCollision")
+
+[node name="LeftLeaf" type="AnimatableBody3D" parent="."]
+position = Vector3(-1.1, 2.15, 0)
+sync_to_physics = true
+[node name="Visual" parent="LeftLeaf" instance=ExtResource("3")]
+[node name="Collision" type="CollisionShape3D" parent="LeftLeaf"]
+shape = SubResource("LeafCollision")
+
+[node name="RightLeaf" type="AnimatableBody3D" parent="."]
+position = Vector3(1.1, 2.15, 0)
+sync_to_physics = true
+[node name="Visual" parent="RightLeaf" instance=ExtResource("3")]
+[node name="Collision" type="CollisionShape3D" parent="RightLeaf"]
+shape = SubResource("LeafCollision")
+
+[node name="ProximitySensor" type="Area3D" parent="."]
+monitoring = false
+collision_layer = 0
+collision_mask = 1
+[node name="Collision" type="CollisionShape3D" parent="ProximitySensor"]
+position = Vector3(0, 1.8, 0)
+shape = SubResource("ProximityShape")
+
+[node name="TransitionThreshold" type="Area3D" parent="."]
+monitoring = false
+collision_layer = 0
+collision_mask = 1
+[node name="Collision" type="CollisionShape3D" parent="TransitionThreshold"]
+position = Vector3(0, 1.8, 0)
+shape = SubResource("ThresholdShape")
+
+[node name="DoorSockets" type="Node3D" parent="."]
+[node name="containment" type="Marker3D" parent="DoorSockets"]
+position = Vector3(0, 1.1, 1.2)
+[node name="archive" type="Marker3D" parent="DoorSockets"]
+position = Vector3(0, 1.1, -1.2)

@@ -1,0 +1,9 @@
+{
+  "asset": "assets/generated/a01_portal_frame.glb",
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "sha256": "b1064b599127b3be8253844ac1190b134209b4440e9f58982ff6c977c29f468a",
+  "boxes": 8,
+  "materials": 3,
+  "bytes": 8208,
+  "deterministic_repeat": true
+}

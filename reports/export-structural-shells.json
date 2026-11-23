@@ -1,0 +1,8 @@
+{
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "coordinate_origin_world": [-9, 0, -14],
+  "assets": [
+    {"id":"a01_structural_shell","boxes":7,"materials":2,"bytes":6848,"sha256":"ffa686f12c393f237716491e31ef29b4673cc80a73f89b1ce78444c69c1c2dc0"},
+    {"id":"c04_structural_shell","boxes":10,"materials":2,"bytes":9020,"sha256":"a2ed2e75957b9c07e285f35d80a31b9a41f69eae0c10baa8534bd54e2a792d47"}
+  ]
+}

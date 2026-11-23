@@ -1,0 +1,35 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="2"]
+[sub_resource type="BoxMesh" id="FloorMesh"]
+size = Vector3(12, 0.2, 12)
+[sub_resource type="BoxShape3D" id="FloorShape"]
+size = Vector3(12, 0.2, 12)
+[sub_resource type="StandardMaterial3D" id="FloorMaterial"]
+albedo_color = Color(0.08, 0.15, 0.19, 1)
+metallic = 0.4
+roughness = 0.55
+[node name="C04Synthetic" type="Node3D"]
+script = ExtResource("1")
+zone_id = &"c04"
+[node name="Floor" type="StaticBody3D" parent="."]
+[node name="Mesh" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("FloorMesh")
+material_override = SubResource("FloorMaterial")
+[node name="Collision" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("FloorShape")
+[node name="DoorSockets" type="Node3D" parent="."]
+[node name="entry" type="Marker3D" parent="DoorSockets"]
+position = Vector3(0, 1.1, 2)
+[node name="to_a01" type="Marker3D" parent="DoorSockets"]
+position = Vector3(0, 1.1, -4.5)
+[node name="PortalA01" parent="." instance=ExtResource("2")]
+position = Vector3(0, 0, -5)
+target_zone = &"a01"
+target_socket = &"from_c04"
+[node name="LocalLight" type="OmniLight3D" parent="."]
+position = Vector3(0, 4, 0)
+omni_range = 12.0
+light_color = Color(0.35, 0.65, 1, 1)
+light_energy = 3.0

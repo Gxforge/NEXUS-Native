@@ -1,0 +1,23 @@
+{
+  "asset_id":"c04_structural_shell","generator_version":1,
+  "source_commit":"f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "source_files":["src/scene/Environment.ts","src/scene/Sectors.ts"],
+  "coordinate_frame":{"world_origin":[-9,0,-14],"local_from_world":"x+9, y, z+14","units":"meters"},
+  "boxes":[
+    {"name":"floor","center":[9,-0.035,42],"size":[72,0.07,84],"material":"floor"},
+    {"name":"ceiling","center":[9,9.2,42],"size":[72.6,0.4,84],"material":"concrete"},
+    {"name":"west_wall","center":[-27,4.6,42],"size":[0.5,9.2,84],"material":"concrete"},
+    {"name":"east_wall","center":[45,4.6,42],"size":[0.5,9.2,84],"material":"concrete"},
+    {"name":"divider_west","center":[-14.6,4.6,0],"size":[24.8,9.2,0.6],"material":"concrete"},
+    {"name":"divider_middle","center":[9,4.6,0],"size":[13.6,9.2,0.6],"material":"concrete"},
+    {"name":"divider_east","center":[32.6,4.6,0],"size":[24.8,9.2,0.6],"material":"concrete"},
+    {"name":"transit_wall_west","center":[-11.1,4.6,84],"size":[32.2,9.2,0.5],"material":"concrete"},
+    {"name":"transit_wall_east","center":[29.1,4.6,84],"size":[32.2,9.2,0.5],"material":"concrete"},
+    {"name":"transit_header","center":[9,7.34,84],"size":[8,3.72,0.5],"material":"concrete"}
+  ],
+  "materials":{
+    "floor":{"base_color":"#202323","metallic":0.18,"roughness":0.72},
+    "concrete":{"base_color":"#515957","metallic":0.12,"roughness":0.70}
+  },
+  "expected_bounds":{"min":[-27.3,-0.07,-0.3],"max":[45.3,9.4,84.25]}
+}

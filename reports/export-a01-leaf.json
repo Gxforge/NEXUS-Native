@@ -1,0 +1,11 @@
+{
+  "asset": "assets/generated/a01_door_leaf.glb",
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "sha256": "04076072adb9fefefc8e751d97e63341fc95900a624fc713b3be3e5916cef787",
+  "boxes": 4,
+  "materials": 3,
+  "bytes": 5296,
+  "closed_centers_x": [-1.1, 1.1],
+  "open_centers_x": [-3.27, 3.27],
+  "travel_per_leaf": 2.17
+}

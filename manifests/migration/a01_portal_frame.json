@@ -1,0 +1,25 @@
+{
+  "asset_id": "a01_portal_frame",
+  "generator_version": 1,
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "source_file": "src/scene/Sectors.ts",
+  "source_feature": "A/01 portal frame at world x=-9, z=-14",
+  "units": "meters",
+  "origin_world": [-9.0, 0.0, -14.0],
+  "boxes": [
+    {"name":"lintel","center":[0.0,6.8,0.0],"size":[4.4,4.8,0.6],"material":"concrete"},
+    {"name":"cross_trim","center":[0.0,4.47,0.0],"size":[4.9,0.34,1.0],"material":"trim"},
+    {"name":"post_left","center":[-2.29,2.2,0.0],"size":[0.24,4.4,0.9],"material":"trim"},
+    {"name":"post_right","center":[2.29,2.2,0.0],"size":[0.24,4.4,0.9],"material":"trim"},
+    {"name":"stripe_left_front","center":[-2.28,2.3,0.52],"size":[0.09,3.7,0.06],"material":"yellow"},
+    {"name":"stripe_left_back","center":[-2.28,2.3,-0.52],"size":[0.09,3.7,0.06],"material":"yellow"},
+    {"name":"stripe_right_front","center":[2.28,2.3,0.52],"size":[0.09,3.7,0.06],"material":"yellow"},
+    {"name":"stripe_right_back","center":[2.28,2.3,-0.52],"size":[0.09,3.7,0.06],"material":"yellow"}
+  ],
+  "materials": {
+    "concrete": {"base_color":"#515957","metallic":0.12,"roughness":0.70},
+    "trim": {"base_color":"#7b8581","metallic":0.60,"roughness":0.44},
+    "yellow": {"base_color":"#d59839","metallic":0.12,"roughness":0.70}
+  },
+  "expected_aabb": {"min":[-2.45,0.0,-0.55],"max":[2.45,9.2,0.55]}
+}

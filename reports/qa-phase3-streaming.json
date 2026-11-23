@@ -1,0 +1,12 @@
+{
+  "checks": 38,
+  "failures": [],
+  "passed": true,
+  "godot": "4.4.1-stable (official)",
+  "flow": ["approach", "threaded_preload", "open", "cross", "instantiate", "transfer", "deactivate", "free"],
+  "sensor_footprint_m": [6.8, 8.0],
+  "threshold_width_m": 4.4,
+  "round_trip": ["c04", "a01", "c04"],
+  "active_zones_after_transition": 1,
+  "scope": "headless streaming and lifecycle validation"
+}
