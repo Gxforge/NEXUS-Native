@@ -22,9 +22,10 @@ def main()->None:
     }
     for manifest,output in manifest_outputs.items():run(PY,'tools/export_nexus_geometry.py',manifest,output)
     run(PY,'tools/export_w01_core.py')
-    outputs=[*(ROOT/p for p in manifest_outputs.values()),ROOT/'assets/generated/w01_core.glb',*sorted((ROOT/'assets/generated/textures').glob('*.png'))]
+    run(PY,'tools/export_w01_eyes.py')
+    outputs=[*(ROOT/p for p in manifest_outputs.values()),ROOT/'assets/generated/w01_core.glb',ROOT/'assets/generated/w01_eyes.glb',*sorted((ROOT/'assets/generated/textures').glob('*.png'))]
     inventory=json.loads((ROOT/'reports/model-inventory.json').read_text())
-    covered={'src/scene/Sectors.ts','src/scene/Infrastructure.ts','src/scene/Head.ts','src/scene/Monster.ts','src/scene/materials.ts'}
+    covered={'src/scene/Sectors.ts','src/scene/Infrastructure.ts','src/scene/Head.ts','src/scene/Monster.ts','src/scene/materials.ts','src/scene/EyeSystem.ts','src/scene/OcularSurface.ts'}
     source_files=[x['source_file'] for x in inventory['files']]
     report={
       'schema':1,'source_commit':'f4e1e819a9c783374e79dbc99cde4597099aba11',

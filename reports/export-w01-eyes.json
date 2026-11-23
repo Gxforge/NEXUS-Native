@@ -1,0 +1,15 @@
+{
+  "bytes": 487628,
+  "embedded_textures": 1,
+  "eyes": 7,
+  "limitations": [
+    "vein tubes deferred to dynamic Godot rig",
+    "lids exported in open baseline; runtime blink deformation pending"
+  ],
+  "nodes": 64,
+  "output": "assets/generated/w01_eyes.glb",
+  "sha256": "deae609e2528c64dc1c8a6280456d5da84349d82253e9b636ff556e4b116c40e",
+  "shared_meshes": 8,
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "visible_mesh_instances": 56
+}

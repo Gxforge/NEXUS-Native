@@ -1,13 +1,15 @@
 {
   "command": "python3 tools/export_all_assets.py",
   "coverage": {
-    "implemented_source_files": 5,
+    "implemented_source_files": 7,
     "inventoried_source_files": 28
   },
   "implemented_source_files": [
+    "src/scene/EyeSystem.ts",
     "src/scene/Head.ts",
     "src/scene/Infrastructure.ts",
     "src/scene/Monster.ts",
+    "src/scene/OcularSurface.ts",
     "src/scene/Sectors.ts",
     "src/scene/materials.ts"
   ],
@@ -38,6 +40,11 @@
       "sha256": "ff3ea58a51617fb6c45d983efce3994fb1248de05a7ab7a81bc0a76ec151cb8d"
     },
     {
+      "bytes": 487628,
+      "path": "assets/generated/w01_eyes.glb",
+      "sha256": "deae609e2528c64dc1c8a6280456d5da84349d82253e9b636ff556e4b116c40e"
+    },
+    {
       "bytes": 93154,
       "path": "assets/generated/textures/nexus_floor.png",
       "sha256": "a387b19570342bc1561ea4da7b22bdec3b5363d5c61fb2d4cc2f5706496bdd1b"
@@ -59,11 +66,9 @@
     "src/scene/Displays.ts",
     "src/scene/Effects.ts",
     "src/scene/Environment.ts",
-    "src/scene/EyeSystem.ts",
     "src/scene/Glove.ts",
     "src/scene/Instruments.ts",
     "src/scene/Larva.ts",
-    "src/scene/OcularSurface.ts",
     "src/scene/Operations.ts",
     "src/scene/Operator.ts",
     "src/scene/SceneExperience.ts",
