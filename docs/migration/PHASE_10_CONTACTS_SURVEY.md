@@ -6,4 +6,6 @@ Se inició la sustitución funcional de `Contacts.ts` y `Survey.ts`:
 - `SurveySystem` proyecta un rayo desde Camera3D, obtiene metadatos del objetivo, evita registros duplicados y emite `target_scanned`.
 - `GameState` conserva snapshots profundos de los registros para sobrevivir cambios de zona.
 
-La QA valida rechazo de rayos inválidos, identidad, zona, deduplicación y restauración persistente. Faltan el resaltado visual de barrido y los ContactFX de gas/impacto; por ello esta fase no marca ambos módulos como completamente migrados.
+`SurveyHighlight` añade un material overlay aditivo con banda de barrido y retícula, avanza durante un tiempo configurable y restaura exactamente el material overlay anterior al finalizar. `SurveySystem` puede conectarlo al objetivo físico detectado.
+
+La QA valida rechazo de rayos inválidos, identidad, zona, deduplicación, restauración persistente, aplicación temporal del resaltado y restauración del material. Faltan los ContactFX de gas/impacto y la integración final con controles/UI; por ello esta fase no marca ambos módulos como completamente migrados.

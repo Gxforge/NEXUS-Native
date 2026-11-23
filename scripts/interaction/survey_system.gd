@@ -7,6 +7,10 @@ signal target_scanned(record: Dictionary)
 @export_flags_3d_physics var collision_mask: int = 0xFFFFFFFF
 
 var records: Array[Dictionary] = []
+var highlighter: SurveyHighlight
+
+func attach_highlighter(value: SurveyHighlight) -> void:
+	highlighter = value
 
 func scan_from_camera(camera: Camera3D, viewport_position: Vector2) -> Dictionary:
 	if camera == null or camera.get_world_3d() == null:
@@ -19,6 +23,8 @@ func scan_from_camera(camera: Camera3D, viewport_position: Vector2) -> Dictionar
 	var collider: Object = hit.get("collider") as Object
 	if not collider is Node:
 		return {}
+	if highlighter != null and collider is GeometryInstance3D:
+		highlighter.begin(collider as GeometryInstance3D)
 	return register_target(collider as Node, hit.get("position", Vector3.ZERO) as Vector3)
 
 func register_target(target: Node, position: Vector3 = Vector3.ZERO) -> Dictionary:
