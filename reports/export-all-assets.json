@@ -1,0 +1,83 @@
+{
+  "command": "python3 tools/export_all_assets.py",
+  "coverage": {
+    "implemented_source_files": 5,
+    "inventoried_source_files": 28
+  },
+  "implemented_source_files": [
+    "src/scene/Head.ts",
+    "src/scene/Infrastructure.ts",
+    "src/scene/Monster.ts",
+    "src/scene/Sectors.ts",
+    "src/scene/materials.ts"
+  ],
+  "outputs": [
+    {
+      "bytes": 8208,
+      "path": "assets/generated/a01_portal_frame.glb",
+      "sha256": "b1064b599127b3be8253844ac1190b134209b4440e9f58982ff6c977c29f468a"
+    },
+    {
+      "bytes": 5296,
+      "path": "assets/generated/a01_door_leaf.glb",
+      "sha256": "04076072adb9fefefc8e751d97e63341fc95900a624fc713b3be3e5916cef787"
+    },
+    {
+      "bytes": 6848,
+      "path": "assets/generated/a01_structural_shell.glb",
+      "sha256": "ffa686f12c393f237716491e31ef29b4673cc80a73f89b1ce78444c69c1c2dc0"
+    },
+    {
+      "bytes": 9020,
+      "path": "assets/generated/c04_structural_shell.glb",
+      "sha256": "a2ed2e75957b9c07e285f35d80a31b9a41f69eae0c10baa8534bd54e2a792d47"
+    },
+    {
+      "bytes": 1485960,
+      "path": "assets/generated/w01_core.glb",
+      "sha256": "ff3ea58a51617fb6c45d983efce3994fb1248de05a7ab7a81bc0a76ec151cb8d"
+    },
+    {
+      "bytes": 93154,
+      "path": "assets/generated/textures/nexus_floor.png",
+      "sha256": "a387b19570342bc1561ea4da7b22bdec3b5363d5c61fb2d4cc2f5706496bdd1b"
+    },
+    {
+      "bytes": 154481,
+      "path": "assets/generated/textures/nexus_iris.png",
+      "sha256": "02c11ce7caac41cdf27b083ea4a5c03be8e8cda22d4f1f689e3792d6001e3bbb"
+    },
+    {
+      "bytes": 880028,
+      "path": "assets/generated/textures/nexus_skin.png",
+      "sha256": "6f919e8c4db4cab2abb0b25cfddf33947f75380ee515a4941ba01ac450629588"
+    }
+  ],
+  "pending_source_files": [
+    "src/scene/BenchCycle.ts",
+    "src/scene/Contacts.ts",
+    "src/scene/Displays.ts",
+    "src/scene/Effects.ts",
+    "src/scene/Environment.ts",
+    "src/scene/EyeSystem.ts",
+    "src/scene/Glove.ts",
+    "src/scene/Instruments.ts",
+    "src/scene/Larva.ts",
+    "src/scene/OcularSurface.ts",
+    "src/scene/Operations.ts",
+    "src/scene/Operator.ts",
+    "src/scene/SceneExperience.ts",
+    "src/scene/Survey.ts",
+    "src/scene/TelemetryScreen.ts",
+    "src/scene/Tentacles.ts",
+    "src/scene/Touch.ts",
+    "src/scene/Transit.ts",
+    "src/scene/Vault.ts",
+    "src/scene/Workshop.ts",
+    "src/scene/ZoneCache.ts",
+    "src/vehicle/Cockpit.ts",
+    "src/vehicle/VehicleModel.ts"
+  ],
+  "schema": 1,
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11"
+}
