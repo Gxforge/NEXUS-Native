@@ -6,6 +6,6 @@
   ],
   "nodes": 6,
   "output": "assets/generated/environment.glb",
-  "sha256": "30669109b8edff9ab509c6b3618b61f18dfb4f37fc2d7fdcb0882a8fe090182e",
+  "sha256": "4c8b54cecf46c896b2317962bc5de328ff5f4dda6252a10f16f97f5428f7ed8f",
   "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11"
 }

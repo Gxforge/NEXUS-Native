@@ -26,9 +26,10 @@ def main()->None:
     run(PY,'tools/export_w01_tentacles.py')
     run(PY,'tools/export_operator.py')
     run(PY,'tools/export_environment.py')
-    outputs=[*(ROOT/p for p in manifest_outputs.values()),ROOT/'assets/generated/w01_core.glb',ROOT/'assets/generated/w01_eyes.glb',ROOT/'assets/generated/w01_tentacles.glb',ROOT/'assets/generated/operator.glb',ROOT/'assets/generated/environment.glb',*sorted((ROOT/'assets/generated/textures').glob('*.png'))]
+    run(PY,'tools/export_source_batch.py')
+    outputs=[*(ROOT/p for p in manifest_outputs.values()),ROOT/'assets/generated/w01_core.glb',ROOT/'assets/generated/w01_eyes.glb',ROOT/'assets/generated/w01_tentacles.glb',ROOT/'assets/generated/operator.glb',ROOT/'assets/generated/environment.glb',*sorted((ROOT/'assets/generated/source-batch').glob('*.glb')),*sorted((ROOT/'assets/generated/textures').glob('*.png'))]
     inventory=json.loads((ROOT/'reports/model-inventory.json').read_text())
-    covered={'src/scene/Sectors.ts','src/scene/Infrastructure.ts','src/scene/Head.ts','src/scene/Monster.ts','src/scene/materials.ts','src/scene/EyeSystem.ts','src/scene/OcularSurface.ts','src/scene/Tentacles.ts','src/scene/Operator.ts','src/scene/Environment.ts'}
+    covered={'src/scene/Sectors.ts','src/scene/Infrastructure.ts','src/scene/Head.ts','src/scene/Monster.ts','src/scene/materials.ts','src/scene/EyeSystem.ts','src/scene/OcularSurface.ts','src/scene/Tentacles.ts','src/scene/Operator.ts','src/scene/Environment.ts','src/scene/Workshop.ts','src/scene/Vault.ts','src/scene/Transit.ts','src/scene/Larva.ts','src/scene/Instruments.ts','src/vehicle/VehicleModel.ts'}
     source_files=[x['source_file'] for x in inventory['files']]
     report={
       'schema':1,'source_commit':'f4e1e819a9c783374e79dbc99cde4597099aba11',

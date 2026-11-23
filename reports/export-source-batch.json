@@ -1,0 +1,57 @@
+{
+  "assets": [
+    {
+      "bytes": 550164,
+      "path": "assets/generated/source-batch/instrument_0.glb",
+      "sha256": "4164b5e457f9413e6ceddd16ba0fa66b8b28de7999f7ff43a7a56e6bdbcc69e1"
+    },
+    {
+      "bytes": 582492,
+      "path": "assets/generated/source-batch/instrument_1.glb",
+      "sha256": "a063c760d3711283acb4805fe1500303774eb4a51c6f1dbc7c0fb0435e48d026"
+    },
+    {
+      "bytes": 517568,
+      "path": "assets/generated/source-batch/instrument_2.glb",
+      "sha256": "5c61a4374d31b5764880f330a61732fd7e5906543c2ada8bf7e793c410922643"
+    },
+    {
+      "bytes": 12311504,
+      "path": "assets/generated/source-batch/larva_0.glb",
+      "sha256": "36b514a708b2dad6fe4aebcb85fd9d65ac94df59ff525c6cdff133b78031a718"
+    },
+    {
+      "bytes": 13054768,
+      "path": "assets/generated/source-batch/larva_1.glb",
+      "sha256": "1990ea8e7d90533f12d372be6a07317dc4cafb2e5d230adbc14713988b4ebc3c"
+    },
+    {
+      "bytes": 13797980,
+      "path": "assets/generated/source-batch/larva_2.glb",
+      "sha256": "55c8137c699e86a05e80790d38ca3288c330fd0c6ad2ea62f64c9f497522d225"
+    },
+    {
+      "bytes": 7450320,
+      "path": "assets/generated/source-batch/transit.glb",
+      "sha256": "5526d16abbd08c0fe7e987c3ea03799f2fb8036a2cbc1a93578b044fc6c0b9ab"
+    },
+    {
+      "bytes": 5324228,
+      "path": "assets/generated/source-batch/vault.glb",
+      "sha256": "23727c2991170b830c466d99c6ec9bd0790681ef610360693f0ab025f09e58ce"
+    },
+    {
+      "bytes": 1832864,
+      "path": "assets/generated/source-batch/vehicle.glb",
+      "sha256": "e27e284fb2d1348b27273082cc9fe637810816ce88f61f870894f432965a486f"
+    },
+    {
+      "bytes": 40130884,
+      "path": "assets/generated/source-batch/workshop_pods.glb",
+      "sha256": "7269593754cf0d29e0a103c7321d83e6a667da43819d0caa18f9b500ef09fc9d"
+    }
+  ],
+  "method": "original TypeScript constructors bundled with esbuild; runtime canvas maps stripped because dynamic CanvasTexture must be native Godot UI/material work",
+  "schema": 1,
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11"
+}
