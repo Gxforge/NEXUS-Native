@@ -33,7 +33,7 @@ try{assets.push(["telemetry_screen",new TelemetryScreen().face])}catch(e){consol
 try{const g=new T.Group();new Display(g,0,0,0,1,.5);assets.push(["display",g])}catch(e){console.error("Display",e)}
 try{const g=new T.Group();new Cockpit(g);assets.push(["cockpit",g])}catch(e){console.error("Cockpit",e)}
 try{const camera=new T.PerspectiveCamera();new Touch(camera);camera.traverse(o=>o.visible=true);assets.push(["touch_rig_assets",camera])}catch(e){console.error("Touch",e)}
-try{assets.push(["laboratory_all_sectors",pick(new Sectors())])}catch(e){console.error("Sectors",e)}
+try{const s:any=new Sectors();for(const [key,label] of [["transit","Transit"],["portals","ZoneGates"],["files","Files"],["vault","Vault"],["facility","Facility"],["ops","Operations"],["assay","AssayBench"],["dock","ChargeBench"]]){const v=s[key];const r=v?.group??v?.root;if(r)r.name=label}assets.push(["laboratory_all_sectors",pick(s)])}catch(e){console.error("Sectors",e)}
 const out="/home/user/NEXUS-Native-audit/assets/generated/source-batch";await import("node:fs").then(fs=>fs.mkdirSync(out,{recursive:true}));
 const exporter=new GLTFExporter();const report:any[]=[];
 for(const [name,root] of assets){root.traverse((o:any)=>{if(o.material){for(const m of (Array.isArray(o.material)?o.material:[o.material])){m.map=null;m.bumpMap=null;m.normalMap=null;m.alphaMap=null;m.emissiveMap=null}}});const data:any=await exporter.parseAsync(root,{binary:true,onlyVisible:false});const buf=Buffer.from(data);await import("node:fs").then(fs=>fs.writeFileSync(`${out}/${name}.glb`,buf));let meshes=0;root.traverse((o:any)=>{if(o.isMesh)meshes++});report.push({name,bytes:buf.length,meshes})}

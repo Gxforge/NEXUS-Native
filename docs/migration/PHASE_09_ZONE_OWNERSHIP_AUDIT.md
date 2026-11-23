@@ -14,4 +14,14 @@ Se aplicaron directamente los ocho límites espaciales originales de `ZoneCache.
 | Vigilancia | 267 | 201.262 |
 | Compartido/sin asignar | 805 | 308.839 |
 
-La categoría compartida exige clasificación jerárquica adicional; no puede repartirse por centro geométrico sin riesgo de romper mecanismos. El script `qa/audit_zone_partition.gd` regenera `reports/zone-partition-audit.json` y no modifica el GLB fuente.
+La categoría compartida exige clasificación jerárquica adicional; no puede repartirse por centro geométrico sin riesgo de romper mecanismos. El exportador ahora conserva nombres para las raíces funcionales. La segunda auditoría identificó:
+
+- `Transit`: 498 mallas compartidas.
+- `ZoneGates`: 56 mallas de conexiones.
+- `Vault`: 29 mallas fuera de un único límite.
+- `Facility`: 11 mallas comunes.
+- `Operations`: 9 mallas comunes.
+- 202 mallas todavía anónimas.
+- 37 mallas cuya AABB cruza más de una zona.
+
+`Transit` y `ZoneGates` no deben cortarse como estáticos por centro: requieren escenas controladoras con transferencia/estado. Las 37 AABB multizona deben revisarse como conexiones o geometría fronteriza. El script `qa/audit_zone_partition.gd` regenera `reports/zone-partition-audit.json` y no modifica el GLB fuente.

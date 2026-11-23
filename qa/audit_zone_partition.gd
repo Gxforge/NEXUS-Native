@@ -28,6 +28,8 @@ func _init() -> void:
 		vertices[zone.id] = 0
 	counts["shared_or_unassigned"] = 0
 	vertices["shared_or_unassigned"] = 0
+	var shared_branches: Dictionary = {}
+	var multi_zone_meshes: int = 0
 	var stack: Array[Node] = [root]
 	while not stack.is_empty():
 		var node: Node = stack.pop_back()
@@ -37,6 +39,12 @@ func _init() -> void:
 			var center: Vector3 = world_box.get_center()
 			var zone_id: String = _zone_for(center)
 			counts[zone_id] += 1
+			var overlaps: Array[String] = _overlapping_zones(world_box)
+			if overlaps.size() > 1:
+				multi_zone_meshes += 1
+			if zone_id == "shared_or_unassigned":
+				var branch_name: String = _root_branch(instance, root)
+				shared_branches[branch_name] = int(shared_branches.get(branch_name, 0)) + 1
 			var mesh_vertices: int = 0
 			if instance.mesh != null:
 				for surface_index: int in instance.mesh.get_surface_count():
@@ -46,6 +54,13 @@ func _init() -> void:
 			vertices[zone_id] += mesh_vertices
 		for child: Node in node.get_children():
 			stack.push_back(child)
+	var functional_shared: Dictionary = {}
+	var anonymous_shared: int = 0
+	for branch_name: String in shared_branches:
+		if branch_name.begins_with("Node") or branch_name.begins_with("Mesh"):
+			anonymous_shared += int(shared_branches[branch_name])
+		else:
+			functional_shared[branch_name] = shared_branches[branch_name]
 	var report: Dictionary = {
 		"schema": 1,
 		"source": "assets/generated/source-batch/laboratory_all_sectors.glb",
@@ -53,6 +68,10 @@ func _init() -> void:
 		"classification": "world-space AABB center against original ZoneCache bounds",
 		"mesh_instances": counts,
 		"vertices": vertices,
+		"shared_by_root_branch": shared_branches,
+		"functional_shared_branches": functional_shared,
+		"anonymous_shared_meshes": anonymous_shared,
+		"multi_zone_meshes": multi_zone_meshes,
 		"warning": "This is an ownership audit only; functional parent hierarchies must be retained during export."
 	}
 	var file: FileAccess = FileAccess.open("res://reports/zone-partition-audit.json", FileAccess.WRITE)
@@ -61,6 +80,22 @@ func _init() -> void:
 	print(JSON.stringify(report))
 	root.queue_free()
 	quit(0)
+
+func _root_branch(node: Node, root: Node) -> String:
+	var branch: Node = node
+	while branch.get_parent() != null and branch.get_parent().get_parent() != root:
+		branch = branch.get_parent()
+	return str(branch.name)
+
+func _overlapping_zones(box: AABB) -> Array[String]:
+	var result: Array[String] = []
+	var end: Vector3 = box.end
+	for zone: Dictionary in ZONES:
+		var lower: Vector2 = zone.min
+		var upper: Vector2 = zone.max
+		if end.x >= lower.x and box.position.x <= upper.x and end.z >= lower.y and box.position.z <= upper.y:
+			result.append(zone.id)
+	return result
 
 func _zone_for(point: Vector3) -> String:
 	for zone: Dictionary in ZONES:
