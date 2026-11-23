@@ -1,5 +1,5 @@
 extends SceneTree
-const ASSETS: Array[String] = ["workshop_pods", "vault", "transit", "larva_0", "larva_1", "larva_2", "instrument_0", "instrument_1", "instrument_2", "vehicle"]
+const ASSETS: Array[String] = ["workshop_pods", "vault", "transit", "larva_0", "larva_1", "larva_2", "instrument_0", "instrument_1", "instrument_2", "vehicle", "effects", "glove_press", "glove_drawer", "glove_grip", "glove_lamp", "glove_flat", "glove_round", "glove_box", "telemetry_screen", "display", "cockpit", "touch_rig_assets"]
 func _init() -> void:
 	var results: Dictionary = {}
 	var passed: bool = true

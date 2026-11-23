@@ -9,6 +9,7 @@ def main():
  nm=Path('/tmp/node_modules');
  if nm.is_symlink() or nm.exists(): nm.unlink()
  nm.symlink_to(SRC/'node_modules',target_is_directory=True)
+ for stale in OUT.glob('*.glb'): stale.unlink()
  subprocess.run(['node','/tmp/nexus-mass.mjs'],check=True)
  assets=[]
  for p in sorted(OUT.glob('*.glb')):assets.append({'path':p.relative_to(ROOT).as_posix(),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})

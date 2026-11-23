@@ -1,12 +1,15 @@
 {
   "command": "python3 tools/export_all_assets.py",
   "coverage": {
-    "implemented_source_files": 16,
+    "implemented_source_files": 22,
     "inventoried_source_files": 28
   },
   "implemented_source_files": [
+    "src/scene/Displays.ts",
+    "src/scene/Effects.ts",
     "src/scene/Environment.ts",
     "src/scene/EyeSystem.ts",
+    "src/scene/Glove.ts",
     "src/scene/Head.ts",
     "src/scene/Infrastructure.ts",
     "src/scene/Instruments.ts",
@@ -15,11 +18,14 @@
     "src/scene/OcularSurface.ts",
     "src/scene/Operator.ts",
     "src/scene/Sectors.ts",
+    "src/scene/TelemetryScreen.ts",
     "src/scene/Tentacles.ts",
+    "src/scene/Touch.ts",
     "src/scene/Transit.ts",
     "src/scene/Vault.ts",
     "src/scene/Workshop.ts",
     "src/scene/materials.ts",
+    "src/vehicle/Cockpit.ts",
     "src/vehicle/VehicleModel.ts"
   ],
   "outputs": [
@@ -69,6 +75,56 @@
       "sha256": "4c8b54cecf46c896b2317962bc5de328ff5f4dda6252a10f16f97f5428f7ed8f"
     },
     {
+      "bytes": 1476,
+      "path": "assets/generated/source-batch/cockpit.glb",
+      "sha256": "c2640bb3c496e30fa6ef32ea7e4be85cca6733edff9c5601dae148099bd19ff6"
+    },
+    {
+      "bytes": 1316,
+      "path": "assets/generated/source-batch/display.glb",
+      "sha256": "7508064d4bf9d4012a588244df30ca2d8d17f457b8050664d2e55662c30464e5"
+    },
+    {
+      "bytes": 2844,
+      "path": "assets/generated/source-batch/effects.glb",
+      "sha256": "4441a5d3f536be9b2a7da73248328b98eb6d2c60a72bd06ebdf17202dced8766"
+    },
+    {
+      "bytes": 856400,
+      "path": "assets/generated/source-batch/glove_box.glb",
+      "sha256": "e6826b0cc4d1f4543ca90a027b59fa4df85f55995553e13cce144728832fb739"
+    },
+    {
+      "bytes": 874840,
+      "path": "assets/generated/source-batch/glove_drawer.glb",
+      "sha256": "6c111a5c9667615030ad797b7531f21ef27104ee8310b1d642121ddc2011a374"
+    },
+    {
+      "bytes": 759632,
+      "path": "assets/generated/source-batch/glove_flat.glb",
+      "sha256": "9108e140f94d5e1003c36022b253e623d74948abd745fc90c5b4b65465458e08"
+    },
+    {
+      "bytes": 691812,
+      "path": "assets/generated/source-batch/glove_grip.glb",
+      "sha256": "f5ea066ef4c32b6f5cd06bac4146ba7bb4b5d4727c5ba32774a218c22fc93e3b"
+    },
+    {
+      "bytes": 595044,
+      "path": "assets/generated/source-batch/glove_lamp.glb",
+      "sha256": "f711b55777e32fdc8830d6c11bf47ac73b636275f42639f3d879e01825944c61"
+    },
+    {
+      "bytes": 874840,
+      "path": "assets/generated/source-batch/glove_press.glb",
+      "sha256": "a5c65c4f7c220830c22c9d62d3f85d86c887574860f7e4a03c3c8e28679614ce"
+    },
+    {
+      "bytes": 856400,
+      "path": "assets/generated/source-batch/glove_round.glb",
+      "sha256": "87a4da9477314c281f19c0e2a5a1413acbb9f21d59d1a9d61c0d84ff189a04cb"
+    },
+    {
       "bytes": 550164,
       "path": "assets/generated/source-batch/instrument_0.glb",
       "sha256": "4164b5e457f9413e6ceddd16ba0fa66b8b28de7999f7ff43a7a56e6bdbcc69e1"
@@ -97,6 +153,16 @@
       "bytes": 13797980,
       "path": "assets/generated/source-batch/larva_2.glb",
       "sha256": "55c8137c699e86a05e80790d38ca3288c330fd0c6ad2ea62f64c9f497522d225"
+    },
+    {
+      "bytes": 1380,
+      "path": "assets/generated/source-batch/telemetry_screen.glb",
+      "sha256": "b2024c5b16869cb82a726072ce7e0b0b8b53c2478563ce8f475b8d6307ac9cb0"
+    },
+    {
+      "bytes": 7203124,
+      "path": "assets/generated/source-batch/touch_rig_assets.glb",
+      "sha256": "948b29c422ca80a4bb2207a5403ed788347c9abd7b1c8fe426a74558c0f0d363"
     },
     {
       "bytes": 7450320,
@@ -137,16 +203,10 @@
   "pending_source_files": [
     "src/scene/BenchCycle.ts",
     "src/scene/Contacts.ts",
-    "src/scene/Displays.ts",
-    "src/scene/Effects.ts",
-    "src/scene/Glove.ts",
     "src/scene/Operations.ts",
     "src/scene/SceneExperience.ts",
     "src/scene/Survey.ts",
-    "src/scene/TelemetryScreen.ts",
-    "src/scene/Touch.ts",
-    "src/scene/ZoneCache.ts",
-    "src/vehicle/Cockpit.ts"
+    "src/scene/ZoneCache.ts"
   ],
   "schema": 1,
   "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11"
