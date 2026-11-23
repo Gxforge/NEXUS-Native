@@ -1,0 +1,8 @@
+{
+  "nodes": 55,
+  "note": "cross-body diagonal strap bar pending exact cylinder orientation",
+  "output": "assets/generated/operator.glb",
+  "sha256": "0a848c2ee7829183cf66a62b897eb12821e303da907d01a6ac9d65d7eb2ba72f",
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "visible_meshes": 50
+}
