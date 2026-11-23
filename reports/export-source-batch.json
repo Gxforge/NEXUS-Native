@@ -66,6 +66,11 @@
       "sha256": "5c61a4374d31b5764880f330a61732fd7e5906543c2ada8bf7e793c410922643"
     },
     {
+      "bytes": 74010152,
+      "path": "assets/generated/source-batch/laboratory_all_sectors.glb",
+      "sha256": "d85dd06e0b51f32590b0819fed1343a460d7fdb884cfb4a8381216ca8d3fe2f1"
+    },
+    {
       "bytes": 12311504,
       "path": "assets/generated/source-batch/larva_0.glb",
       "sha256": "36b514a708b2dad6fe4aebcb85fd9d65ac94df59ff525c6cdff133b78031a718"

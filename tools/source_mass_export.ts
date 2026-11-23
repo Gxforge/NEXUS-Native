@@ -17,6 +17,7 @@ const {TelemetryScreen}=await import("/home/user/NEXUS-15.1-source/src/scene/Tel
 const {Display}=await import("/home/user/NEXUS-15.1-source/src/scene/Displays.ts");
 const {Cockpit}=await import("/home/user/NEXUS-15.1-source/src/vehicle/Cockpit.ts");
 const {Touch}=await import("/home/user/NEXUS-15.1-source/src/scene/Touch.ts");
+const {Sectors}=await import("/home/user/NEXUS-15.1-source/src/scene/Sectors.ts");
 const finish=(v:number)=>new T.MeshStandardMaterial({color:v});
 const assets:any[]=[];
 function pick(x:any){for(const k of ["group","root","train"]){if(x?.[k] instanceof T.Object3D)return x[k]}if(x instanceof T.Object3D)return x;throw Error("no root")}
@@ -32,6 +33,7 @@ try{assets.push(["telemetry_screen",new TelemetryScreen().face])}catch(e){consol
 try{const g=new T.Group();new Display(g,0,0,0,1,.5);assets.push(["display",g])}catch(e){console.error("Display",e)}
 try{const g=new T.Group();new Cockpit(g);assets.push(["cockpit",g])}catch(e){console.error("Cockpit",e)}
 try{const camera=new T.PerspectiveCamera();new Touch(camera);camera.traverse(o=>o.visible=true);assets.push(["touch_rig_assets",camera])}catch(e){console.error("Touch",e)}
+try{assets.push(["laboratory_all_sectors",pick(new Sectors())])}catch(e){console.error("Sectors",e)}
 const out="/home/user/NEXUS-Native-audit/assets/generated/source-batch";await import("node:fs").then(fs=>fs.mkdirSync(out,{recursive:true}));
 const exporter=new GLTFExporter();const report:any[]=[];
 for(const [name,root] of assets){root.traverse((o:any)=>{if(o.material){for(const m of (Array.isArray(o.material)?o.material:[o.material])){m.map=null;m.bumpMap=null;m.normalMap=null;m.alphaMap=null;m.emissiveMap=null}}});const data:any=await exporter.parseAsync(root,{binary:true,onlyVisible:false});const buf=Buffer.from(data);await import("node:fs").then(fs=>fs.writeFileSync(`${out}/${name}.glb`,buf));let meshes=0;root.traverse((o:any)=>{if(o.isMesh)meshes++});report.push({name,bytes:buf.length,meshes})}

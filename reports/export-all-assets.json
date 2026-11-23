@@ -1,10 +1,11 @@
 {
   "command": "python3 tools/export_all_assets.py",
   "coverage": {
-    "implemented_source_files": 22,
+    "implemented_source_files": 24,
     "inventoried_source_files": 28
   },
   "implemented_source_files": [
+    "src/scene/BenchCycle.ts",
     "src/scene/Displays.ts",
     "src/scene/Effects.ts",
     "src/scene/Environment.ts",
@@ -16,6 +17,7 @@
     "src/scene/Larva.ts",
     "src/scene/Monster.ts",
     "src/scene/OcularSurface.ts",
+    "src/scene/Operations.ts",
     "src/scene/Operator.ts",
     "src/scene/Sectors.ts",
     "src/scene/TelemetryScreen.ts",
@@ -140,6 +142,11 @@
       "sha256": "5c61a4374d31b5764880f330a61732fd7e5906543c2ada8bf7e793c410922643"
     },
     {
+      "bytes": 74010152,
+      "path": "assets/generated/source-batch/laboratory_all_sectors.glb",
+      "sha256": "d85dd06e0b51f32590b0819fed1343a460d7fdb884cfb4a8381216ca8d3fe2f1"
+    },
+    {
       "bytes": 12311504,
       "path": "assets/generated/source-batch/larva_0.glb",
       "sha256": "36b514a708b2dad6fe4aebcb85fd9d65ac94df59ff525c6cdff133b78031a718"
@@ -201,9 +208,7 @@
     }
   ],
   "pending_source_files": [
-    "src/scene/BenchCycle.ts",
     "src/scene/Contacts.ts",
-    "src/scene/Operations.ts",
     "src/scene/SceneExperience.ts",
     "src/scene/Survey.ts",
     "src/scene/ZoneCache.ts"
