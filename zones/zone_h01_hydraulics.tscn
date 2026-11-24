@@ -4,6 +4,9 @@
 [ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
 [ext_resource type="PackedScene" path="res://assets/generated/h01_structural_shell.glb" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="4"]
+[ext_resource type="Script" path="res://scripts/systems/bench_station.gd" id="6"]
+[sub_resource type="BoxShape3D" id="BenchStationShape"]
+size = Vector3(1.6, 1.1, 0.9)
 
 [node name="H01StructuralSlice" type="Node3D"]
 script = ExtResource("1")
@@ -45,3 +48,14 @@ position = Vector3(-11, 7, -72)
 omni_range = 32
 light_color = Color(0.62, 0.83, 0.87, 1)
 light_energy = 8
+
+[node name="Bench" type="Node3D" parent="."]
+
+[node name="ChargerBench" type="StaticBody3D" parent="Bench"]
+position = Vector3(6, 0.6, -60)
+script = ExtResource("6")
+bench_id = &"charger"
+display_name = "Cuna de carga H–01"
+[node name="Collision" type="CollisionShape3D" parent="Bench/ChargerBench"]
+shape = SubResource("BenchStationShape")
+

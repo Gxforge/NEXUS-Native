@@ -8,7 +8,7 @@ signal zone_changed(previous_zone: StringName, current_zone: StringName)
 signal power_state_changed(snapshot: Dictionary)
 
 const SAVE_PATH := "user://nexus_native_save.json"
-const SAVE_VERSION := 6
+const SAVE_VERSION := 7
 
 var persistence_path: String = SAVE_PATH
 var current_zone: StringName = &""
@@ -31,6 +31,9 @@ var _files_pending: Dictionary = {}
 var power: PowerGrid = null
 ## Cuadro eléctrico y CCTV: port de `Operations.ts`.
 var operations: OperationsPanel = null
+## Bancos de carga (cuna) y de ensayo óptico: port de `BenchCycle.ts`.
+var benches: Array[BenchCycle] = []
+var bench_state: Dictionary = {"charged": false, "analyzed": false}
 ## Si es `false`, la red no avanza sola (QA y capturas controlan el paso a mano).
 var power_simulation := true
 
@@ -38,6 +41,7 @@ func _init() -> void:
 	power = PowerGrid.new()
 	# Orden de la web: primero los doce inversores y los extractores del cuadro.
 	operations = OperationsPanel.new(power)
+	benches = [BenchCycle.new(BenchCycle.CHARGER), BenchCycle.new(BenchCycle.ANALYZER)]
 	power.apply_laboratory_circuits()
 	if not power.state_changed.is_connected(_on_power_state_changed):
 		power.state_changed.connect(_on_power_state_changed)
@@ -52,6 +56,14 @@ func _process(delta: float) -> void:
 		return
 	var motor := bool(player_state.get("motor", false))
 	var aggression := float(power_aggression_source())
+	var player: NexusPlayer = null
+	if is_inside_tree():
+		player = get_tree().get_first_node_in_group(&"player") as NexusPlayer
+	var running := 0.0
+	for bench in benches:
+		bench.update(delta, player, power.tripped)
+		running += bench.kw()
+	power.machines = running
 	power.update(delta, motor, aggression)
 
 ## Gancho para que la IA de W-01 (o una prueba) module la carga. Por defecto usa
@@ -80,6 +92,19 @@ func files_snapshot() -> Dictionary:
 
 func vault_snapshot() -> Dictionary:
 	return vault.to_dict() if vault != null else {}
+
+func bench(id: StringName) -> BenchCycle:
+	for bench_cycle in benches:
+		if bench_cycle.id == id:
+			return bench_cycle
+	return null
+
+func benches_snapshot() -> Dictionary:
+	var result: Dictionary = {}
+	for bench in benches:
+		result[str(bench.id)] = bench.to_dict()
+	result["state"] = bench_state.duplicate(true)
+	return result
 
 func operations_snapshot() -> Dictionary:
 	return operations.to_dict() if operations != null else {}
@@ -172,6 +197,7 @@ func save_game(path: String = "") -> bool:
 		"vault": vault.to_dict() if vault != null else _vault_pending,
 		"files": files.to_dict() if files != null else _files_pending,
 		"operations": operations.to_dict() if operations != null else {},
+		"benches": benches_snapshot(),
 	}
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	if file == null:
@@ -255,6 +281,23 @@ func load_game(path: String = "") -> bool:
 			files.from_dict(saved_files)
 		else:
 			_files_pending = (saved_files as Dictionary).duplicate(true)
+
+	var saved_benches: Variant = parsed.get("benches", {})
+	if saved_benches is Dictionary:
+		var bench_data := saved_benches as Dictionary
+		for key in bench_data:
+			if key == "state":
+				var raw_state: Variant = bench_data[key]
+				if raw_state is Dictionary:
+					bench_state["charged"] = bool((raw_state as Dictionary).get("charged", false))
+					bench_state["analyzed"] = bool((raw_state as Dictionary).get("analyzed", false))
+				continue
+			var saved_bench: Variant = bench_data[key]
+			if saved_bench is Dictionary:
+				for bench_cycle in benches:
+					if str(bench_cycle.id) == str(key):
+						bench_cycle.from_dict(saved_bench)
+						break
 
 	var saved_operations: Variant = parsed.get("operations", {})
 	if saved_operations is Dictionary and operations != null:

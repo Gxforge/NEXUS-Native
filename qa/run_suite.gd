@@ -240,6 +240,47 @@ func _validate_operations_panel() -> void:
 	_check(operations.bank == 4, "camera bank advances four channels")
 	operations.queue_free()
 
+func _validate_bench_cycle() -> void:
+	var state: GameState = GameState.new()
+	state.power_simulation = false
+	state.add_to_group(&"game_state")
+	root.add_child(state)
+	var player: NexusPlayer = load("res://scripts/world/player.gd").new()
+	var camera := Camera3D.new()
+	camera.name = "Camera3D"
+	player.add_child(camera)
+	root.add_child(player)
+	player.game_state = state
+	state.inventory.assign([&"lamp", &"cell", &"sample"] as Array[StringName])
+	state.quick_slots.assign([&"cell", &"lamp", &"", &"", &""] as Array[StringName])
+	player.flashlight_battery = 40.0
+	player.energy = 20.0
+	player.selected_quick_slot = 0
+	var charger := state.bench(BenchCycle.CHARGER)
+	var analyzer := state.bench(BenchCycle.ANALYZER)
+	_check(charger != null and analyzer != null, "both technical benches exist")
+	_check(is_equal_approx(charger.duration(), 8.0) and is_equal_approx(analyzer.duration(), 10.0),
+		"bench durations match the web (8 s and 10 s)")
+	_check(charger.interact(player).contains("Acoplando"), "charger mounts the cell")
+	_check(is_equal_approx(charger.kw(), 18.0), "charger draws 18 kW while running")
+	charger.update(2.0, player, true)
+	_check(charger.stage == "SIN RED", "bench stalls when the grid trips")
+	charger.update(9.0, player, false)
+	_check(charger.done and is_equal_approx(player.energy, 100.0), "charger completes and refills energy")
+	_check(charger.interact(player) == "Equipo retirado", "finished bench returns the item")
+	check_bench_analyzer(analyzer, player, state)
+	state.remove_from_group(&"game_state")
+	player.free()
+	state.queue_free()
+
+func check_bench_analyzer(analyzer: BenchCycle, player: NexusPlayer, state: GameState) -> void:
+	_check(state.has_item(&"sample"), "sample is in the inventory")
+	_check(analyzer.interact(player).contains("Vial"), "analyzer takes the vial")
+	analyzer.update(10.0, player, false)
+	_check(analyzer.done and bool(state.bench_state.get("analyzed", false)),
+		"analyzer marks the sample as analyzed")
+	_check(analyzer.stage == "VERIFICADO / RETIRAR", "analyzer screen asks to remove the vial")
+
 func _run() -> void:
 	await _validate_exported_pattern()
 	await _validate_portal_assembly()
@@ -253,6 +294,7 @@ func _run() -> void:
 	_validate_vault_module()
 	_validate_files_module()
 	_validate_operations_panel()
+	_validate_bench_cycle()
 	var main := packed.instantiate()
 	var test_state := main.get_node("GameState") as GameState
 	test_state.persistence_path = QA_SAVE_PATH

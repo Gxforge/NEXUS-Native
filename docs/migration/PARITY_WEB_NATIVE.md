@@ -25,8 +25,8 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 | `Files.ts` | 173 | `scripts/zones/files_module.gd` + `files_tray.gd` | ✅ | Diez bandejas con giro propio, tope por proximidad, seis expedientes idénticos a la web y lectura a la bitácora sin duplicados; 33 checks. Falta la geometría del folio y el lector a pantalla completa. |
 | `Operations.ts` | 943 | `scripts/systems/operations_panel.gd` + `operations_console.gd` | ✅ | Cuadro eléctrico y CCTV: 19 circuitos, selección zona/derivación, interruptores, eco, contadores, informe maestro de cinco páginas, iluminación y las diez cámaras; 77 checks. Falta la geometría, las pantallas y el vídeo real. |
 | `Infrastructure.ts` | 440 | `zones/zone_*.tscn` (carcasas) | 🟡 | Volumen y colisión. `light_zone`/`area` del cuadro ya cubren la lectura por zona; faltan pasillos, anexos y rótulos. |
-| `Workshop.ts` | 448 | — | ❌ | Taller: bancos, instrumentos, tambores, luminarias y las vainas (`Pods`) con su ciclo. |
-| `BenchCycle.ts` | 216 | — | ❌ | Ciclo de banco de carga asociado a la red (entra cuando exista `Operations`). |
+| `Workshop.ts` | 448 | `bench_cycle.gd` (bancos) · pendiente el resto | 🟡 | Los dos bancos técnicos están portados; faltan los tres vasos de observación (`Pods`), instrumentos, tambores y luminarias. |
+| `BenchCycle.ts` | 216 | `scripts/systems/bench_cycle.gd` + `bench_station.gd` | ✅ | Cuna (8 s, 18 kW) y analizador (10 s, 9 kW) con la misma elección de equipo, etapas, corte por red y consumo real en `PowerGrid.machines`; 51 checks. Falta la geometría y las pantallas. |
 | `Transit.ts` | 669 | shells `transit_hub/road/rail` | ❌ | Cápsula, llamada, carga, freno, postura sentada, `use()` y `step()` del vehículo. |
 | `vehicle/*` (5 archivos) | 922 | — | ❌ | Modelo, física de cuatro apoyos, audio, cabina y perspectivas del coche. |
 | `Monster.ts` + `MonsterAI.ts` + `Attention.ts` + `FieldSense.ts` | 438 | `scripts/entities/w01_actor.gd` | 🟡 | Sólo presentación (respiración, boca, ojos, oscilación). Faltan estados de IA, atención, memoria breve, percepción por campo y reacción a herramientas. |
@@ -48,10 +48,10 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 
 ## 2. Resumen cuantitativo
 
-- **Portado con pruebas:** red eléctrica, cuadro eléctrico + CCTV, bóveda V-03 (lógica), archivo D-02, encuesta/raycast, contactos, caché de zonas, compuertas, streaming y persistencia de partida.
+- **Portado con pruebas:** red eléctrica, cuadro eléctrico + CCTV, bóveda V-03 (lógica), archivo D-02, bancos de carga y analizador, encuesta/raycast, contactos, caché de zonas, compuertas, streaming y persistencia de partida.
 - **Parcial:** W-01 (visual), jugador y carga, sectores/mobiliario, HUD, mapa, materiales.
-- **Sin empezar:** taller/turbinas/cuadro eléctrico, taller, tránsito y vehículo, IA del sujeto, pantallas y telemetría, perfiles de calidad, orquestación de experiencias y distribución.
-- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **26 %**; el resto son sistemas por migrar.
+- **Sin empezar:** vasos de observación, tránsito/vehículo, IA/cuadro eléctrico, taller, tránsito y vehículo, IA del sujeto, pantallas y telemetría, perfiles de calidad, orquestación de experiencias y distribución.
+- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **30 %**; el resto son sistemas por migrar.
 
 ## 3. Hoja de ruta propuesta
 
@@ -64,7 +64,7 @@ Cada fase termina con validador headless propio y una entrada en
 | **P-2** ✅ | Bóveda V-03 (`Vault.ts`): cerradura, estaciones, cajones, objetos | P-1 | `validate_vault.gd` 53/53 + 10 checks en la suite · hecho |
 | **P-3** ✅ | Archivos D-02 (`Files.ts`): gavetas, expedientes, lector | P-2 | `validate_files.gd` 33/33 + 8 checks en la suite · hecho |
 | **P-4** ✅ | Cuadro eléctrico + CCTV (`Operations.ts`, `Infrastructure.ts`) | P-1 | `validate_operations.gd` 77/77 + 11 checks en la suite · hecho |
-| **P-5** | Hidráulica H-01 y turbinas B-02 (`Workshop.ts`, `Infrastructure.ts`) | P-1 | Vainas y bancos consumen de la red y respetan el estrés |
+| **P-5** ✅ | Bancos de H-01 y B-02 (`BenchCycle.ts`, `Workshop.ts`) | P-1 | `validate_bench_cycle.gd` 51/51 + 11 checks en la suite · hecho (faltan los vasos, que son visuales) |
 | **P-6** | IA de W-01 (`MonsterAI`, `Attention`, `FieldSense`, `Tentacles`, `Breath`) | — | Estados, memoria, percepción y agarre con A/B numérico frente a la web |
 | **P-7** | Tránsito y vehículo (`Transit.ts`, `vehicle/*`) | P-1 | Cápsula con llamada/carga/freno y coche con solver de cuatro apoyos |
 | **P-8** | UI y orquestación (`App.tsx`, `SceneExperience.ts`, `CameraController`, `DisplayQuality`, `Visibility`) | P-2…P-7 | Ajustes, perfiles de calidad, mapa con estado y pantalla de recuperación |
@@ -86,13 +86,14 @@ Cada fase termina con validador headless propio y una entrada en
 
 | Prueba | Resultado |
 |---|---|
-| `qa/run_suite.gd` | **186/186** (157 red → 167 bóveda → 175 archivo → 186 cuadro) |
+| `qa/run_suite.gd` | **197/197** (167 bóveda → 175 archivo → 186 cuadro → 197 bancos) |
 | `qa/validate_zone_graph.gd` | 303/303 |
 | `qa/validate_zone_traversal.gd` | 255/255 |
 | `qa/validate_power_grid.gd` | 45/45 |
 | `qa/validate_vault.gd` | 53/53 |
 | `qa/validate_files.gd` | 33/33 |
-| `qa/validate_operations.gd` | 77/77 (nuevo) |
+| `qa/validate_operations.gd` | 77/77 |
+| `qa/validate_bench_cycle.gd` | 51/51 (nuevo) |
 | `qa/validate_game_state.gd` | 17/17 (incluye la red en el guardado) |
 | `qa/validate_resume.gd` | 8/8 |
 | `qa/validate_contacts_survey.gd` | 9/9 |
