@@ -786,6 +786,8 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
             self.minsize(760, 560)
             self.configure(bg="#0b1418")
 
+            self.closed = False
+            self._after_ids: list[str] = []
             self.events: queue.Queue = queue.Queue()
             self.worker: threading.Thread | None = None
             self.cancel_event = threading.Event()
@@ -814,14 +816,32 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
             self.remote_label = tk.StringVar(value="Rama remota: —")
 
             self._build()
-            self.after(self.POLL_MS, self._drain)
-            self.after(400, self.check)
+            self._later(self.POLL_MS, self._drain)
+            self._later(400, self.check)
             autostart = os.environ.get("NEXUS_SYNC_AUTOSTART", "").strip().lower()
             if autostart:
                 self._append("info", "Arranque automático: %s" % autostart)
-                self.after(1200, lambda: self.start(dry_run=autostart == "dry"))
-            self.after(5000, self._auto_tick)
+                self._later(1200, lambda: self.start(dry_run=autostart == "dry"))
+            self._later(5000, self._auto_tick)
             self.protocol("WM_DELETE_WINDOW", self._on_close)
+
+        # -- ciclo de vida ----------------------------------------------- #
+        def _later(self, delay_ms: int, callback) -> None:
+            """`after` con registro del id para poder cancelarlo al cerrar."""
+            if self.closed:
+                return
+            try:
+                self._after_ids.append(self.after(delay_ms, callback))
+            except tk.TclError:
+                pass
+
+        def _cancel_pending(self) -> None:
+            for after_id in self._after_ids:
+                try:
+                    self.after_cancel(after_id)
+                except (tk.TclError, ValueError):
+                    pass
+            self._after_ids.clear()
 
         # -- interfaz ---------------------------------------------------- #
         def _build(self) -> None:
@@ -1127,16 +1147,20 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
             self.status.set("Cancelando…")
 
         def _auto_tick(self) -> None:
+            if self.closed:
+                return
             try:
                 if self.auto_check.get() and self.worker is None:
                     if time.monotonic() - self.last_check > 30.0:
                         self.last_check = time.monotonic()
                         self.check()
             finally:
-                self.after(5000, self._auto_tick)
+                self._later(5000, self._auto_tick)
 
         # -- bucle de eventos --------------------------------------------- #
         def _drain(self) -> None:
+            if self.closed:
+                return
             try:
                 while True:
                     event = self.events.get_nowait()
@@ -1159,7 +1183,7 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
                         self.status.set("Proyecto reparado · abre Godot para reimportar")
                         self._append("ok", "Reparación lista: %d .import huérfano(s), caché %s."
                                      % (event[1], "borrada" if event[2] else "intacta"))
-                        self.after(300, self.check)
+                        self._later(300, self.check)
                     elif kind == "cancelled":
                         self.worker = None
                         self._set_running(False)
@@ -1176,7 +1200,7 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
             except queue.Empty:
                 pass
             finally:
-                self.after(self.POLL_MS, self._drain)
+                self._later(self.POLL_MS, self._drain)
 
         def _on_checked(self, remote: str | None, local: str | None) -> None:
             self.worker = None
@@ -1228,13 +1252,15 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
             if not report.dry_run:
                 self.remote_label.set("Sincronizado · %s" % (report.remote_commit[:7]
                                                             if report.remote_commit else "local"))
-                self.after(200, self.check)
+                self._later(200, self.check)
 
         def _on_close(self) -> None:
             self._remember()
             if self.worker is not None and not messagebox.askyesno("NEXUS", "Hay una sincronización en curso.\n¿Cerrar igualmente?"):
                 return
             self.cancel_event.set()
+            self.closed = True
+            self._cancel_pending()
             self.destroy()
 
     app = SyncApp()
