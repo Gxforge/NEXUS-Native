@@ -2,6 +2,8 @@
 
 División derivada de `Sectors.zone()`, `ZoneGates`, `PortalLight` y la geometría fuente.
 
+Estado (fase 13): las doce zonas están registradas, enlazadas y con streaming real. Las escenas indicadas en la columna «ID / escena» ya existen; los nombres de C-04 y A-01 se mantienen en `zone_c04_shell.tscn` y `zone_a01_shell.tscn`. El contenido interactivo específico de cada módulo sigue pendiente.
+
 | ID / escena | Límite | Contenido exclusivo |
 |---|---|---|
 | `c04/zone_c04_containment.tscn` | `z>-14`, núcleo | campo de 24 lados, W-01 cuando corresponda, luces |
@@ -17,7 +19,9 @@ División derivada de `Sectors.zone()`, `ZoneGates`, `PortalLight` y la geometr�
 | `transit_road/zone_transit_road.tscn` | `z>70`, `x<=6.1` | carretera 2000 m y muro terminal |
 | `transit_rail/zone_transit_rail.tscn` | `z>70`, `x>6.1` | vía, andenes, cápsula y asientos |
 
-Transit puede agruparse durante el primer puerto de fidelidad, pero mantendrá subescenas descargables para Android.
+Transit puede agruparse durante el primer puerto de fidelidad, pero mantendrá subescenas descargables para Android. En la implementación actual `transit_hub`, `transit_road` y `transit_rail` son módulos separados: el hub es la sala de andén (z 70–96) y las dos vías miden 2000 m con luces cada 120 m.
+
+La fuente de verdad ejecutable es `data/zone_graph.json`, generada junto con manifiestos, GLB y escenas por `tools/generate_zone_modules.py`.
 
 ## Conexiones comprobadas
 

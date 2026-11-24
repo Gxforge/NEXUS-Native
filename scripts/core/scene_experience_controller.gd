@@ -21,6 +21,7 @@ func _ready() -> void:
 	add_child(survey)
 	add_child(highlighter)
 	add_child(contact_fx)
+	survey.range_m = 22.0
 	survey.attach_highlighter(highlighter)
 	survey.restore(game_state.survey_records)
 	survey.target_scanned.connect(_on_target_scanned)

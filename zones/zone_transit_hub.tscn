@@ -1,0 +1,54 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
+[ext_resource type="PackedScene" path="res://assets/generated/transit_hub_structural_shell.glb" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="4"]
+
+[node name="TransitHubSlice" type="Node3D"]
+script = ExtResource("1")
+zone_id = &"transit_hub"
+
+[node name="StructuralShell" type="Node3D" parent="."]
+script = ExtResource("2")
+manifest_path = "res://manifests/migration/transit_hub_structural_shell.json"
+[node name="Visual" parent="StructuralShell" instance=ExtResource("3")]
+
+[node name="PortalC04" parent="." instance=ExtResource("4")]
+position = Vector3(9, 0, 84)
+target_zone = &"c04"
+target_socket = &"from_transit_hub"
+
+[node name="PortalTransitRoad" parent="." instance=ExtResource("4")]
+position = Vector3(1.5, 0, 110)
+rotation_degrees = Vector3(0, 180, 0)
+target_zone = &"transit_road"
+target_socket = &"from_transit_hub"
+
+[node name="PortalTransitRail" parent="." instance=ExtResource("4")]
+position = Vector3(22.5, 0, 110)
+rotation_degrees = Vector3(0, 180, 0)
+target_zone = &"transit_rail"
+target_socket = &"from_transit_hub"
+
+[node name="DoorSockets" type="Node3D" parent="."]
+[node name="entry" type="Marker3D" parent="DoorSockets"]
+position = Vector3(-21, 1.1, 90)
+
+[node name="from_c04" type="Marker3D" parent="DoorSockets"]
+position = Vector3(9, 1.1, 85.6)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="from_transit_road" type="Marker3D" parent="DoorSockets"]
+position = Vector3(1.5, 1.1, 108.4)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="from_transit_rail" type="Marker3D" parent="DoorSockets"]
+position = Vector3(22.5, 1.1, 108.4)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="LocalLight0" type="OmniLight3D" parent="."]
+position = Vector3(9, 7, 97)
+omni_range = 32
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 9

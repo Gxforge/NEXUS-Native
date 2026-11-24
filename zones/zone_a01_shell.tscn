@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
 [ext_resource type="PackedScene" path="res://assets/generated/a01_structural_shell.glb" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/entities/field_flashlight.tscn" id="5"]
 [node name="A01StructuralSlice" type="Node3D"]
 script = ExtResource("1")
 zone_id = &"a01"
@@ -17,7 +18,8 @@ target_zone = &"c04"
 target_socket = &"to_a01"
 [node name="DoorSockets" type="Node3D" parent="."]
 [node name="entry" type="Marker3D" parent="DoorSockets"]
-position = Vector3(0, 1.1, -4)
+position = Vector3(0, 1.1, -9)
+rotation_degrees = Vector3(0, 180, 0)
 [node name="from_c04" type="Marker3D" parent="DoorSockets"]
 position = Vector3(0, 1.1, -1.2)
 [node name="LocalLight" type="OmniLight3D" parent="."]
@@ -25,3 +27,5 @@ position = Vector3(0, 5.9, -9)
 omni_range = 32.0
 light_color = Color(0.62, 0.83, 0.87, 1)
 light_energy = 12.0
+[node name="FieldFlashlight" parent="." instance=ExtResource("5")]
+position = Vector3(0, 0.0, -6.5)

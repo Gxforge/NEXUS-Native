@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/interaction/field_pickup.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="FlashlightMaterial"]
+albedo_color = Color(0.16, 0.23, 0.25, 1)
+metallic = 0.65
+roughness = 0.32
+
+[sub_resource type="CylinderMesh" id="FlashlightMesh"]
+material = SubResource("FlashlightMaterial")
+top_radius = 0.11
+bottom_radius = 0.13
+height = 0.54
+radial_segments = 16
+
+[sub_resource type="CylinderMesh" id="BezelMesh"]
+material = SubResource("FlashlightMaterial")
+top_radius = 0.17
+bottom_radius = 0.17
+height = 0.08
+radial_segments = 16
+
+[sub_resource type="CylinderShape3D" id="FlashlightShape"]
+radius = 0.15
+height = 0.58
+
+[node name="FieldFlashlight" type="StaticBody3D" groups=["interactable"]]
+collision_layer = 1
+collision_mask = 1
+script = ExtResource("1")
+item_id = &"lamp"
+display_name = "Linterna de campo"
+
+[node name="Visual" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.35, 0)
+mesh = SubResource("FlashlightMesh")
+
+[node name="Bezel" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.62, 0)
+mesh = SubResource("BezelMesh")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.35, 0)
+shape = SubResource("FlashlightShape")

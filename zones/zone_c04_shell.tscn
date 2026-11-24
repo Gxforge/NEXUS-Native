@@ -19,11 +19,47 @@ look_target_path = NodePath("/root/Main/PersistentWorld/Player")
 [node name="PortalA01" parent="." instance=ExtResource("4")]
 target_zone = &"a01"
 target_socket = &"from_c04"
+
+[node name="PortalB02" parent="." instance=ExtResource("4")]
+position = Vector3(18, 0, 0)
+target_zone = &"b02"
+target_socket = &"from_c04"
+
+[node name="PortalSurveillance" parent="." instance=ExtResource("4")]
+position = Vector3(-17, 0, 66.2)
+rotation_degrees = Vector3(0, 180, 0)
+target_zone = &"surveillance"
+target_socket = &"from_c04"
+
+[node name="PortalElectrical" parent="." instance=ExtResource("4")]
+position = Vector3(35, 0, 58.2)
+rotation_degrees = Vector3(0, 180, 0)
+target_zone = &"electrical"
+target_socket = &"from_c04"
+
+[node name="PortalTransitHub" parent="." instance=ExtResource("4")]
+position = Vector3(9, 0, 84)
+rotation_degrees = Vector3(0, 180, 0)
+target_zone = &"transit_hub"
+target_socket = &"from_c04"
 [node name="DoorSockets" type="Node3D" parent="."]
 [node name="entry" type="Marker3D" parent="DoorSockets"]
 position = Vector3(9, 1.1, 22)
+rotation_degrees = Vector3(0, 90, 0)
 [node name="to_a01" type="Marker3D" parent="DoorSockets"]
 position = Vector3(0, 1.1, 1.2)
+
+[node name="from_b02" type="Marker3D" parent="DoorSockets"]
+position = Vector3(18, 1.1, 1.6)
+
+[node name="from_surveillance" type="Marker3D" parent="DoorSockets"]
+position = Vector3(-17, 1.1, 64.6)
+
+[node name="from_electrical" type="Marker3D" parent="DoorSockets"]
+position = Vector3(35, 1.1, 56.6)
+
+[node name="from_transit_hub" type="Marker3D" parent="DoorSockets"]
+position = Vector3(9, 1.1, 82.4)
 [node name="LocalLight" type="OmniLight3D" parent="."]
 position = Vector3(0, 5.9, 9)
 omni_range = 32.0

@@ -18,7 +18,8 @@ script = ExtResource("1")
 
 [node name="Tentacles" parent="." instance=ExtResource("4")]
 
-[node name="BodyCollision" type="StaticBody3D" parent="."]
+[node name="BodyCollision" type="AnimatableBody3D" parent="."]
+sync_to_physics = true
 collision_layer = 4
 collision_mask = 1
 

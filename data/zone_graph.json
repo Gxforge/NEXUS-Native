@@ -1,0 +1,449 @@
+{
+  "connections": [
+    {
+      "bidirectional": true,
+      "from_socket": "from_c04",
+      "from_zone": "a01",
+      "id": "a01_c04",
+      "portal_yaw_from": 180.0,
+      "portal_yaw_to": 0.0,
+      "to_socket": "to_a01",
+      "to_zone": "c04",
+      "width": 4.4,
+      "world_door": [
+        -9.0,
+        -14.0
+      ]
+    },
+    {
+      "bidirectional": true,
+      "from_socket": "from_c04",
+      "from_zone": "b02",
+      "id": "b02_c04",
+      "portal_yaw_from": 180.0,
+      "portal_yaw_to": 0.0,
+      "to_socket": "from_b02",
+      "to_zone": "c04",
+      "width": 4.4,
+      "world_door": [
+        9.0,
+        -14.0
+      ]
+    },
+    {
+      "bidirectional": true,
+      "from_socket": "from_v03_gallery",
+      "from_zone": "b02",
+      "id": "b02_v03_gallery",
+      "portal_yaw_from": 0.0,
+      "portal_yaw_to": 180.0,
+      "to_socket": "from_b02",
+      "to_zone": "v03_gallery",
+      "width": 4.4,
+      "world_door": [
+        18.0,
+        -38.0
+      ]
+    },
+    {
+      "bidirectional": true,
+      "from_socket": "from_electrical",
+      "from_zone": "c04",
+      "id": "c04_electrical",
+      "portal_yaw_from": 180.0,
+      "portal_yaw_to": 0.0,
+      "to_socket": "from_c04",
+      "to_zone": "electrical",
+      "width": 4.4,
+      "world_door": [
+        26.0,
+        44.2
+      ]
+    },
+    {
+      "bidirectional": true,
+      "from_socket": "from_surveillance",
+      "from_zone": "c04",
+      "id": "c04_surveillance",
+      "portal_yaw_from": 180.0,
+      "portal_yaw_to": 0.0,
+      "to_socket": "from_c04",
+      "to_zone": "surveillance",
+      "width": 4.4,
+      "world_door": [
+        -26.0,
+        52.2
+      ]
+    },
+    {
+      "bidirectional": true,
+      "from_socket": "from_transit_hub",
+      "from_zone": "c04",
+      "id": "c04_transit_hub",
+      "portal_yaw_from": 180.0,
+      "portal_yaw_to": 0.0,
+      "to_socket": "from_c04",
+      "to_zone": "transit_hub",
+      "width": 4.4,
+      "world_door": [
+        0.0,
+        70.0
+      ]
+    },
+    {
+      "bidirectional": true,
+      "from_socket": "from_v03_gallery",
+      "from_zone": "d02",
+      "id": "d02_v03_gallery",
+      "portal_yaw_from": 90.0,
+      "portal_yaw_to": -90.0,
+      "to_socket": "from_d02",
+      "to_zone": "v03_gallery",
+      "width": 4.4,
+      "world_door": [
+        22.0,
+        -82.0
+      ]
+    },
+    {
+      "bidirectional": true,
+      "from_socket": "from_v03_gallery",
+      "from_zone": "h01",
+      "id": "h01_v03_gallery",
+      "portal_yaw_from": -90.0,
+      "portal_yaw_to": 90.0,
+      "to_socket": "from_h01",
+      "to_zone": "v03_gallery",
+      "width": 4.4,
+      "world_door": [
+        14.0,
+        -62.0
+      ]
+    },
+    {
+      "bidirectional": true,
+      "from_socket": "from_transit_rail",
+      "from_zone": "transit_hub",
+      "id": "transit_hub_transit_rail",
+      "portal_yaw_from": 180.0,
+      "portal_yaw_to": 0.0,
+      "to_socket": "from_transit_hub",
+      "to_zone": "transit_rail",
+      "width": 4.4,
+      "world_door": [
+        13.5,
+        96.0
+      ]
+    },
+    {
+      "bidirectional": true,
+      "from_socket": "from_transit_road",
+      "from_zone": "transit_hub",
+      "id": "transit_hub_transit_road",
+      "portal_yaw_from": 180.0,
+      "portal_yaw_to": 0.0,
+      "to_socket": "from_transit_hub",
+      "to_zone": "transit_road",
+      "width": 4.4,
+      "world_door": [
+        -7.5,
+        96.0
+      ]
+    },
+    {
+      "bidirectional": true,
+      "from_socket": "from_v03_gallery",
+      "from_zone": "v03_cryo",
+      "id": "v03_cryo_v03_gallery",
+      "portal_yaw_from": 180.0,
+      "portal_yaw_to": 0.0,
+      "to_socket": "from_v03_cryo",
+      "to_zone": "v03_gallery",
+      "width": 4.4,
+      "world_door": [
+        18.0,
+        -96.0
+      ]
+    }
+  ],
+  "coordinate_frame": {
+    "local_from_world": "x+9, y, z+14",
+    "units": "meters",
+    "world_origin": [
+      9.0,
+      0.0,
+      14.0
+    ]
+  },
+  "schema": 1,
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "zones": [
+    {
+      "bounds": {
+        "max": [
+          36.0,
+          70.0
+        ],
+        "min": [
+          -36.0,
+          -14.0
+        ]
+      },
+      "display_name": "C-04 \u00b7 Contenci\u00f3n",
+      "entry_socket": "entry",
+      "entry_world": [
+        -30.0,
+        -8.0
+      ],
+      "height": 9.2,
+      "hull_of": [
+        "surveillance",
+        "electrical"
+      ],
+      "id": "c04",
+      "scene": "res://zones/zone_c04_shell.tscn"
+    },
+    {
+      "bounds": {
+        "max": [
+          0.0,
+          -14.0
+        ],
+        "min": [
+          -36.0,
+          -38.0
+        ]
+      },
+      "display_name": "A-01 \u00b7 Archivo",
+      "entry_socket": "entry",
+      "entry_world": [
+        -30.0,
+        -32.0
+      ],
+      "height": 9.2,
+      "hull_of": [],
+      "id": "a01",
+      "scene": "res://zones/zone_a01_shell.tscn"
+    },
+    {
+      "bounds": {
+        "max": [
+          36.0,
+          -14.0
+        ],
+        "min": [
+          0.0,
+          -38.0
+        ]
+      },
+      "display_name": "B-02 \u00b7 Turbinas",
+      "entry_socket": "entry",
+      "entry_world": [
+        6.0,
+        -32.0
+      ],
+      "height": 9.2,
+      "hull_of": [],
+      "id": "b02",
+      "scene": "res://zones/zone_b02_turbines.tscn"
+    },
+    {
+      "bounds": {
+        "max": [
+          -17.3,
+          70.0
+        ],
+        "min": [
+          -36.0,
+          52.2
+        ]
+      },
+      "display_name": "Vigilancia",
+      "entry_socket": "entry",
+      "entry_world": [
+        -30.0,
+        58.2
+      ],
+      "height": 9.2,
+      "hull_of": [],
+      "id": "surveillance",
+      "scene": "res://zones/zone_surveillance.tscn"
+    },
+    {
+      "bounds": {
+        "max": [
+          36.0,
+          70.0
+        ],
+        "min": [
+          17.3,
+          44.2
+        ]
+      },
+      "display_name": "Electricidad",
+      "entry_socket": "entry",
+      "entry_world": [
+        23.3,
+        50.2
+      ],
+      "height": 9.2,
+      "hull_of": [],
+      "id": "electrical",
+      "scene": "res://zones/zone_electrical.tscn"
+    },
+    {
+      "bounds": {
+        "max": [
+          36.0,
+          96.0
+        ],
+        "min": [
+          -36.0,
+          70.0
+        ]
+      },
+      "display_name": "Transit \u00b7 Hub L-01",
+      "entry_socket": "entry",
+      "entry_world": [
+        -30.0,
+        76.0
+      ],
+      "height": 9.2,
+      "hull_of": [],
+      "id": "transit_hub",
+      "scene": "res://zones/zone_transit_hub.tscn"
+    },
+    {
+      "bounds": {
+        "max": [
+          6.1,
+          2096.0
+        ],
+        "min": [
+          -21.0,
+          96.0
+        ]
+      },
+      "display_name": "Transit \u00b7 Carretera",
+      "entry_socket": "entry",
+      "entry_world": [
+        -15.0,
+        102.0
+      ],
+      "height": 6.0,
+      "hull_of": [],
+      "id": "transit_road",
+      "scene": "res://zones/zone_transit_road.tscn"
+    },
+    {
+      "bounds": {
+        "max": [
+          21.0,
+          2096.0
+        ],
+        "min": [
+          6.1,
+          96.0
+        ]
+      },
+      "display_name": "Transit \u00b7 V\u00eda",
+      "entry_socket": "entry",
+      "entry_world": [
+        12.1,
+        102.0
+      ],
+      "height": 6.0,
+      "hull_of": [],
+      "id": "transit_rail",
+      "scene": "res://zones/zone_transit_rail.tscn"
+    },
+    {
+      "bounds": {
+        "max": [
+          22.0,
+          -38.0
+        ],
+        "min": [
+          14.0,
+          -96.0
+        ]
+      },
+      "display_name": "Galer\u00eda V-03",
+      "entry_socket": "entry",
+      "entry_world": [
+        20.0,
+        -90.0
+      ],
+      "height": 4.4,
+      "hull_of": [],
+      "id": "v03_gallery",
+      "scene": "res://zones/zone_v03_gallery.tscn"
+    },
+    {
+      "bounds": {
+        "max": [
+          14.0,
+          -38.0
+        ],
+        "min": [
+          -36.0,
+          -96.0
+        ]
+      },
+      "display_name": "H-01 \u00b7 Hidr\u00e1ulica",
+      "entry_socket": "entry",
+      "entry_world": [
+        -30.0,
+        -90.0
+      ],
+      "height": 9.2,
+      "hull_of": [],
+      "id": "h01",
+      "scene": "res://zones/zone_h01_hydraulics.tscn"
+    },
+    {
+      "bounds": {
+        "max": [
+          37.0,
+          -38.0
+        ],
+        "min": [
+          22.0,
+          -96.0
+        ]
+      },
+      "display_name": "D-02 \u00b7 Registros",
+      "entry_socket": "entry",
+      "entry_world": [
+        28.0,
+        -90.0
+      ],
+      "height": 9.2,
+      "hull_of": [],
+      "id": "d02",
+      "scene": "res://zones/zone_d02_records.tscn"
+    },
+    {
+      "bounds": {
+        "max": [
+          36.0,
+          -96.0
+        ],
+        "min": [
+          4.0,
+          -114.0
+        ]
+      },
+      "display_name": "Crioteca V-03",
+      "entry_socket": "entry",
+      "entry_world": [
+        10.0,
+        -108.0
+      ],
+      "height": 7.0,
+      "hull_of": [],
+      "id": "v03_cryo",
+      "scene": "res://zones/zone_v03_cryotheque.tscn"
+    }
+  ]
+}

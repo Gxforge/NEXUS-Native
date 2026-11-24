@@ -4,19 +4,27 @@ extends RefCounted
 const SHARED: StringName = &"shared_infrastructure"
 const CONNECTION: StringName = &"zone_connection"
 
+## Canonical footprints of the twelve laboratory modules, mirrored from
+## `data/zone_graph.json` (Environment.ts world meters). `validate_zone_ownership`
+## keeps both sources in sync.
 const BOUNDS: Dictionary = {
-	&"electricidad": Rect2(-36.0, 52.44, 18.54, 17.56),
-	&"vigilancia": Rect2(17.46, 44.44, 18.54, 25.56),
-	&"turbinas": Rect2(1.0, -70.0, 12.85, 16.0),
-	&"registros": Rect2(22.15, -90.0, 14.85, 16.0),
-	&"crioteca": Rect2(9.0, -112.0, 18.0, 15.84),
-	&"c04": Rect2(-36.0, -38.0, 35.75, 23.68),
-	&"a01": Rect2(0.25, -38.0, 35.75, 23.68),
-	&"galeria": Rect2(14.0, -95.9, 8.0, 57.7),
+	&"c04": Rect2(-36.0, -14.0, 72.0, 84.0),
+	&"a01": Rect2(-36.0, -38.0, 36.0, 24.0),
+	&"b02": Rect2(0.0, -38.0, 36.0, 24.0),
+	&"surveillance": Rect2(-36.0, 52.2, 18.7, 17.8),
+	&"electrical": Rect2(17.3, 44.2, 18.7, 25.8),
+	&"transit_hub": Rect2(-36.0, 70.0, 72.0, 26.0),
+	&"transit_road": Rect2(-21.0, 96.0, 27.1, 2000.0),
+	&"transit_rail": Rect2(6.1, 96.0, 14.9, 2000.0),
+	&"v03_gallery": Rect2(14.0, -96.0, 8.0, 58.0),
+	&"h01": Rect2(-36.0, -96.0, 50.0, 58.0),
+	&"d02": Rect2(22.0, -96.0, 15.0, 58.0),
+	&"v03_cryo": Rect2(4.0, -114.0, 32.0, 18.0),
 }
 
 const FUNCTIONAL_SHARED: Dictionary = {
 	"Transit": &"transit_controller",
+	"TransitHub": &"transit_controller",
 	"ZoneGates": CONNECTION,
 	"Facility": SHARED,
 	"Operations": &"operations_controller",

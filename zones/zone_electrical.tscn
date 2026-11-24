@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
+[ext_resource type="PackedScene" path="res://assets/generated/electrical_structural_shell.glb" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/entities/field_flashlight.tscn" id="5"]
+
+[node name="ElectricalSlice" type="Node3D"]
+script = ExtResource("1")
+zone_id = &"electrical"
+
+[node name="StructuralShell" type="Node3D" parent="."]
+script = ExtResource("2")
+manifest_path = "res://manifests/migration/electrical_structural_shell.json"
+[node name="Visual" parent="StructuralShell" instance=ExtResource("3")]
+
+[node name="PortalC04" parent="." instance=ExtResource("4")]
+position = Vector3(35, 0, 58.2)
+target_zone = &"c04"
+target_socket = &"from_electrical"
+
+[node name="DoorSockets" type="Node3D" parent="."]
+[node name="entry" type="Marker3D" parent="DoorSockets"]
+position = Vector3(32.3, 1.1, 64.2)
+
+[node name="from_c04" type="Marker3D" parent="DoorSockets"]
+position = Vector3(35, 1.1, 59.8)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="LocalLight0" type="OmniLight3D" parent="."]
+position = Vector3(35.65, 7, 71.1)
+omni_range = 32
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 8
+
+[node name="Pickup0" parent="." instance=ExtResource("5")]
+position = Vector3(35, 0, 74)
+item_id = &"cell"
+display_name = "Celda de respaldo E-07"

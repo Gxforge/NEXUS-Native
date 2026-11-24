@@ -21,3 +21,25 @@ func connection(id: StringName) -> DoorConnection:
 
 func has_zone(id: StringName) -> bool:
 	return _zones.has(id)
+
+func zone_ids() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	for id: StringName in _zones:
+		ids.append(id)
+	ids.sort()
+	return ids
+
+func connection_ids() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	for id: StringName in _connections:
+		ids.append(id)
+	ids.sort()
+	return ids
+
+func connections_of(zone_id: StringName) -> Array[DoorConnection]:
+	var result: Array[DoorConnection] = []
+	for id in connection_ids():
+		var connection := _connections[id] as DoorConnection
+		if connection.from_zone == zone_id or connection.to_zone == zone_id:
+			result.append(connection)
+	return result

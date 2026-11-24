@@ -1,23 +1,392 @@
 {
-  "asset_id":"c04_structural_shell","generator_version":1,
-  "source_commit":"f4e1e819a9c783374e79dbc99cde4597099aba11",
-  "source_files":["src/scene/Environment.ts","src/scene/Sectors.ts"],
-  "coordinate_frame":{"world_origin":[-9,0,-14],"local_from_world":"x+9, y, z+14","units":"meters"},
-  "boxes":[
-    {"name":"floor","center":[9,-0.035,42],"size":[72,0.07,84],"material":"floor"},
-    {"name":"ceiling","center":[9,9.2,42],"size":[72.6,0.4,84],"material":"concrete"},
-    {"name":"west_wall","center":[-27,4.6,42],"size":[0.5,9.2,84],"material":"concrete"},
-    {"name":"east_wall","center":[45,4.6,42],"size":[0.5,9.2,84],"material":"concrete"},
-    {"name":"divider_west","center":[-14.6,4.6,0],"size":[24.8,9.2,0.6],"material":"concrete"},
-    {"name":"divider_middle","center":[9,4.6,0],"size":[13.6,9.2,0.6],"material":"concrete"},
-    {"name":"divider_east","center":[32.6,4.6,0],"size":[24.8,9.2,0.6],"material":"concrete"},
-    {"name":"transit_wall_west","center":[-11.1,4.6,84],"size":[32.2,9.2,0.5],"material":"concrete"},
-    {"name":"transit_wall_east","center":[29.1,4.6,84],"size":[32.2,9.2,0.5],"material":"concrete"},
-    {"name":"transit_header","center":[9,7.34,84],"size":[8,3.72,0.5],"material":"concrete"}
+  "asset_id": "c04_structural_shell",
+  "boxes": [
+    {
+      "center": [
+        9.0,
+        -0.2,
+        42.0
+      ],
+      "material": "floor",
+      "name": "floor",
+      "size": [
+        72.0,
+        0.4,
+        84.0
+      ]
+    },
+    {
+      "center": [
+        9.0,
+        9.4,
+        42.0
+      ],
+      "material": "concrete",
+      "name": "ceiling",
+      "size": [
+        72.6,
+        0.4,
+        84.6
+      ]
+    },
+    {
+      "center": [
+        -14.6,
+        4.6,
+        0.0
+      ],
+      "material": "concrete",
+      "name": "south_wall_0",
+      "size": [
+        24.8,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        9.0,
+        4.6,
+        0.0
+      ],
+      "material": "concrete",
+      "name": "south_wall_1",
+      "size": [
+        13.6,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        32.6,
+        4.6,
+        0.0
+      ],
+      "material": "concrete",
+      "name": "south_wall_2",
+      "size": [
+        24.8,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        0.0,
+        6.8,
+        0.0
+      ],
+      "material": "concrete",
+      "name": "south_header_0",
+      "size": [
+        4.4,
+        4.8,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        18.0,
+        6.8,
+        0.0
+      ],
+      "material": "concrete",
+      "name": "south_header_1",
+      "size": [
+        4.4,
+        4.8,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        -10.1,
+        4.6,
+        84.0
+      ],
+      "material": "concrete",
+      "name": "north_wall_0",
+      "size": [
+        33.8,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        28.1,
+        4.6,
+        84.0
+      ],
+      "material": "concrete",
+      "name": "north_wall_1",
+      "size": [
+        33.8,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        9.0,
+        6.8,
+        84.0
+      ],
+      "material": "concrete",
+      "name": "north_header_0",
+      "size": [
+        4.4,
+        4.8,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        -27.0,
+        4.6,
+        42.0
+      ],
+      "material": "concrete",
+      "name": "west_wall_0",
+      "size": [
+        0.5,
+        9.2,
+        84.0
+      ]
+    },
+    {
+      "center": [
+        45.0,
+        4.6,
+        42.0
+      ],
+      "material": "concrete",
+      "name": "east_wall_0",
+      "size": [
+        0.5,
+        9.2,
+        84.0
+      ]
+    },
+    {
+      "center": [
+        -23.1,
+        4.6,
+        66.2
+      ],
+      "material": "concrete",
+      "name": "surveillance_partition_0",
+      "size": [
+        7.8,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        -11.55,
+        4.6,
+        66.2
+      ],
+      "material": "concrete",
+      "name": "surveillance_partition_1",
+      "size": [
+        6.5,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        -17.0,
+        6.8,
+        66.2
+      ],
+      "material": "concrete",
+      "name": "surveillance_partition_header_0",
+      "size": [
+        4.4,
+        4.8,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        29.55,
+        4.6,
+        58.2
+      ],
+      "material": "concrete",
+      "name": "electrical_partition_0",
+      "size": [
+        6.5,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        41.1,
+        4.6,
+        58.2
+      ],
+      "material": "concrete",
+      "name": "electrical_partition_1",
+      "size": [
+        7.8,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        35.0,
+        6.8,
+        58.2
+      ],
+      "material": "concrete",
+      "name": "electrical_partition_header_0",
+      "size": [
+        4.4,
+        4.8,
+        0.5
+      ]
+    }
   ],
-  "materials":{
-    "floor":{"base_color":"#202323","metallic":0.18,"roughness":0.72},
-    "concrete":{"base_color":"#515957","metallic":0.12,"roughness":0.70}
+  "coordinate_frame": {
+    "local_from_world": "x+9, y, z+14",
+    "units": "meters",
+    "world_origin": [
+      9.0,
+      0.0,
+      14.0
+    ]
   },
-  "expected_bounds":{"min":[-27.3,-0.07,-0.3],"max":[45.3,9.4,84.25]}
+  "doors": [
+    {
+      "name": "c04_to_a01",
+      "portal_yaw": 0.0,
+      "socket": "to_a01",
+      "socket_world": [
+        -9.0,
+        -12.4
+      ],
+      "target_socket": "from_c04",
+      "target_zone": "a01",
+      "wall": "south",
+      "width": 4.4,
+      "world_position": [
+        -9.0,
+        -14.0
+      ]
+    },
+    {
+      "name": "c04_to_b02",
+      "portal_yaw": 0.0,
+      "socket": "from_b02",
+      "socket_world": [
+        9.0,
+        -12.4
+      ],
+      "target_socket": "from_c04",
+      "target_zone": "b02",
+      "wall": "south",
+      "width": 4.4,
+      "world_position": [
+        9.0,
+        -14.0
+      ]
+    },
+    {
+      "name": "c04_to_transit_hub",
+      "portal_yaw": 180.0,
+      "socket": "from_transit_hub",
+      "socket_world": [
+        0.0,
+        68.4
+      ],
+      "target_socket": "from_c04",
+      "target_zone": "transit_hub",
+      "wall": "north",
+      "width": 4.4,
+      "world_position": [
+        0.0,
+        70.0
+      ]
+    },
+    {
+      "name": "c04_to_surveillance",
+      "portal_yaw": 180.0,
+      "socket": "from_surveillance",
+      "socket_world": [
+        -26.0,
+        50.6
+      ],
+      "target_socket": "from_c04",
+      "target_zone": "surveillance",
+      "wall": "partition",
+      "width": 4.4,
+      "world_position": [
+        -26.0,
+        52.2
+      ]
+    },
+    {
+      "name": "c04_to_electrical",
+      "portal_yaw": 180.0,
+      "socket": "from_electrical",
+      "socket_world": [
+        26.0,
+        42.6
+      ],
+      "target_socket": "from_c04",
+      "target_zone": "electrical",
+      "wall": "partition",
+      "width": 4.4,
+      "world_position": [
+        26.0,
+        44.2
+      ]
+    }
+  ],
+  "expected_bounds": {
+    "max": [
+      45.3,
+      9.6,
+      84.3
+    ],
+    "min": [
+      -27.3,
+      -0.4,
+      -0.3
+    ]
+  },
+  "expected_collisions": 18,
+  "generator_version": 2,
+  "height": 9.2,
+  "materials": {
+    "concrete": {
+      "base_color": "#515957",
+      "metallic": 0.12,
+      "roughness": 0.7
+    },
+    "floor": {
+      "base_color": "#202323",
+      "metallic": 0.18,
+      "roughness": 0.72
+    }
+  },
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "source_files": [
+    "src/scene/Environment.ts",
+    "src/scene/Sectors.ts",
+    "src/scene/ZoneGates.ts"
+  ],
+  "world_rect": [
+    -36.0,
+    -14.0,
+    36.0,
+    70.0
+  ]
 }

@@ -13,5 +13,7 @@ Fuente de solo lectura: `f4e1e819a9c783374e79dbc99cde4597099aba11` (`nexus-v15.1
 - [Fase 2B · Puerta A/01](PHASE_02B_A01_DOOR.md)
 - [Fase 3A · Streaming C-04 ↔ A-01](PHASE_03_C04_A01_STREAMING.md)
 - [Fase 4A · Estructuras reales](PHASE_04_STRUCTURAL_SHELLS.md)
+- Fases 5–12: W-01 nativo, texturas procedurales, source batch, interacción, exportación de sectores, política de propiedad, contactos/escaneo, `SceneExperience` y flujo de arranque (ver índice en `MIGRATION_PROGRESS.md`).
+- [Fase 13 · Doce módulos enlazados](PHASE_13_ZONE_MODULES.md)
 
 Solo “migrado y verificado” implica implementación final. Sintético, parcial, planificado o exportado no equivale a migrado.

@@ -1,0 +1,82 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
+[ext_resource type="PackedScene" path="res://assets/generated/v03_gallery_structural_shell.glb" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/entities/field_flashlight.tscn" id="5"]
+
+[node name="V03GallerySlice" type="Node3D"]
+script = ExtResource("1")
+zone_id = &"v03_gallery"
+
+[node name="StructuralShell" type="Node3D" parent="."]
+script = ExtResource("2")
+manifest_path = "res://manifests/migration/v03_gallery_structural_shell.json"
+[node name="Visual" parent="StructuralShell" instance=ExtResource("3")]
+
+[node name="PortalB02" parent="." instance=ExtResource("4")]
+position = Vector3(27, 0, -24)
+rotation_degrees = Vector3(0, 180, 0)
+target_zone = &"b02"
+target_socket = &"from_v03_gallery"
+
+[node name="PortalH01" parent="." instance=ExtResource("4")]
+position = Vector3(23, 0, -48)
+rotation_degrees = Vector3(0, 90, 0)
+target_zone = &"h01"
+target_socket = &"from_v03_gallery"
+
+[node name="PortalD02" parent="." instance=ExtResource("4")]
+position = Vector3(31, 0, -68)
+rotation_degrees = Vector3(0, -90, 0)
+target_zone = &"d02"
+target_socket = &"from_v03_gallery"
+
+[node name="PortalV03Cryo" parent="." instance=ExtResource("4")]
+position = Vector3(27, 0, -82)
+target_zone = &"v03_cryo"
+target_socket = &"from_v03_gallery"
+
+[node name="DoorSockets" type="Node3D" parent="."]
+[node name="entry" type="Marker3D" parent="DoorSockets"]
+position = Vector3(29, 1.1, -76)
+
+[node name="from_b02" type="Marker3D" parent="DoorSockets"]
+position = Vector3(27, 1.1, -25.6)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="from_h01" type="Marker3D" parent="DoorSockets"]
+position = Vector3(24.6, 1.1, -48)
+rotation_degrees = Vector3(0, 270, 0)
+
+[node name="from_d02" type="Marker3D" parent="DoorSockets"]
+position = Vector3(29.4, 1.1, -68)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="from_v03_cryo" type="Marker3D" parent="DoorSockets"]
+position = Vector3(27, 1.1, -80.4)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="LocalLight0" type="OmniLight3D" parent="."]
+position = Vector3(27, 2.4, -72)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight1" type="OmniLight3D" parent="."]
+position = Vector3(27, 2.4, -52)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight2" type="OmniLight3D" parent="."]
+position = Vector3(27, 2.4, -32)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="Pickup0" parent="." instance=ExtResource("5")]
+position = Vector3(27, 0, -52)
+item_id = &"sample"
+display_name = "Muestra V-03"

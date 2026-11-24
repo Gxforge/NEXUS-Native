@@ -1,0 +1,274 @@
+{
+  "asset_id": "transit_hub_structural_shell",
+  "boxes": [
+    {
+      "center": [
+        9.0,
+        -0.2,
+        97.0
+      ],
+      "material": "floor",
+      "name": "floor",
+      "size": [
+        72.0,
+        0.4,
+        26.0
+      ]
+    },
+    {
+      "center": [
+        9.0,
+        9.4,
+        97.0
+      ],
+      "material": "transit",
+      "name": "ceiling",
+      "size": [
+        72.6,
+        0.4,
+        26.6
+      ]
+    },
+    {
+      "center": [
+        -10.1,
+        4.6,
+        84.0
+      ],
+      "material": "transit",
+      "name": "south_wall_0",
+      "size": [
+        33.8,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        28.1,
+        4.6,
+        84.0
+      ],
+      "material": "transit",
+      "name": "south_wall_1",
+      "size": [
+        33.8,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        9.0,
+        6.8,
+        84.0
+      ],
+      "material": "transit",
+      "name": "south_header_0",
+      "size": [
+        4.4,
+        4.8,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        -13.85,
+        4.6,
+        110.0
+      ],
+      "material": "transit",
+      "name": "north_wall_0",
+      "size": [
+        26.3,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        12.0,
+        4.6,
+        110.0
+      ],
+      "material": "transit",
+      "name": "north_wall_1",
+      "size": [
+        16.6,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        34.85,
+        4.6,
+        110.0
+      ],
+      "material": "transit",
+      "name": "north_wall_2",
+      "size": [
+        20.3,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        1.5,
+        6.8,
+        110.0
+      ],
+      "material": "transit",
+      "name": "north_header_0",
+      "size": [
+        4.4,
+        4.8,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        22.5,
+        6.8,
+        110.0
+      ],
+      "material": "transit",
+      "name": "north_header_1",
+      "size": [
+        4.4,
+        4.8,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        -27.0,
+        4.6,
+        97.0
+      ],
+      "material": "transit",
+      "name": "west_wall_0",
+      "size": [
+        0.5,
+        9.2,
+        26.0
+      ]
+    },
+    {
+      "center": [
+        45.0,
+        4.6,
+        97.0
+      ],
+      "material": "transit",
+      "name": "east_wall_0",
+      "size": [
+        0.5,
+        9.2,
+        26.0
+      ]
+    }
+  ],
+  "coordinate_frame": {
+    "local_from_world": "x+9, y, z+14",
+    "units": "meters",
+    "world_origin": [
+      9.0,
+      0.0,
+      14.0
+    ]
+  },
+  "doors": [
+    {
+      "name": "transit_hub_to_c04",
+      "portal_yaw": 0.0,
+      "socket": "from_c04",
+      "socket_world": [
+        0.0,
+        71.6
+      ],
+      "target_socket": "from_transit_hub",
+      "target_zone": "c04",
+      "wall": "south",
+      "width": 4.4,
+      "world_position": [
+        0.0,
+        70.0
+      ]
+    },
+    {
+      "name": "transit_hub_to_transit_road",
+      "portal_yaw": 180.0,
+      "socket": "from_transit_road",
+      "socket_world": [
+        -7.5,
+        94.4
+      ],
+      "target_socket": "from_transit_hub",
+      "target_zone": "transit_road",
+      "wall": "north",
+      "width": 4.4,
+      "world_position": [
+        -7.5,
+        96.0
+      ]
+    },
+    {
+      "name": "transit_hub_to_transit_rail",
+      "portal_yaw": 180.0,
+      "socket": "from_transit_rail",
+      "socket_world": [
+        13.5,
+        94.4
+      ],
+      "target_socket": "from_transit_hub",
+      "target_zone": "transit_rail",
+      "wall": "north",
+      "width": 4.4,
+      "world_position": [
+        13.5,
+        96.0
+      ]
+    }
+  ],
+  "expected_bounds": {
+    "max": [
+      45.3,
+      9.6,
+      110.3
+    ],
+    "min": [
+      -27.3,
+      -0.4,
+      83.7
+    ]
+  },
+  "expected_collisions": 12,
+  "generator_version": 2,
+  "height": 9.2,
+  "materials": {
+    "floor": {
+      "base_color": "#202323",
+      "metallic": 0.18,
+      "roughness": 0.72
+    },
+    "transit": {
+      "base_color": "#262B30",
+      "metallic": 0.42,
+      "roughness": 0.5
+    }
+  },
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "source_files": [
+    "src/scene/Environment.ts",
+    "src/scene/Sectors.ts",
+    "src/scene/ZoneGates.ts"
+  ],
+  "world_rect": [
+    -36.0,
+    70.0,
+    36.0,
+    96.0
+  ]
+}

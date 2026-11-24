@@ -1,0 +1,130 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
+[ext_resource type="PackedScene" path="res://assets/generated/transit_rail_structural_shell.glb" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="4"]
+
+[node name="TransitRailSlice" type="Node3D"]
+script = ExtResource("1")
+zone_id = &"transit_rail"
+
+[node name="StructuralShell" type="Node3D" parent="."]
+script = ExtResource("2")
+manifest_path = "res://manifests/migration/transit_rail_structural_shell.json"
+[node name="Visual" parent="StructuralShell" instance=ExtResource("3")]
+
+[node name="PortalTransitHub" parent="." instance=ExtResource("4")]
+position = Vector3(22.5, 0, 110)
+target_zone = &"transit_hub"
+target_socket = &"from_transit_rail"
+
+[node name="DoorSockets" type="Node3D" parent="."]
+[node name="entry" type="Marker3D" parent="DoorSockets"]
+position = Vector3(21.1, 1.1, 116)
+
+[node name="from_transit_hub" type="Marker3D" parent="DoorSockets"]
+position = Vector3(22.5, 1.1, 111.6)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="LocalLight0" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 170)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight1" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 290)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight2" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 410)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight3" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 530)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight4" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 650)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight5" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 770)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight6" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 890)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight7" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 1010)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight8" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 1130)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight9" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 1250)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight10" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 1370)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight11" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 1490)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight12" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 1610)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight13" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 1730)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight14" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 1850)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight15" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 1970)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6
+
+[node name="LocalLight16" type="OmniLight3D" parent="."]
+position = Vector3(22.55, 3.8, 2090)
+omni_range = 26
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 6

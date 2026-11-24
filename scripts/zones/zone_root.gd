@@ -9,6 +9,10 @@ var is_active := false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
+	set_meta("zone_id", zone_id)
+	set_meta("survey_id", "zone_%s" % str(zone_id))
+	set_meta("survey_name", "Zona %s" % str(zone_id).to_upper())
+	set_meta("survey_detail", "Módulo NEXUS registrado en el mapa de campo")
 	call_deferred("_announce_ready")
 
 func _announce_ready() -> void:

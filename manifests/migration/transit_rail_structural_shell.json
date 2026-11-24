@@ -1,0 +1,184 @@
+{
+  "asset_id": "transit_rail_structural_shell",
+  "boxes": [
+    {
+      "center": [
+        22.55,
+        -0.2,
+        1110.0
+      ],
+      "material": "floor",
+      "name": "floor",
+      "size": [
+        14.9,
+        0.4,
+        2000.0
+      ]
+    },
+    {
+      "center": [
+        22.55,
+        6.2,
+        1110.0
+      ],
+      "material": "transit",
+      "name": "ceiling",
+      "size": [
+        15.5,
+        0.4,
+        2000.6
+      ]
+    },
+    {
+      "center": [
+        17.7,
+        3.0,
+        110.0
+      ],
+      "material": "transit",
+      "name": "south_wall_0",
+      "size": [
+        5.2,
+        6.0,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        27.35,
+        3.0,
+        110.0
+      ],
+      "material": "transit",
+      "name": "south_wall_1",
+      "size": [
+        5.3,
+        6.0,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        22.5,
+        5.2,
+        110.0
+      ],
+      "material": "transit",
+      "name": "south_header_0",
+      "size": [
+        4.4,
+        1.6,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        22.55,
+        3.0,
+        2110.0
+      ],
+      "material": "transit",
+      "name": "north_wall_0",
+      "size": [
+        14.9,
+        6.0,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        15.1,
+        3.0,
+        1110.0
+      ],
+      "material": "transit",
+      "name": "west_wall_0",
+      "size": [
+        0.5,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "center": [
+        30.0,
+        3.0,
+        1110.0
+      ],
+      "material": "transit",
+      "name": "east_wall_0",
+      "size": [
+        0.5,
+        6.0,
+        2000.0
+      ]
+    }
+  ],
+  "coordinate_frame": {
+    "local_from_world": "x+9, y, z+14",
+    "units": "meters",
+    "world_origin": [
+      9.0,
+      0.0,
+      14.0
+    ]
+  },
+  "doors": [
+    {
+      "name": "transit_rail_to_transit_hub",
+      "portal_yaw": 0.0,
+      "socket": "from_transit_hub",
+      "socket_world": [
+        13.5,
+        97.6
+      ],
+      "target_socket": "from_transit_rail",
+      "target_zone": "transit_hub",
+      "wall": "south",
+      "width": 4.4,
+      "world_position": [
+        13.5,
+        96.0
+      ]
+    }
+  ],
+  "expected_bounds": {
+    "max": [
+      30.3,
+      6.4,
+      2110.3
+    ],
+    "min": [
+      14.8,
+      -0.4,
+      109.7
+    ]
+  },
+  "expected_collisions": 8,
+  "generator_version": 2,
+  "height": 6.0,
+  "materials": {
+    "floor": {
+      "base_color": "#202323",
+      "metallic": 0.18,
+      "roughness": 0.72
+    },
+    "transit": {
+      "base_color": "#262B30",
+      "metallic": 0.42,
+      "roughness": 0.5
+    }
+  },
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "source_files": [
+    "src/scene/Environment.ts",
+    "src/scene/Sectors.ts",
+    "src/scene/ZoneGates.ts"
+  ],
+  "world_rect": [
+    6.1,
+    96.0,
+    21.0,
+    2096.0
+  ]
+}

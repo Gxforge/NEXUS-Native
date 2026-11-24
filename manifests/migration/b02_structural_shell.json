@@ -1,0 +1,229 @@
+{
+  "asset_id": "b02_structural_shell",
+  "boxes": [
+    {
+      "center": [
+        27.0,
+        -0.2,
+        -12.0
+      ],
+      "material": "floor",
+      "name": "floor",
+      "size": [
+        36.0,
+        0.4,
+        24.0
+      ]
+    },
+    {
+      "center": [
+        27.0,
+        9.4,
+        -12.0
+      ],
+      "material": "concrete",
+      "name": "ceiling",
+      "size": [
+        36.6,
+        0.4,
+        24.6
+      ]
+    },
+    {
+      "center": [
+        16.9,
+        4.6,
+        -24.0
+      ],
+      "material": "concrete",
+      "name": "south_wall_0",
+      "size": [
+        15.8,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        37.1,
+        4.6,
+        -24.0
+      ],
+      "material": "concrete",
+      "name": "south_wall_1",
+      "size": [
+        15.8,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        27.0,
+        6.8,
+        -24.0
+      ],
+      "material": "concrete",
+      "name": "south_header_0",
+      "size": [
+        4.4,
+        4.8,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        12.4,
+        4.6,
+        0.0
+      ],
+      "material": "concrete",
+      "name": "north_wall_0",
+      "size": [
+        6.8,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        32.6,
+        4.6,
+        0.0
+      ],
+      "material": "concrete",
+      "name": "north_wall_1",
+      "size": [
+        24.8,
+        9.2,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        18.0,
+        6.8,
+        0.0
+      ],
+      "material": "concrete",
+      "name": "north_header_0",
+      "size": [
+        4.4,
+        4.8,
+        0.5
+      ]
+    },
+    {
+      "center": [
+        9.0,
+        4.6,
+        -12.0
+      ],
+      "material": "concrete",
+      "name": "west_wall_0",
+      "size": [
+        0.5,
+        9.2,
+        24.0
+      ]
+    },
+    {
+      "center": [
+        45.0,
+        4.6,
+        -12.0
+      ],
+      "material": "concrete",
+      "name": "east_wall_0",
+      "size": [
+        0.5,
+        9.2,
+        24.0
+      ]
+    }
+  ],
+  "coordinate_frame": {
+    "local_from_world": "x+9, y, z+14",
+    "units": "meters",
+    "world_origin": [
+      9.0,
+      0.0,
+      14.0
+    ]
+  },
+  "doors": [
+    {
+      "name": "b02_to_c04",
+      "portal_yaw": 180.0,
+      "socket": "from_c04",
+      "socket_world": [
+        9.0,
+        -15.6
+      ],
+      "target_socket": "from_b02",
+      "target_zone": "c04",
+      "wall": "north",
+      "width": 4.4,
+      "world_position": [
+        9.0,
+        -14.0
+      ]
+    },
+    {
+      "name": "b02_to_v03_gallery",
+      "portal_yaw": 0.0,
+      "socket": "from_v03_gallery",
+      "socket_world": [
+        18.0,
+        -36.4
+      ],
+      "target_socket": "from_b02",
+      "target_zone": "v03_gallery",
+      "wall": "south",
+      "width": 4.4,
+      "world_position": [
+        18.0,
+        -38.0
+      ]
+    }
+  ],
+  "expected_bounds": {
+    "max": [
+      45.3,
+      9.6,
+      0.3
+    ],
+    "min": [
+      8.7,
+      -0.4,
+      -24.3
+    ]
+  },
+  "expected_collisions": 10,
+  "generator_version": 2,
+  "height": 9.2,
+  "materials": {
+    "concrete": {
+      "base_color": "#515957",
+      "metallic": 0.12,
+      "roughness": 0.7
+    },
+    "floor": {
+      "base_color": "#202323",
+      "metallic": 0.18,
+      "roughness": 0.72
+    }
+  },
+  "source_commit": "f4e1e819a9c783374e79dbc99cde4597099aba11",
+  "source_files": [
+    "src/scene/Environment.ts",
+    "src/scene/Sectors.ts",
+    "src/scene/ZoneGates.ts"
+  ],
+  "world_rect": [
+    0.0,
+    -38.0,
+    36.0,
+    -14.0
+  ]
+}

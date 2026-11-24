@@ -1,0 +1,56 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
+[ext_resource type="PackedScene" path="res://assets/generated/b02_structural_shell.glb" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/entities/field_flashlight.tscn" id="5"]
+
+[node name="B02StructuralSlice" type="Node3D"]
+script = ExtResource("1")
+zone_id = &"b02"
+
+[node name="StructuralShell" type="Node3D" parent="."]
+script = ExtResource("2")
+manifest_path = "res://manifests/migration/b02_structural_shell.json"
+[node name="Visual" parent="StructuralShell" instance=ExtResource("3")]
+
+[node name="PortalC04" parent="." instance=ExtResource("4")]
+position = Vector3(18, 0, 0)
+rotation_degrees = Vector3(0, 180, 0)
+target_zone = &"c04"
+target_socket = &"from_b02"
+
+[node name="PortalV03Gallery" parent="." instance=ExtResource("4")]
+position = Vector3(27, 0, -24)
+target_zone = &"v03_gallery"
+target_socket = &"from_b02"
+
+[node name="DoorSockets" type="Node3D" parent="."]
+[node name="entry" type="Marker3D" parent="DoorSockets"]
+position = Vector3(15, 1.1, -18)
+
+[node name="from_c04" type="Marker3D" parent="DoorSockets"]
+position = Vector3(18, 1.1, -1.6)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="from_v03_gallery" type="Marker3D" parent="DoorSockets"]
+position = Vector3(27, 1.1, -22.4)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="LocalLight0" type="OmniLight3D" parent="."]
+position = Vector3(18, 7, -12)
+omni_range = 32
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 10
+
+[node name="LocalLight1" type="OmniLight3D" parent="."]
+position = Vector3(36, 7, -12)
+omni_range = 32
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 8
+
+[node name="Pickup0" parent="." instance=ExtResource("5")]
+position = Vector3(21, 0, -16)
+item_id = &"cell"
+display_name = "Celda de carga B-02"

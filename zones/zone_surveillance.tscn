@@ -1,0 +1,34 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
+[ext_resource type="PackedScene" path="res://assets/generated/surveillance_structural_shell.glb" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="4"]
+
+[node name="SurveillanceSlice" type="Node3D"]
+script = ExtResource("1")
+zone_id = &"surveillance"
+
+[node name="StructuralShell" type="Node3D" parent="."]
+script = ExtResource("2")
+manifest_path = "res://manifests/migration/surveillance_structural_shell.json"
+[node name="Visual" parent="StructuralShell" instance=ExtResource("3")]
+
+[node name="PortalC04" parent="." instance=ExtResource("4")]
+position = Vector3(-17, 0, 66.2)
+target_zone = &"c04"
+target_socket = &"from_surveillance"
+
+[node name="DoorSockets" type="Node3D" parent="."]
+[node name="entry" type="Marker3D" parent="DoorSockets"]
+position = Vector3(-21, 1.1, 72.2)
+
+[node name="from_c04" type="Marker3D" parent="DoorSockets"]
+position = Vector3(-17, 1.1, 67.8)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="LocalLight0" type="OmniLight3D" parent="."]
+position = Vector3(-17.65, 7, 75.1)
+omni_range = 32
+light_color = Color(0.62, 0.83, 0.87, 1)
+light_energy = 7
