@@ -116,6 +116,60 @@ def default_target() -> Path:
     return script_dir
 
 
+def godot_cache_dir(target: Path) -> Path:
+    return target / ".godot"
+
+
+def orphan_imports(target: Path) -> list[Path]:
+    """`.import` cuyo archivo fuente ya no existe (el proyecto los ignora)."""
+    result: list[Path] = []
+    for import_file in target.rglob("*.import"):
+        if any(part in {".godot", ".git"} for part in import_file.parts):
+            continue
+        try:
+            text = import_file.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        for line in text.splitlines():
+            if line.startswith("source_file="):
+                source = line.split("=", 1)[1].strip().strip('"')
+                if source.startswith("res://"):
+                    if not (target / source[len("res://"):]).is_file():
+                        result.append(import_file)
+                break
+    return result
+
+
+def clean_godot_cache(target: Path, log) -> bool:
+    cache = godot_cache_dir(target)
+    if not cache.exists():
+        return False
+    try:
+        shutil.rmtree(cache)
+    except OSError as error:
+        log("warn", "No se pudo borrar la caché .godot: %s" % error)
+        return False
+    log("warn", "Caché .godot borrada: Godot la reconstruye y reimporta al abrir el proyecto.")
+    return True
+
+
+def repair_project(target: Path, log) -> tuple[int, bool]:
+    """Deja el proyecto en estado reimportable: caché fuera y .import huérfanos."""
+    removed = 0
+    for import_file in orphan_imports(target):
+        try:
+            import_file.unlink()
+            removed += 1
+        except OSError:
+            pass
+    if removed:
+        log("warn", "%d archivo(s) .import huérfano(s) retirado(s) (su fuente no está en el proyecto)."
+            % removed)
+    cleaned = clean_godot_cache(target, log)
+    log("info", "Reparación terminada: abre Godot y deja que reimporte (la primera vez tarda).")
+    return removed, cleaned
+
+
 def settings_path() -> Path:
     return Path.home() / SETTINGS_NAME
 
@@ -546,6 +600,12 @@ class SyncEngine:
             temporary = target / (MANIFEST_NAME + ".tmp")
             temporary.write_text(json.dumps(payload, indent=1, sort_keys=True) + "\n", encoding="utf-8")
             os.replace(temporary, target / MANIFEST_NAME)
+            if report.changed:
+                if getattr(options, "repair", False) or getattr(options, "clean_cache", False):
+                    repair_project(target, self._log)
+                elif godot_cache_dir(target).exists():
+                    self._log("info", "Si Godot muestra errores de UID, ciérralo y borra la carpeta "
+                                      ".godot (o pulsa Reparar): se reimporta limpio.")
         return report
 
 
@@ -576,6 +636,10 @@ def build_parser() -> argparse.ArgumentParser:
                         help="vigila la rama y avisa (o sincroniza con --auto-sync)")
     parser.add_argument("--auto-sync", action="store_true", help="con --watch, aplica los cambios")
     parser.add_argument("--check", action="store_true", help="solo compara commits remotos y sale")
+    parser.add_argument("--clean-cache", action="store_true",
+                        help="borra la caché .godot después de actualizar (reimporta limpio)")
+    parser.add_argument("--repair", action="store_true",
+                        help="borra la caché .godot y los .import huérfanos y sale")
     parser.add_argument("--force-download", action="store_true",
                         help="descarga aunque el commit remoto ya esté sincronizado (recupera archivos editados)")
     parser.add_argument("--gui", action="store_true", help="fuerza la ventana")
@@ -644,6 +708,13 @@ def run_cli(args: argparse.Namespace) -> int:
                 return 0
         if not args.auto_sync:
             return 0
+
+    if args.repair and not args.watch and not args.check:
+        if not target.is_dir():
+            print("ERROR: la carpeta no existe: %s" % target, file=sys.stderr)
+            return 2
+        repair_project(target, cli_log)
+        return 0
 
     if target.exists() and any(target.iterdir()) and not (target / "project.godot").is_file() and not args.force:
         print("ERROR: %s no parece la raíz del proyecto (falta project.godot)." % target, file=sys.stderr)
@@ -717,6 +788,7 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
             self.auto_apply = tk.BooleanVar(value=bool(self.settings.get("auto_apply", False)))
             self.remember_token = tk.BooleanVar(value=False)
             self.force_download = tk.BooleanVar(value=False)
+            self.clean_cache = tk.BooleanVar(value=bool(self.settings.get("clean_cache", True)))
             self.status = tk.StringVar(value="Listo")
             self.detail = tk.StringVar(value="")
             self.remote_label = tk.StringVar(value="Rama remota: —")
@@ -803,6 +875,8 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
                             variable=self.auto_apply).grid(row=1, column=1, sticky="w", padx=16, pady=(6, 0))
             ttk.Checkbutton(options, text="forzar descarga y comparación",
                             variable=self.force_download).grid(row=1, column=2, sticky="w", padx=16, pady=(6, 0))
+            ttk.Checkbutton(options, text="borrar caché .godot al actualizar (recomendado)",
+                            variable=self.clean_cache).grid(row=2, column=0, sticky="w", pady=(6, 0))
 
             actions = ttk.Frame(outer)
             actions.pack(fill="x", pady=(0, 10))
@@ -816,6 +890,7 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
             self.cancel_button = ttk.Button(actions, text="Cancelar", command=self.cancel, state="disabled")
             self.cancel_button.pack(side="left", padx=8)
             ttk.Button(actions, text="Abrir carpeta", command=self._open_target).pack(side="right")
+            ttk.Button(actions, text="Reparar", command=self.repair).pack(side="right", padx=8)
 
             progress_box = ttk.Frame(outer)
             progress_box.pack(fill="x")
@@ -908,6 +983,8 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
                 keep_download=None,
                 force=False,
                 force_download=bool(self.force_download.get()),
+                clean_cache=bool(self.clean_cache.get()),
+                repair=False,
                 yes=True,
             )
 
@@ -927,6 +1004,7 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
                 "backup": bool(self.backup.get()),
                 "auto_check": bool(self.auto_check.get()),
                 "auto_apply": bool(self.auto_apply.get()),
+                "clean_cache": bool(self.clean_cache.get()),
             }
             if self.remember_token.get() and self.token.get().strip():
                 data["token"] = self.token.get().strip()
@@ -995,6 +1073,32 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
             self.worker = threading.Thread(target=work, daemon=True)
             self.worker.start()
 
+        def repair(self) -> None:
+            target = Path(self.target.get()).expanduser()
+            if not target.is_dir():
+                messagebox.showwarning("NEXUS", "La carpeta no existe.")
+                return
+            if not messagebox.askyesno("NEXUS · reparar",
+                                       "Se borrará la caché .godot (Godot la reconstruye al abrir) "
+                                       "y los .import sin archivo fuente.\n\n¿Continuar?"):
+                return
+            if self.worker is not None:
+                return
+            self._set_running(True)
+            self.status.set("Reparando proyecto…")
+            self.progress.configure(value=0)
+
+            def work() -> None:
+                try:
+                    removed, cleaned = repair_project(
+                        target, lambda level, text: self.events.put(("log", level, text)))
+                    self.events.put(("repaired", removed, cleaned))
+                except Exception as error:  # noqa: BLE001
+                    self.events.put(("error", str(error)))
+
+            self.worker = threading.Thread(target=work, daemon=True)
+            self.worker.start()
+
         def cancel(self) -> None:
             self.cancel_event.set()
             self.status.set("Cancelando…")
@@ -1025,6 +1129,14 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
                         self._on_checked(event[1], event[2])
                     elif kind == "done":
                         self._on_done(event[1])
+                    elif kind == "repaired":
+                        self.worker = None
+                        self._set_running(False)
+                        self.progress.configure(value=0)
+                        self.status.set("Proyecto reparado · abre Godot para reimportar")
+                        self._append("ok", "Reparación lista: %d .import huérfano(s), caché %s."
+                                     % (event[1], "borrada" if event[2] else "intacta"))
+                        self.after(300, self.check)
                     elif kind == "cancelled":
                         self.worker = None
                         self._set_running(False)

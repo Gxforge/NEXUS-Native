@@ -72,6 +72,8 @@ plan (nuevos `+`, actualizados `~`, eliminados `-`).
 | `--backup-dir RUTA` / `--no-backup` | dónde guardar el respaldo de lo sobrescrito (por defecto, junto al proyecto) |
 | `--keep-download RUTA` | conserva el zip descargado |
 | `--force` | permite un destino que no contenga `project.godot` |
+| `--clean-cache` | tras actualizar, borra la caché `.godot` para que Godot reimporte limpio |
+| `--repair` | solo repara: borra la caché `.godot` y los `.import` sin fuente, sin sincronizar |
 
 ## Descargas eficientes
 
@@ -82,6 +84,29 @@ Para volver a bajar y comparar de todos modos —por ejemplo para recuperar
 archivos que editaste— marca **“forzar descarga y comparación”** en la ventana o
 usa `--force-download` en consola. La barra muestra además velocidad y tiempo
 restante estimados.
+
+## Si Godot avisa de UID o de importaciones
+
+Los mensajes `ERROR: Unrecognized UID: "uid://…"` **no son del juego**: son de la
+caché de importación. Godot guarda en `.godot/` el mapa entre cada `uid://` y su
+archivo; si esa caché se creó antes de que llegaran los archivos nuevos (o quedó
+a medias porque el editor estaba abierto), los UID del proyecto no aparecen en
+ella y Godot avisa mientras el editor reimporta. La carpeta `.godot/` es
+descartable: se reconstruye sola.
+
+Tres formas de resolverlo, de la más cómoda a la manual:
+
+1. Deja marcada **“borrar caché .godot al actualizar (recomendado)”**: cada
+   sincronización que cambia archivos elimina la caché y Godot reimporta entero
+   la próxima vez que abras el proyecto.
+2. Pulsa **Reparar** en la ventana (o `python sync_nexus.py --repair --target "D:\proyectos\proyecto game\nexus-native"`).
+   Borra la caché y los `.import` cuyo archivo fuente ya no existe.
+3. A mano: cierra Godot, borra la carpeta `.godot\` del proyecto y vuelve a
+   abrirlo. La primera apertura tarda más porque reimporta todo.
+
+Los avisos de texturas 3D (`mipmaps`, `VRAM Compressed`) son informativos: el
+proyecto ya trae esas tres texturas preconfiguradas en modo VRAM comprimido, así
+que no deberían volver a aparecer.
 
 ## Garantías
 
