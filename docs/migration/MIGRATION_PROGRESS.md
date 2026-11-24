@@ -102,6 +102,12 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - La primera pantalla del banco de C–04 pasa a `kind = "telemetry"` con un `TelemetryFeed` (`C04Feed`) creado con el mobiliario: carga/temperatura de red, sujeto, integridad, distancia e intención en vivo.
 - `validate_dressing` 110 → **116 checks** (pasarela, pórtico, carretilla, conos, pantallas y feed enlazado). Total: **2014 checks**, 0 fallos. Hoja `reports/phase27-ingame.png`. Detalle en `PHASE_27_CONTAINMENT_SCALE.md`.
 
+## Fase 28 · Modelos originales y aspecto de la web
+- `scripts/world/prop_library.gd` reparte los grupos de `assets/generated/source-batch/`: los tres vasos de H–01 y la larva salen ya de `workshop_pods.glb` y la puerta de la bóveda de B–02 de `vault.glb` (131 mallas), escalada por el disco real de 7,18 m.
+- `project.godot` pasa de `rendering_method = "mobile"` a **`forward_plus`**: sin SSAO ni iluminación por píxel decente el laboratorio parecía de plástico.
+- `Environment` con ACES + glow + SSAO, `DirectionalLight3D` `#a6caff`, suelo con la textura de `createFloorTexture()` (repetida cada 12 m), relleno de luz por sala con rebote a 0,7 m y polvo biológico de `Effects.ts`.
+- Capturas con `--rendering-method mobile` (llvmpipe no da para Forward+): nueve zonas y hoja `reports/phase28-ingame.png`. Detalle en `PHASE_28_ORIGINAL_MODELS.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.

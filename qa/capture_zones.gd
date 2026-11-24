@@ -9,7 +9,7 @@ extends Node
 
 const VIEWS := {
 	"h01": [Vector3(3.5, 0.0, -49.0), Vector3(-5.5, 2.0, -62.0)],
-	"b02": [Vector3(30.0, 0.0, -3.0), Vector3(22.0, 2.8, -17.0)],
+	"b02": [Vector3(24.0, 0.0, -6.0), Vector3(36.0, 2.4, -22.0)],
 	"electrical": [Vector3(35.0, 0.0, 74.5), Vector3(27.0, 1.2, 68.0)],
 	"surveillance": [Vector3(-12.0, 0.0, 68.0), Vector3(-25.0, 2.4, 80.0)],
 	"d02": [Vector3(36.2, 0.0, -26.0), Vector3(32.2, 1.0, -58.0)],
@@ -31,6 +31,13 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_order = VIEWS.keys()
 	_order.sort()
+	# Filtro opcional: `-- b02` captura sólo esas zonas.
+	var wanted: Array = []
+	for argument in OS.get_cmdline_user_args():
+		if VIEWS.has(argument):
+			wanted.append(argument)
+	if not wanted.is_empty():
+		_order = wanted
 
 
 func _process(_delta: float) -> void:

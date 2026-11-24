@@ -192,13 +192,17 @@ func _check_zone_props(id: String, dressing: Node3D) -> void:
 		"b02":
 			_check(fans.size() == 4, "B–02: cuatro turbinas")
 			_check(_has_child(dressing, "VaultDoor"), "B–02: puerta de la bóveda")
-			var bolts := 0
 			var door: Node = dressing.get_node_or_null("VaultDoor")
+			var door_meshes := 0
 			if door != null:
-				for child in door.get_children():
-					if String(child.name).begins_with("Bolt"):
-						bolts += 1
-			_check(bolts == 8, "B–02: ocho pestillos en la puerta")
+				var stack: Array[Node] = [door]
+				while not stack.is_empty():
+					var node: Node = stack.pop_back()
+					if node is MeshInstance3D:
+						door_meshes += 1
+					for child in node.get_children():
+						stack.push_back(child)
+			_check(door_meshes >= 40, "B–02: puerta de la bóveda con su modelo original (%d mallas)" % door_meshes)
 		"v03_gallery":
 			_check(_count_prefixed(dressing, "Arch") >= 7, "V–03: al menos siete arcos")
 		"v03_cryo":

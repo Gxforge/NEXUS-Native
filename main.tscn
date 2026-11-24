@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/core/main.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/core/zone_catalog.gd" id="2"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/world/player.gd" id="5"]
 [ext_resource type="Script" path="res://scripts/core/scene_experience_controller.gd" id="6"]
 [ext_resource type="Script" path="res://scripts/ui/nexus_hud.gd" id="7"]
+[ext_resource type="Script" path="res://scripts/world/biological_dust.gd" id="8"]
 [sub_resource type="CapsuleShape3D" id="PlayerShape"]
 radius = 0.34
 height = 1.82
@@ -15,7 +16,22 @@ background_mode = 1
 background_color = Color(0.01, 0.018, 0.025, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.42, 0.55, 0.68, 1)
-ambient_light_energy = 0.72
+ambient_light_energy = 0.8
+tonemap_mode = 3
+tonemap_exposure = 0.95
+tonemap_white = 6.0
+ssao_enabled = true
+ssao_radius = 1.1
+ssao_intensity = 1.6
+ssao_power = 1.5
+glow_enabled = true
+glow_normalized = false
+glow_intensity = 0.3
+glow_strength = 1.0
+glow_bloom = 0.06
+glow_blend_mode = 1
+glow_hdr_threshold = 1.5
+glow_hdr_scale = 2.2
 
 [node name="Main" type="Node"]
 script = ExtResource("1")
@@ -29,6 +45,10 @@ shape = SubResource("PlayerShape")
 [node name="Camera3D" type="Camera3D" parent="PersistentWorld/Player"]
 position = Vector3(0, 1.72, 0)
 current = true
+
+[node name="BiologicalDust" type="GPUParticles3D" parent="PersistentWorld/Player"]
+position = Vector3(0, 1.4, -1)
+script = ExtResource("8")
 
 [node name="SceneExperience" type="Node" parent="PersistentWorld"]
 script = ExtResource("6")
@@ -45,6 +65,13 @@ script = ExtResource("3")
 script = ExtResource("4")
 active_zones_path = NodePath("../ActiveZones")
 player_path = NodePath("../PersistentWorld/Player")
+
+[node name="SunLight" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-70, 22, 0)
+light_color = Color(0.651, 0.792, 1, 1)
+light_energy = 0.6
+light_specular = 0.35
+shadow_enabled = false
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("GlobalEnvironment")

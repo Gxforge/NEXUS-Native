@@ -243,6 +243,44 @@ static func cabinet(parent: Node3D, x: float, z: float, yaw := 0.0, width := 1.6
 	return root
 
 
+## Suelo del laboratorio: la textura de `materials.ts` (`createFloorTexture`),
+## repetida cada 12 m (la web la repite 6 veces sobre 72 m).
+static func floor_material(uv_scale := Vector2.ONE) -> StandardMaterial3D:
+	var key := "%.2f_%.2f" % [uv_scale.x, uv_scale.y]
+	if _floor_materials.has(key):
+		return _floor_materials[key] as StandardMaterial3D
+	var material := StandardMaterial3D.new()
+	material.albedo_texture = load("res://assets/textures/floor_dark.png")
+	material.albedo_color = Color("#ffffff")
+	material.roughness = 0.6
+	material.metallic = 0.26
+	material.metallic_specular = 0.55
+	material.uv1_scale = Vector3(uv_scale.x, uv_scale.y, 1.0)
+	# El plano se dibuja por ambas caras: la losa se ve desde el interior de la sala.
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	_floor_materials[key] = material
+	return material
+
+
+static var _floor_materials := {}
+
+
+## Losa de suelo a la medida de la sala, con la textura del laboratorio.
+static func floor_slab(parent: Node3D, center: Vector3, size: Vector2,
+		height := 0.0) -> MeshInstance3D:
+	var plane := PlaneMesh.new()
+	plane.size = size
+	var instance := MeshInstance3D.new()
+	instance.name = "FloorSlab"
+	instance.mesh = plane
+	instance.material_override = floor_material(Vector2(size.x / 12.0, size.y / 12.0))
+	instance.position = Vector3(center.x, height, center.z)
+	instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(instance)
+	return instance
+
+
 ## Rejilla de suelo con líneas emisivas (el "grid" del laboratorio de la web).
 static func floor_grid(parent: Node3D, center: Vector3, size: Vector2, step := 3.0,
 		tint := Color("#20343a"), y := 0.02) -> Node3D:

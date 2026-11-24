@@ -102,4 +102,4 @@ pause_game={"deadzone": 0.5, "events": [Object(InputEventKey,"physical_keycode":
 
 [rendering]
 
-renderer/rendering_method="mobile"
+renderer/rendering_method="forward_plus"

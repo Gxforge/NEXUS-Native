@@ -53,6 +53,8 @@ func _ready() -> void:
 
 func build() -> void:
 	name = "Dressing"
+	_build_floor()
+	_build_fill()
 	match zone_id:
 		&"h01":
 			_build_h01()
@@ -75,6 +77,59 @@ func build() -> void:
 		&"transit_hub", &"transit_road", &"transit_rail":
 			_build_transit()
 	built_meshes = count_meshes(self)
+
+
+## Relleno de luz: la web ilumina con un `fill` y un `floorBounce` además del
+## ambiente. Aquí tres focos repartidos por el eje largo, en dos alturas: una
+## arriba a media altura y otra pegada al suelo, porque las luminarias de techo
+## están a 8 m y su atenuación no llega a la losa.
+func _build_fill() -> void:
+	var r := room()
+	var along_x: bool = (r[1] - r[0]) >= (r[3] - r[2])
+	for index in 3:
+		var t: float = (float(index) + 0.5) / 3.0
+		var x: float = lerpf(float(r[0]), float(r[1]), t) if along_x else (float(r[0]) + float(r[1])) * 0.5
+		var z: float = (float(r[2]) + float(r[3])) * 0.5 if along_x else lerpf(float(r[2]), float(r[3]), t)
+		var upper := OmniLight3D.new()
+		upper.name = "Fill%d" % index
+		upper.light_color = Color("#c3d4e6")
+		upper.light_energy = 2.4
+		upper.omni_range = 34.0
+		upper.omni_attenuation = 1.2
+		upper.shadow_enabled = false
+		upper.position = Vector3(x, ceiling() * 0.55, z)
+		add_child(upper)
+		var bounce := OmniLight3D.new()
+		bounce.name = "Bounce%d" % index
+		bounce.light_color = Color("#a9c2d6")
+		bounce.light_energy = 1.5
+		bounce.omni_range = 28.0
+		bounce.omni_attenuation = 1.7
+		bounce.shadow_enabled = false
+		bounce.position = Vector3(x, 0.7, z)
+		add_child(bounce)
+
+
+## Suelo texturizado de la sala (la losa de `createFloorTexture` de la web).
+func _build_floor() -> void:
+	var r := room()
+	var center := Vector3((r[0] + r[1]) * 0.5, 0.0, (r[2] + r[3]) * 0.5)
+	var size := Vector2(r[1] - r[0], r[3] - r[2])
+	BuildKit.floor_slab(self, center, size, 0.02)
+
+
+## Saca del grupo exportado la malla de la criatura (la única del vaso cuyo
+## volumen ronda 2,3 × 2,7 × 2,2 m; el cristal mide 3,1 × 3,2 × 3,1).
+func _take_larva(pod: Node3D) -> MeshInstance3D:
+	for child in pod.get_children():
+		var mesh := child as MeshInstance3D
+		if mesh == null or mesh.mesh == null:
+			continue
+		var box := mesh.get_aabb()
+		if box.size.x > 2.0 and box.size.x < 2.6 and box.size.y > 2.0:
+			pod.remove_child(mesh)
+			return mesh
+	return null
 
 
 func _process(delta: float) -> void:
@@ -176,40 +231,35 @@ func _build_h01() -> void:
 	var body := Node3D.new()
 	body.name = "Pods"
 	add_child(body)
+	# Vasos originales de la web (`workshop_pods.glb`): la base, el cristal, los
+	# anillos, los pestillos y el manómetro salen de la exportación de three.js.
+	var originals := PropLibrary.pods()
 	for index in 3:
 		var z: float = [-66.6, -62.0, -57.4][index]
-		var pod := Node3D.new()
+		var pod: Node3D = originals[index] if index < originals.size() else Node3D.new()
 		pod.name = "Pod%d" % (index + 1)
 		pod.position = Vector3(-5.5, 0.0, z)
 		pod.set_meta("survey_id", "pod_%d" % index)
 		body.add_child(pod)
 		pods.append(pod)
-		for y: float in [0.25, 0.71, 4.22]:
-			BuildKit.drum(pod, graphite, 0.0, y, 0.0, 1.64, 0.36)
-			BuildKit.ring(pod, bronze, 0.0, y + 0.13, 0.0, 1.61, 0.055, true)
-		BuildKit.drum(pod, metal, 0.0, 0.53, 0.0, 1.44, 0.4)
-		BuildKit.drum(pod, BuildKit.glass(), 0.0, 2.46, 0.0, 1.55, 3.17)
-		BuildKit.drum(pod, BuildKit.liquid(), 0.0, 2.3, 0.0, 1.49, 2.88)
-		BuildKit.ring(pod, BuildKit.emissive(BuildKit.GLOW, 1.4), 0.0, 3.74, 0.0, 1.46, 0.021, true)
-		for k in 8:
-			var a: float = k * PI / 4.0
-			BuildKit.drum(pod, bronze, 1.47 * cos(a), 4.45, 1.47 * sin(a), 0.068, 0.13)
-			if k % 2 == 1:
-				BuildKit.drum(pod, metal, 1.56 * cos(a), 2.49, 1.56 * sin(a), 0.052, 3.16)
-		# Larva en suspensión: el cuerpo de W–01 a escala de vaso.
-		var creature := Node3D.new()
-		creature.name = "Specimen"
-		creature.position = Vector3(0.0, 2.2, 0.0)
-		creature.rotation.y = 1.27
-		creature.scale = Vector3(0.42, 0.42, 0.42)
-		pod.add_child(creature)
-		var core := (load(W01_CORE) as PackedScene).instantiate()
-		core.name = "Core"
-		creature.add_child(core)
-		var tentacles := (load(W01_TENTACLES) as PackedScene).instantiate()
-		tentacles.name = "Tentacles"
-		creature.add_child(tentacles)
-		specimens.append(creature)
+		# La larva exportada pasa a un pivote propio para poder latir: el pivote se
+		# queda en el centro de la criatura y `animate()` lo escala a 0.42.
+		var specimen := Node3D.new()
+		specimen.name = "Specimen"
+		specimen.position = Vector3(0.0, 2.25, 0.0)
+		specimen.rotation.y = 1.27
+		specimen.scale = Vector3(0.42, 0.42, 0.42)
+		pod.add_child(specimen)
+		var larva := _take_larva(pod)
+		if larva != null:
+			larva.scale = Vector3(2.381, 2.381, 2.381)
+			larva.position = Vector3(0.0, -5.38, 0.0)
+			specimen.add_child(larva)
+		else:
+			var core := (load(W01_CORE) as PackedScene).instantiate()
+			core.name = "Core"
+			specimen.add_child(core)
+		specimens.append(specimen)
 		# Burbujas ascendentes del líquido (48 por vaso, como la web).
 		var group: Array = []
 		var bubble_material := BuildKit.emissive(Color(0.6, 0.81, 0.68), 0.35)
@@ -220,18 +270,6 @@ func _build_h01() -> void:
 				0.92 + 2.74 * float(j) / 48.0, sin(angle) * radius, 0.021, 6)
 			group.append(bubble)
 		bubbles.append(group)
-		# Boca de desagüe superior y manómetro.
-		BuildKit.bar(pod, bronze, Vector3(0.0, 4.41, 0.0), Vector3(0.0, 4.87, 0.0), 0.117)
-		BuildKit.bar(pod, bronze, Vector3(0.0, 4.87, 0.0), Vector3(-0.3, 5.12, 0.0), 0.117)
-		BuildKit.bar(pod, bronze, Vector3(-0.3, 5.12, 0.0), Vector3(-2.36, 5.12, 0.0), 0.117)
-		var gauge := Node3D.new()
-		gauge.position = Vector3(1.64, 0.7, 0.0)
-		gauge.rotation.y = PI * 0.5
-		pod.add_child(gauge)
-		BuildKit.drum(gauge, bronze, 0.0, 0.0, 0.045, 0.086, 0.15, true)
-		BuildKit.block(gauge, graphite, 0.0, 0.0, 0.115, 0.49, 0.48, 0.11)
-		BuildKit.drum(gauge, BuildKit.material(BuildKit.WHITE, 0.2, 0.3),
-			0.0, 0.0, 0.242, 0.194, 0.03, true)
 	# Bancos de bombas hidráulicas contra el muro oeste.
 	for index in 4:
 		var z: float = -74.0 + float(index) * 7.0
@@ -304,48 +342,80 @@ func _build_b02() -> void:
 
 ## Puerta circular de la bóveda con pestillos, brazos y aros emisivos.
 func _vault_door(center: Vector3, radius: float) -> Node3D:
-	var metal := BuildKit.material(BuildKit.METAL)
-	var graphite := BuildKit.material(BuildKit.GRAPHITE)
-	var bronze := BuildKit.material(BuildKit.BRONZE)
 	var door := Node3D.new()
 	door.name = "VaultDoor"
 	door.position = center
 	add_child(door)
-	BuildKit.block(door, graphite, 0.0, 0.0, -0.28, radius * 2.6, radius * 2.6, 0.5)
-	BuildKit.drum(door, metal, 0.0, 0.0, 0.1, radius, 0.55, true, 48)
-	BuildKit.ring(door, bronze, 0.0, 0.0, 0.42, radius * 0.92, 0.09)
-	BuildKit.ring(door, BuildKit.emissive(BuildKit.AMBER, 1.15), 0.0, 0.0, 0.45,
-		radius * 0.74, 0.035)
-	BuildKit.ring(door, metal, 0.0, 0.0, 0.47, radius * 0.66, 0.11)
-	BuildKit.ring(door, BuildKit.material(BuildKit.STEEL, 0.6, 0.36), 0.0, 0.0, 0.5,
-		radius * 0.42, 0.12)
-	BuildKit.drum(door, BuildKit.emissive(Color("#cfe9ee"), 1.4), 0.0, 0.0, 0.52,
-		radius * 0.19, 0.06, true, 32)
-	# Ocho pestillos radiales y sus brazos hidráulicos.
-	for index in 8:
-		var angle := index * TAU / 8.0
-		var bolt := Node3D.new()
-		bolt.name = "Bolt%d" % index
-		bolt.position = Vector3(-cos(angle) * radius * 0.78, sin(angle) * radius * 0.78, 0.22)
-		bolt.rotation.z = -angle + PI * 0.5
-		door.add_child(bolt)
-		BuildKit.block(bolt, bronze, 0.0, 0.0, 0.0, 0.3, radius * 0.34, 0.3)
-		BuildKit.block(bolt, metal, 0.0, -radius * 0.22, 0.02, 0.18, radius * 0.16, 0.22)
-	for arm in 3:
-		var angle := arm * TAU / 3.0
-		var grip := Node3D.new()
-		grip.name = "Arm%d" % arm
-		grip.position = Vector3(-radius * 0.95, 0.0, -0.1)
-		grip.rotation.z = angle
-		door.add_child(grip)
-		BuildKit.drum(grip, metal, 0.0, 0.0, 0.0, 0.11, radius * 1.9, true, 16)
-		BuildKit.drum(grip, bronze, 0.0, radius * 0.95, 0.0, 0.18, 0.36, false, 16)
+	# Puerta original de la web (`vault.glb`, grupo `Node2`): aros, pestillos,
+	# brazos hidráulicos y el disco central salen de la exportación de three.js.
+	var original := PropLibrary.vault_door()
+	if original == null:
+		return door
+	original.position = Vector3.ZERO
+	original.rotation = Vector3.ZERO
+	door.add_child(original)
+	# El disco exportado mide 7,18 m de diámetro (`vault.glb`); el resto del grupo
+	# es el marco de obra, que escala con él.
+	var factor: float = (radius * 2.0) / 7.18
+	original.scale = Vector3(factor, factor, factor)
+	var disc := _disc_aabb(original)
+	original.position = -disc.get_center() + Vector3(0.0, 0.0, disc.size.z * 0.32)
 	return door
 
 
-# --------------------------------------------------------------------------- #
-# Electricidad · armarios del cuadro con sus pantallas
-# --------------------------------------------------------------------------- #
+## Caja del disco de la puerta: mallas de más de 5 m centradas en el eje del grupo.
+func _disc_aabb(root: Node3D) -> AABB:
+	var box := AABB()
+	var first := true
+	var stack: Array[Node] = [root]
+	while not stack.is_empty():
+		var node: Node = stack.pop_back()
+		for child in node.get_children():
+			stack.push_back(child)
+		var mesh := node as MeshInstance3D
+		if mesh == null or mesh.mesh == null:
+			continue
+		var local: Transform3D = _relative_transform(mesh, root)
+		var mesh_box: AABB = local * mesh.get_aabb()
+		var center := mesh_box.get_center()
+		if mesh_box.size.x < 4.5 or Vector2(center.x, center.y).length() > 0.4:
+			continue
+		box = mesh_box if first else box.merge(mesh_box)
+		first = false
+	return box
+
+
+## Caja envolvente de todas las mallas de un subárbol, en el espacio del padre.
+func _subtree_aabb(root: Node3D) -> AABB:
+	var box := AABB()
+	var first := true
+	var stack: Array[Node] = [root]
+	while not stack.is_empty():
+		var node: Node = stack.pop_back()
+		for child in node.get_children():
+			stack.push_back(child)
+		var mesh := node as MeshInstance3D
+		if mesh == null or mesh.mesh == null:
+			continue
+		var local: Transform3D = _relative_transform(mesh, root)
+		var mesh_box: AABB = local * mesh.get_aabb()
+		box = mesh_box if first else box.merge(mesh_box)
+		first = false
+	return box
+
+
+## Transformación de `node` respecto de `ancestor`.
+func _relative_transform(node: Node3D, ancestor: Node3D) -> Transform3D:
+	var transform := Transform3D.IDENTITY
+	var current: Node = node
+	while current != null and current != ancestor:
+		var spatial := current as Node3D
+		if spatial != null:
+			transform = spatial.transform * transform
+		current = current.get_parent()
+	return transform
+
+
 func _build_electrical() -> void:
 	for index in 8:
 		var z: float = 62.0 + float(index) * 2.3
