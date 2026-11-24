@@ -434,9 +434,9 @@ func _read_bools(source: Variant, destination: Array) -> void:
 # --------------------------------------------------------------------------- #
 # red por defecto del laboratorio
 # --------------------------------------------------------------------------- #
-## Doce alimentadores y los circuitos que la versión web declara al arrancar.
-static func for_laboratory() -> PowerGrid:
-	var grid := PowerGrid.new()
+## Circuitos de instalación (los que no van por el cuadro técnico).
+func apply_laboratory_circuits() -> void:
+	var grid := self
 	grid.register_circuit("electrical", "Luces de laboratorio", 18.0, true)
 	grid.register_circuit("electrical", "Bancos de contención", 12.0)
 	grid.register_circuit("c04", "Instrumentación C-04", 6.0, true)
@@ -447,4 +447,9 @@ static func for_laboratory() -> PowerGrid:
 	grid.register_circuit("transit_hub", "Enclave de tránsito", 7.0)
 	grid.machines = 6.0
 	grid._recalculate_light_kw()
+
+## Red completa de laboratorio para pruebas: circuitos de instalación.
+static func for_laboratory() -> PowerGrid:
+	var grid := PowerGrid.new()
+	grid.apply_laboratory_circuits()
 	return grid

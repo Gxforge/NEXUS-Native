@@ -217,6 +217,29 @@ func _validate_files_module() -> void:
 	state.queue_free()
 	files.queue_free()
 
+func _validate_operations_panel() -> void:
+	var grid: PowerGrid = PowerGrid.new()
+	var operations: OperationsPanel = OperationsPanel.new(grid)
+	grid.apply_laboratory_circuits()
+	root.add_child(operations)
+	_check(operations.zones()[0] == "Generación", "operations panel starts on the generator group")
+	_check(str(operations.selected_circuit().get("name", "")) == "INV 1", "operations panel starts on INV 1")
+	_check(operations.light_zone(Vector3(24, 0, 56)) == "Electricidad", "operations panel maps the electrical room")
+	_check(operations.area(-24, 56) == "Vigilancia", "operations panel maps the surveillance room")
+	operations.handle(&"branchSwitch")
+	_check(not grid.feeds[0], "switching INV 1 isolates its feeder")
+	operations.handle(&"branchSwitch")
+	_check(grid.feeds[0], "switching again restores the feeder")
+	operations.handle(&"ecoMaster")
+	_check(grid.limits[0], "eco mode limits the selected feeder to 14 kW")
+	_check(str(operations.meter(0).get("title", "")).contains("ECO"), "meter shows eco state")
+	operations.handle(&"illum")
+	_check(is_equal_approx(grid.brightness, 0.55), "illumination steps down")
+	_check(operations.strip_label(0) == "CAM 01 / OBSERVACIÓN", "camera strip labels the first channel")
+	operations.handle(&"camNext")
+	_check(operations.bank == 4, "camera bank advances four channels")
+	operations.queue_free()
+
 func _run() -> void:
 	await _validate_exported_pattern()
 	await _validate_portal_assembly()
@@ -229,6 +252,7 @@ func _run() -> void:
 	_validate_power_grid()
 	_validate_vault_module()
 	_validate_files_module()
+	_validate_operations_panel()
 	var main := packed.instantiate()
 	var test_state := main.get_node("GameState") as GameState
 	test_state.persistence_path = QA_SAVE_PATH

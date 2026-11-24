@@ -1,10 +1,13 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
 [ext_resource type="PackedScene" path="res://assets/generated/electrical_structural_shell.glb" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/entities/field_flashlight.tscn" id="5"]
+[ext_resource type="Script" path="res://scripts/systems/operations_console.gd" id="6"]
+[sub_resource type="BoxShape3D" id="OpsConsoleShape"]
+size = Vector3(1.4, 1.2, 0.8)
 
 [node name="ElectricalSlice" type="Node3D"]
 script = ExtResource("1")
@@ -38,3 +41,45 @@ light_energy = 8
 position = Vector3(35, 0, 74)
 item_id = &"cell"
 display_name = "Celda de respaldo E-07"
+
+[node name="OperationsRoom" type="Node3D" parent="."]
+
+[node name="ZoneNext" type="StaticBody3D" parent="OperationsRoom"]
+position = Vector3(24, 0.62, 52)
+script = ExtResource("6")
+handle_id = &"zoneNext"
+display_name = "Selector de zona"
+[node name="Collision" type="CollisionShape3D" parent="OperationsRoom/ZoneNext"]
+shape = SubResource("OpsConsoleShape")
+
+[node name="DeviceNext" type="StaticBody3D" parent="OperationsRoom"]
+position = Vector3(26, 0.62, 52)
+script = ExtResource("6")
+handle_id = &"deviceNext"
+display_name = "Selector de derivación"
+[node name="Collision" type="CollisionShape3D" parent="OperationsRoom/DeviceNext"]
+shape = SubResource("OpsConsoleShape")
+
+[node name="ZoneSwitch" type="StaticBody3D" parent="OperationsRoom"]
+position = Vector3(28, 0.62, 52)
+script = ExtResource("6")
+handle_id = &"zoneSwitch"
+display_name = "Interruptor de zona"
+[node name="Collision" type="CollisionShape3D" parent="OperationsRoom/ZoneSwitch"]
+shape = SubResource("OpsConsoleShape")
+
+[node name="BranchSwitch" type="StaticBody3D" parent="OperationsRoom"]
+position = Vector3(30, 0.62, 52)
+script = ExtResource("6")
+handle_id = &"branchSwitch"
+display_name = "Palanca de derivación"
+[node name="Collision" type="CollisionShape3D" parent="OperationsRoom/BranchSwitch"]
+shape = SubResource("OpsConsoleShape")
+
+[node name="Illum" type="StaticBody3D" parent="OperationsRoom"]
+position = Vector3(32, 0.62, 52)
+script = ExtResource("6")
+handle_id = &"illum"
+display_name = "Mando de iluminación"
+[node name="Collision" type="CollisionShape3D" parent="OperationsRoom/Illum"]
+shape = SubResource("OpsConsoleShape")
