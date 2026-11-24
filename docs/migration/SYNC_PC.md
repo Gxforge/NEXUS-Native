@@ -73,6 +73,16 @@ plan (nuevos `+`, actualizados `~`, eliminados `-`).
 | `--keep-download RUTA` | conserva el zip descargado |
 | `--force` | permite un destino que no contenga `project.godot` |
 
+## Descargas eficientes
+
+Antes de bajar nada se consulta el último commit de la rama. Si coincide con el
+que ya está sincronizado, la herramienta termina en menos de un segundo sin
+descargar el archivo (~38 MB, la mayor parte son los GLB fuente comprimidos).
+Para volver a bajar y comparar de todos modos —por ejemplo para recuperar
+archivos que editaste— marca **“forzar descarga y comparación”** en la ventana o
+usa `--force-download` en consola. La barra muestra además velocidad y tiempo
+restante estimados.
+
 ## Garantías
 
 - **Manifiesto**: tras cada sincronización se escribe `.nexus-sync-manifest.json`

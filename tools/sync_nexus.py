@@ -53,7 +53,7 @@ MANIFEST_NAME = ".nexus-sync-manifest.json"
 MANIFEST_VERSION = 2
 SETTINGS_NAME = ".nexus-sync-settings.json"
 API_ROOT = "https://api.github.com"
-USER_AGENT = "nexus-sync/2.0"
+USER_AGENT = "nexus-sync/2.1"
 
 IGNORE_DIRS = {".git", ".godot", "__pycache__", "node_modules", ".import"}
 IGNORE_FILES = {".DS_Store", "Thumbs.db", "desktop.ini"}
@@ -367,16 +367,26 @@ class SyncEngine:
         state = {"last": 0.0}
 
         expected = 42.0 * 1024 * 1024  # tamaño típico del zip; GitHub no manda Content-Length
+        state["started"] = time.monotonic()
 
         def on_chunk(read: int, total: int) -> None:
             self._check_cancel()
+            elapsed = max(0.001, time.monotonic() - state["started"])
+            speed = read / elapsed
             if total:
                 fraction = low + (high - low) * min(1.0, read / float(total))
+                reference = float(total)
                 text = "Descargando %s de %s" % (human_size(read), human_size(total))
             else:
                 # sin longitud conocida: curva asintótica para que la barra avance
                 fraction = low + (high - low - 0.02) * (1.0 - pow(2.718281828, -read / expected))
+                reference = expected
                 text = "Descargando %s" % human_size(read)
+            remaining = max(0.0, (reference - read) / speed) if speed > 1024 else 0.0
+            text += " · %s/s" % human_size(speed)
+            if remaining > 1.0:
+                text += " · quedan %s" % (("%d:%02d" % (int(remaining) // 60, int(remaining) % 60))
+                                          if remaining >= 60 else "%d s" % int(remaining))
             now = time.monotonic()
             if now - state["last"] > 0.12:
                 state["last"] = now
@@ -403,10 +413,20 @@ class SyncEngine:
         target = self.target
         self._log("info", "Destino: %s" % target)
 
+        manifest = load_manifest(target)
         if not options.archive:
             remote, local = self.check_only()
             report.remote_commit = remote
             self._progress(0.02, "Rama remota comprobada")
+            force = bool(getattr(options, "force_download", False))
+            same_full = bool(manifest.get("files")) and bool(manifest.get("full")) == bool(options.full)
+            if remote and local and remote == local and same_full and not force:
+                report.unchanged = len(manifest.get("files", {}))
+                report.total_files = report.unchanged
+                report.elapsed = time.monotonic() - started
+                self._log("ok", "Ya está sincronizado con %s: no hace falta descargar nada." % remote[:7])
+                self._progress(1.0, "Al día · %s" % remote[:7])
+                return report
             if remote and local:
                 if remote == local:
                     self._log("ok", "Sin cambios remotos desde la última sincronización (%s)." % remote[:7])
@@ -556,10 +576,12 @@ def build_parser() -> argparse.ArgumentParser:
                         help="vigila la rama y avisa (o sincroniza con --auto-sync)")
     parser.add_argument("--auto-sync", action="store_true", help="con --watch, aplica los cambios")
     parser.add_argument("--check", action="store_true", help="solo compara commits remotos y sale")
+    parser.add_argument("--force-download", action="store_true",
+                        help="descarga aunque el commit remoto ya esté sincronizado (recupera archivos editados)")
     parser.add_argument("--gui", action="store_true", help="fuerza la ventana")
     parser.add_argument("--no-gui", action="store_true", help="fuerza la consola")
     parser.add_argument("--no-pause", action="store_true")
-    parser.add_argument("--version", action="version", version="nexus-sync 2.0")
+    parser.add_argument("--version", action="version", version="nexus-sync 2.1")
     return parser
 
 
@@ -694,6 +716,7 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
             self.auto_check = tk.BooleanVar(value=bool(self.settings.get("auto_check", True)))
             self.auto_apply = tk.BooleanVar(value=bool(self.settings.get("auto_apply", False)))
             self.remember_token = tk.BooleanVar(value=False)
+            self.force_download = tk.BooleanVar(value=False)
             self.status = tk.StringVar(value="Listo")
             self.detail = tk.StringVar(value="")
             self.remote_label = tk.StringVar(value="Rama remota: —")
@@ -778,6 +801,8 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
                             variable=self.auto_check).grid(row=1, column=0, sticky="w", pady=(6, 0))
             ttk.Checkbutton(options, text="aplicar automáticamente al detectarlos",
                             variable=self.auto_apply).grid(row=1, column=1, sticky="w", padx=16, pady=(6, 0))
+            ttk.Checkbutton(options, text="forzar descarga y comparación",
+                            variable=self.force_download).grid(row=1, column=2, sticky="w", padx=16, pady=(6, 0))
 
             actions = ttk.Frame(outer)
             actions.pack(fill="x", pady=(0, 10))
@@ -882,6 +907,7 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
                 no_backup=not bool(self.backup.get()),
                 keep_download=None,
                 force=False,
+                force_download=bool(self.force_download.get()),
                 yes=True,
             )
 
