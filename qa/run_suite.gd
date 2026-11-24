@@ -191,6 +191,32 @@ func _validate_vault_module() -> void:
 	state.queue_free()
 	vault.queue_free()
 
+func _validate_files_module() -> void:
+	var files: FilesModule = FilesModule.new()
+	files.apply_web_layout()
+	root.add_child(files)
+	_check(files.tray_count() == 10, "files module declares ten trays")
+	_check(files.DOSSIERS.size() == 6, "files module ships the six web dossiers")
+	var home: Vector3 = files.trays[0]["home"]
+	_check(files.toggle(0), "files tray toggles open")
+	for _step in 90:
+		files.update(1.0 / 30.0, home + Vector3(6.0, 0.0, 0.0))
+	_check(files.tray_revealed(0), "files tray slides out and reveals its sheet")
+	var state: GameState = GameState.new()
+	state.power_simulation = false
+	state.add_to_group(&"game_state")
+	root.add_child(state)
+	state.register_files(files)
+	_check(files.read_tray(0, null).contains("Ciclo de retorno"), "files dossier reads with its title")
+	_check(state.survey_records.size() == 1, "read dossier lands in the field log")
+	files.read_tray(0, null)
+	_check(state.survey_records.size() == 1, "reading twice does not duplicate the log entry")
+	_check(state.save_game(QA_SAVE_PATH), "game state saves the file cabinet")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(QA_SAVE_PATH))
+	state.remove_from_group(&"game_state")
+	state.queue_free()
+	files.queue_free()
+
 func _run() -> void:
 	await _validate_exported_pattern()
 	await _validate_portal_assembly()
@@ -202,6 +228,7 @@ func _run() -> void:
 		return
 	_validate_power_grid()
 	_validate_vault_module()
+	_validate_files_module()
 	var main := packed.instantiate()
 	var test_state := main.get_node("GameState") as GameState
 	test_state.persistence_path = QA_SAVE_PATH

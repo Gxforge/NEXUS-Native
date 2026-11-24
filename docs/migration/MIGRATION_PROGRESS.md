@@ -33,7 +33,8 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - [ ] Bóveda V-03 completa: lector/tarjeta, fases de apertura, celdas, muestra, analizador y bitácora.
 - [x] Grid/energía de instalación (fase 14: `scripts/systems/power_grid.gd`, port de `Power.ts`). Queda el panel 3D, la telemetría y el CCTV interactivo.
 - [x] Bóveda V–03 (fase 15: secuencia, estaciones, cajones por proximidad, objetos y persistencia). Falta su geometría animada.
-- [ ] Archivos, bandejas/documentos, bancos de carga y el resto de pickups/interactuables.
+- [x] Archivo D–02 (fase 16: bandejas con giro, expedientes y bitácora). Faltan bancos de carga y el lector a pantalla completa.
+- [ ] Resto de pickups/interactuables.
 - [ ] Transit: cápsula/carro, asientos, llamadas, carga, freno y solver de cuatro apoyos del vehículo.
 - [ ] Paneles de base de datos/mapa con el contenido completo de la web; ahora son una estructura inicial limitada a C-04/A-01.
 - [ ] Audio, VFX, feedback fisiológico, settings/gráficos y paridad visual completa.
@@ -43,9 +44,10 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - Godot 4.4.1 `--headless --editor --path . --quit`: importación/escaneo completado y scripts cargados.
 - `qa/validate_zone_graph.gd`: 303 checks, 0 fallos (identidad, manifiestos, colisión, AABB, sockets, portales y solapes de las 12 zonas).
 - `qa/validate_zone_traversal.gd`: 255 checks, 0 fallos (22 cruces por los portales con llegada a socket, una sola zona activa, liberación del módulo y un cruce físico caminando contra el umbral).
-- `qa/run_suite.gd`: 167 checks, 0 fallos (validación estructural de las 12 zonas, streaming C-04↔A-01, HUD/paneles con mapa de 12 módulos, armas UV/crio, pickup por rayo, linterna y sockets).
+- `qa/run_suite.gd`: 175 checks, 0 fallos (validación estructural de las 12 zonas, streaming C-04↔A-01, HUD/paneles con mapa de 12 módulos, armas UV/crio, pickup por rayo, linterna y sockets).
 - `qa/validate_game_state.gd`: 17 checks, 0 fallos (inventario, slots, puertas y serialización JSON, ahora con la red eléctrica dentro del guardado).
 - `qa/validate_power_grid.gd`: 45 checks, 0 fallos (capacidad, carga, reparto, picos, disparo, rearme y persistencia de la red).
+- `qa/validate_files.gd`: 33 checks, 0 fallos (bandejas giradas, tope por proximidad, expedientes en la bitácora y persistencia).
 - `qa/validate_vault.gd`: 53 checks, 0 fallos (secuencia de la bóveda, estaciones a 4 m, cajones por proximidad, objetos, inventario y guardado).
 - `qa/validate_resume.gd`: 8 checks, 0 fallos (continúa en A-01 y evita transición accidental al aparecer junto al portal).
 - `qa/validate_zone_ownership.gd` (13 checks, política de propiedad espejo del grafo), `validate_contacts_survey.gd`, `validate_contact_fx.gd`, `validate_source_batch.gd`, además de los validadores de núcleo/ojos/tentáculos W-01: pasaron en la ejecución registrada.

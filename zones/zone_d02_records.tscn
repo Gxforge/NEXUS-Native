@@ -1,10 +1,15 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
 [ext_resource type="PackedScene" path="res://assets/generated/d02_structural_shell.glb" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/entities/field_flashlight.tscn" id="5"]
+[ext_resource type="Script" path="res://scripts/zones/files_module.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/zones/files_tray.gd" id="7"]
+
+[sub_resource type="BoxShape3D" id="FilesTrayShape"]
+size = Vector3(1.8, 0.9, 0.9)
 
 [node name="D02StructuralSlice" type="Node3D"]
 script = ExtResource("1")
@@ -39,3 +44,34 @@ light_energy = 8
 position = Vector3(38.5, 0, -58)
 item_id = &"recorder"
 display_name = "Bitácora de custodia D-02"
+
+[node name="FilesModule" type="Node3D" parent="."]
+script = ExtResource("6")
+
+[node name="Tray0" type="StaticBody3D" parent="FilesModule"]
+position = Vector3(-25, 0.55, -37.34)
+script = ExtResource("7")
+tray_index = 0
+display_name = "Bandeja · Ciclo de retorno"
+files_path = NodePath("..")
+[node name="Collision" type="CollisionShape3D" parent="FilesModule/Tray0"]
+shape = SubResource("FilesTrayShape")
+
+[node name="Tray1" type="StaticBody3D" parent="FilesModule"]
+position = Vector3(-19.8, 0.55, -37.34)
+script = ExtResource("7")
+tray_index = 1
+display_name = "Bandeja · Memoria del perímetro"
+files_path = NodePath("..")
+[node name="Collision" type="CollisionShape3D" parent="FilesModule/Tray1"]
+shape = SubResource("FilesTrayShape")
+
+[node name="Tray2" type="StaticBody3D" parent="FilesModule"]
+position = Vector3(-35.22, 0.55, -25.8)
+script = ExtResource("7")
+tray_index = 6
+display_name = "Bandeja · Parte de inspección"
+files_path = NodePath("..")
+[node name="Collision" type="CollisionShape3D" parent="FilesModule/Tray2"]
+shape = SubResource("FilesTrayShape")
+

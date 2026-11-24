@@ -22,7 +22,7 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 |---|---|---|---|---|
 | `Power.ts` | 106 | `scripts/systems/power_grid.gd` | ✅ | Nada funcional. Doce alimentadores, límites de 14/28 kW, picos, temperatura, estrés, disparo y rearme con las mismas constantes; 44 checks en `qa/validate_power_grid.gd`. Falta sólo el panel de interruptores en 3D (va con `Operations.ts`). |
 | `Vault.ts` | 737 | `scripts/zones/vault_module.gd` + `vault_station.gd` | ✅ | Lógica completa (secuencia de 22 s, estaciones, cajones por proximidad, objetos y persistencia; 53 checks). Falta sólo la geometría del disco y los pistones, que llega con el pase de alta fidelidad. |
-| `Files.ts` | 173 | — | ❌ | Archivadores de D-02: gavetas con contenido, apertura/cierre, colisión y lectura de expedientes que alimenta la bitácora. |
+| `Files.ts` | 173 | `scripts/zones/files_module.gd` + `files_tray.gd` | ✅ | Diez bandejas con giro propio, tope por proximidad, seis expedientes idénticos a la web y lectura a la bitácora sin duplicados; 33 checks. Falta la geometría del folio y el lector a pantalla completa. |
 | `Operations.ts` | 943 | — | ❌ | Cuadro eléctrico, ramas por zona, manivelas/handles, atado de luces, selección de circuito y disparo por zona. |
 | `Infrastructure.ts` | 440 | `zones/zone_*.tscn` (carcasas) | 🟡 | Sólo hay volumen y colisión. Faltan pasillos, anexos, rótulos y la lectura de sensores por zona. |
 | `Workshop.ts` | 448 | — | ❌ | Taller: bancos, instrumentos, tambores, luminarias y las vainas (`Pods`) con su ciclo. |
@@ -48,10 +48,10 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 
 ## 2. Resumen cuantitativo
 
-- **Portado con pruebas:** red eléctrica, bóveda V-03 (lógica), encuesta/raycast, contactos, caché de zonas, compuertas, streaming y persistencia de partida.
+- **Portado con pruebas:** red eléctrica, bóveda V-03 (lógica), archivo D-02, encuesta/raycast, contactos, caché de zonas, compuertas, streaming y persistencia de partida.
 - **Parcial:** W-01 (visual), jugador y carga, sectores/mobiliario, HUD, mapa, materiales.
-- **Sin empezar:** archivos, operaciones/cuadro eléctrico, taller, tránsito y vehículo, IA del sujeto, pantallas y telemetría, perfiles de calidad, orquestación de experiencias y distribución.
-- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **17 %**; el resto son sistemas por migrar.
+- **Sin empezar:** operaciones/cuadro eléctrico, taller, tránsito y vehículo, IA del sujeto, pantallas y telemetría, perfiles de calidad, orquestación de experiencias y distribución.
+- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **19 %**; el resto son sistemas por migrar.
 
 ## 3. Hoja de ruta propuesta
 
@@ -62,7 +62,7 @@ Cada fase termina con validador headless propio y una entrada en
 |---|---|---|---|
 | **P-1** ✅ | Red eléctrica (`Power.ts`) | — | `validate_power_grid.gd` 44/44 · hecho |
 | **P-2** ✅ | Bóveda V-03 (`Vault.ts`): cerradura, estaciones, cajones, objetos | P-1 | `validate_vault.gd` 53/53 + 10 checks en la suite · hecho |
-| **P-3** | Archivos D-02 (`Files.ts`): gavetas, expedientes, lector | P-2 | Expediente leído se guarda en la bitácora y sobrevive a guardar/cargar |
+| **P-3** ✅ | Archivos D-02 (`Files.ts`): gavetas, expedientes, lector | P-2 | `validate_files.gd` 33/33 + 8 checks en la suite · hecho |
 | **P-4** | Cuadro eléctrico + CCTV (`Operations.ts`, `Infrastructure.ts`) | P-1 | Ramas por zona, manivelas, disparo y restablecimiento desde la zona técnica; cámara con conmutación |
 | **P-5** | Hidráulica H-01 y turbinas B-02 (`Workshop.ts`, `Infrastructure.ts`) | P-1 | Vainas y bancos consumen de la red y respetan el estrés |
 | **P-6** | IA de W-01 (`MonsterAI`, `Attention`, `FieldSense`, `Tentacles`, `Breath`) | — | Estados, memoria, percepción y agarre con A/B numérico frente a la web |
@@ -75,8 +75,8 @@ Cada fase termina con validador headless propio y una entrada en
 1. **V-03 primero**: es el único módulo que en la web combina cerradura, inventario,
    cajones y consumo eléctrico; al cerrarlo se valida el patrón de "módulo
    interactivo completo" que después se repite en H-01, B-02 y D-02.
-2. **D-02 después**: reutiliza la misma interfaz de estación y añade contenido
-   textual (expedientes), que alimenta la bitácora ya existente.
+2. ~~**D-02 después**~~ hecho en la fase 16: mismas estaciones y expedientes en
+   la bitácora; sigue el lector a pantalla completa.
 3. **Cuadro eléctrico + CCTV**: cierra el bucle de la red que ya está simulada;
    sin él, P-1 sólo se ve en el HUD.
 4. **IA de W-01 en paralelo** cuando haya hueco: no bloquea contenido, pero es lo
@@ -86,11 +86,12 @@ Cada fase termina con validador headless propio y una entrada en
 
 | Prueba | Resultado |
 |---|---|
-| `qa/run_suite.gd` | **167/167** (148 → 157 con la red, 167 con la bóveda) |
+| `qa/run_suite.gd` | **175/175** (148 → 157 red → 167 bóveda → 175 archivo) |
 | `qa/validate_zone_graph.gd` | 303/303 |
 | `qa/validate_zone_traversal.gd` | 255/255 |
 | `qa/validate_power_grid.gd` | 45/45 |
-| `qa/validate_vault.gd` | 53/53 (nuevo) |
+| `qa/validate_vault.gd` | 53/53 |
+| `qa/validate_files.gd` | 33/33 (nuevo) |
 | `qa/validate_game_state.gd` | 17/17 (incluye la red en el guardado) |
 | `qa/validate_resume.gd` | 8/8 |
 | `qa/validate_contacts_survey.gd` | 9/9 |

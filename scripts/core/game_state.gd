@@ -8,7 +8,7 @@ signal zone_changed(previous_zone: StringName, current_zone: StringName)
 signal power_state_changed(snapshot: Dictionary)
 
 const SAVE_PATH := "user://nexus_native_save.json"
-const SAVE_VERSION := 4
+const SAVE_VERSION := 5
 
 var persistence_path: String = SAVE_PATH
 var current_zone: StringName = &""
@@ -24,6 +24,9 @@ var watcher_state: Dictionary = {
 ## Bóveda V–03 (se registra sola al entrar en la zona).
 var vault: VaultModule = null
 var _vault_pending: Dictionary = {}
+## Archivadores de D–02 (se registran al entrar en la zona).
+var files: FilesModule = null
+var _files_pending: Dictionary = {}
 ## Red eléctrica: port de `Power.ts` de la versión web.
 var power: PowerGrid = PowerGrid.for_laboratory()
 ## Si es `false`, la red no avanza sola (QA y capturas controlan el paso a mano).
@@ -54,6 +57,15 @@ func register_vault(module: VaultModule) -> void:
 	if not _vault_pending.is_empty():
 		vault.from_dict(_vault_pending)
 		_vault_pending = {}
+
+func register_files(module: FilesModule) -> void:
+	files = module
+	if not _files_pending.is_empty():
+		files.from_dict(_files_pending)
+		_files_pending = {}
+
+func files_snapshot() -> Dictionary:
+	return files.to_dict() if files != null else {}
 
 func vault_snapshot() -> Dictionary:
 	return vault.to_dict() if vault != null else {}
@@ -144,6 +156,7 @@ func save_game(path: String = "") -> bool:
 		"watcher_state": _to_json_value(watcher_state),
 		"power": power.to_dict() if power != null else {},
 		"vault": vault.to_dict() if vault != null else _vault_pending,
+		"files": files.to_dict() if files != null else _files_pending,
 	}
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	if file == null:
@@ -220,6 +233,13 @@ func load_game(path: String = "") -> bool:
 			vault.from_dict(saved_vault)
 		else:
 			_vault_pending = (saved_vault as Dictionary).duplicate(true)
+
+	var saved_files: Variant = parsed.get("files", {})
+	if saved_files is Dictionary and not (saved_files as Dictionary).is_empty():
+		if files != null:
+			files.from_dict(saved_files)
+		else:
+			_files_pending = (saved_files as Dictionary).duplicate(true)
 
 	var saved_power: Variant = parsed.get("power", {})
 	if saved_power is Dictionary and power != null:
