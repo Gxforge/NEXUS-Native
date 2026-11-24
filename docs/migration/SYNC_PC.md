@@ -7,14 +7,26 @@ dependencias externas y funciona en Windows, Linux y macOS con Python 3.9+.
 
 ## Uso habitual
 
-```bash
-# token en variable de entorno (recomendado)
-set NEXUS_GITHUB_TOKEN=ghp_xxx            # Windows (cmd)
-$env:NEXUS_GITHUB_TOKEN="ghp_xxx"         # Windows (PowerShell)
-export NEXUS_GITHUB_TOKEN=ghp_xxx         # Linux / macOS
+Deja el script en la raíz del proyecto (o usa `tools/sync_nexus.py`): **sin
+`--target` sincroniza la carpeta donde vive el script**, así que funciona desde
+cualquier directorio, incluso con doble clic.
 
-python tools/sync_nexus.py --target "C:\dev\NEXUS-Native"
+```bat
+:: Windows: doble clic en SINCRONIZAR.bat, o desde cmd
+set NEXUS_GITHUB_TOKEN=ghp_xxx
+python sync_nexus.py
+python sync_nexus.py --dry-run          :: solo muestra el plan
 ```
+
+```bash
+# Linux / macOS
+export NEXUS_GITHUB_TOKEN=ghp_xxx
+python3 tools/sync_nexus.py
+```
+
+`SINCRONIZAR.bat` vive en la raíz del repositorio y hace lo mismo con un clic:
+pide el token si no está en el entorno y ejecuta el sincronizador sobre esa
+carpeta.
 
 Sin `--yes` pide confirmación antes de escribir. Con `--dry-run` solo muestra el
 plan (nuevos `+`, actualizados `~`, eliminados `-`).
@@ -23,7 +35,7 @@ plan (nuevos `+`, actualizados `~`, eliminados `-`).
 
 | Opción | Efecto |
 |---|---|
-| `--target RUTA` | carpeta raíz del proyecto en el PC (obligatoria). Si está vacía o no existe, se crea |
+| `--target RUTA` | carpeta raíz del proyecto. Opcional: por defecto la carpeta del propio script (si no hay `project.godot` ahí, el directorio actual). Si está vacía o no existe, se crea |
 | `--repo owner/repo` | por defecto `Gxforge/NEXUS-Native` |
 | `--branch main` | rama a sincronizar |
 | `--mode api\|git` | `api` (zipball HTTPS, por defecto) o clonar con `git` |
@@ -53,6 +65,16 @@ plan (nuevos `+`, actualizados `~`, eliminados `-`).
   mensajes de error.
 - Se ignoran `.git/`, `.godot/`, `__pycache__/`, basura del sistema y, salvo
   `--full`, los GLB fuente pesados.
+
+## Windows rápido
+
+```bat
+D:\proyectos\proyecto game\nexus-native> python sync_nexus.py
+Destino: D:\proyectos\proyecto game\nexus-native (carpeta del script; usa --target para cambiarla)
+```
+
+Si el script se coloca fuera de cualquier proyecto y no se pasa `--target`, avisa
+de que falta `project.godot` y recuerda cómo indicar la carpeta.
 
 ## Verificación
 

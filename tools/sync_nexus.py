@@ -8,10 +8,11 @@ hayas creado y que nunca formaron parte del repositorio.
 
 Ejemplos
 --------
-    # 1) Uso normal: token en variable de entorno y carpeta destino
+    # 1) Lo normal: el script dentro del proyecto, sin --target
     set NEXUS_GITHUB_TOKEN=ghp_xxx            (Windows)
     export NEXUS_GITHUB_TOKEN=ghp_xxx         (Linux/macOS)
-    python sync_nexus.py --target "C:\\dev\\NEXUS-Native"
+    python sync_nexus.py                      # destino = carpeta del propio script
+    python sync_nexus.py --target "C:\\dev\\NEXUS-Native"   # destino explícito
 
     # 2) Ver qué haría, sin escribir nada
     python sync_nexus.py --target "C:\\dev\\NEXUS-Native" --dry-run
@@ -97,6 +98,21 @@ def is_ignored(rel: Path, full: bool) -> bool:
             if posix == heavy or posix.startswith(heavy + "/"):
                 return True
     return False
+
+
+def default_target() -> Path:
+    """Carpeta del proyecto cuando no se indica --target.
+
+    Prioriza la carpeta donde vive el script (así basta con dejarlo en la raíz
+    del proyecto y ejecutarlo desde cualquier sitio) y, si ahí no hay
+    `project.godot`, prueba el directorio de trabajo actual.
+    """
+    script_dir = Path(__file__).resolve().parent
+    candidates = [script_dir, Path.cwd().resolve()]
+    for candidate in candidates:
+        if (candidate / "project.godot").is_file():
+            return candidate
+    return script_dir
 
 
 def scrub(text: str, token: str | None) -> str:
@@ -398,7 +414,9 @@ def sync(source_root: Path, target: Path, manifest: dict, options: argparse.Name
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Sincroniza el repositorio NEXUS-Native con la carpeta local del proyecto.")
-    parser.add_argument("--target", required=True, help="carpeta raíz del proyecto en tu PC")
+    parser.add_argument("--target",
+                        help="carpeta raíz del proyecto en tu PC "
+                             "(por defecto, la carpeta donde está este script)")
     parser.add_argument("--repo", default=DEFAULT_REPO, help="owner/repo de GitHub (por defecto %s)" % DEFAULT_REPO)
     parser.add_argument("--branch", default=DEFAULT_BRANCH, help="rama a sincronizar (por defecto %s)" % DEFAULT_BRANCH)
     parser.add_argument("--mode", choices=("api", "git"), default="api",
@@ -415,18 +433,38 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--keep-download", help="guarda el archivo descargado en esa ruta")
     parser.add_argument("--force", action="store_true", help="permite un destino que no sea un proyecto Godot")
     parser.add_argument("--yes", "-y", action="store_true", help="no pedir confirmación")
+    parser.add_argument("--no-pause", action="store_true",
+                        help="no esperar a Intro al terminar (por defecto solo pausa en Windows)")
+    parser.add_argument("--version", action="version", version="nexus-sync 1.1")
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
+    try:  # mezcla predecible de mensajes y errores en la consola de Windows
+        sys.stdout.reconfigure(line_buffering=True)
+        sys.stderr.reconfigure(line_buffering=True)
+    except (AttributeError, ValueError):
+        pass
     options = parse_args(argv)
-    target = Path(options.target).expanduser().resolve()
+    explicit_target = bool(options.target)
+    target = Path(options.target).expanduser().resolve() if explicit_target else default_target()
     token = resolve_token(options)
+    if explicit_target:
+        print("Destino: %s" % target)
+    else:
+        print("Destino: %s (carpeta del script; usa --target para cambiarla)" % target)
+    if not (target / "project.godot").is_file() and not options.force:
+        print("Aviso: en %s no hay project.godot todavía." % target)
 
     target_has_content = target.exists() and any(target.iterdir())
     if target_has_content:
         if not (target / "project.godot").is_file() and not options.force:
-            fail("%s no parece la raíz del proyecto (falta project.godot). Usa --force si es correcto." % target)
+            fail("%s no parece la raíz del proyecto (falta project.godot)." % target)
+            if not explicit_target:
+                fail("copia sync_nexus.py a la raíz del proyecto o indica la carpeta: "
+                     "--target \"RUTA\\al\\proyecto\"")
+            else:
+                fail("revisa la ruta o usa --force si de verdad quieres escribir ahí.")
             return 2
     else:
         print("La carpeta destino no existe; se creará: %s" % target)
@@ -488,9 +526,22 @@ def main(argv: list[str] | None = None) -> int:
         shutil.rmtree(workdir, ignore_errors=True)
 
 
+def _windows_pause() -> None:
+    if os.name != "nt" or "--no-pause" in sys.argv:
+        return
+    try:
+        if not sys.stdin.isatty():
+            return
+        input("\nPulsa Intro para cerrar…")
+    except (EOFError, KeyboardInterrupt):
+        pass
+
+
 if __name__ == "__main__":
     try:
-        raise SystemExit(main())
+        code = main()
     except KeyboardInterrupt:
         print("\nInterrumpido.")
-        raise SystemExit(130)
+        code = 130
+    _windows_pause()
+    raise SystemExit(code)
