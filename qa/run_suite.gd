@@ -313,6 +313,78 @@ func _validate_w01_perception() -> void:
 	_check(restored_field.from_dict(field.to_dict()) and is_equal_approx(restored_field.sector_risk(5), 0.1),
 		"field memory survives serialisation")
 
+func _validate_transit() -> void:
+	var transit: CapsuleTransit = CapsuleTransit.new()
+	transit.simulation = false
+	transit.reset()
+	_check(is_equal_approx(transit.at, 102.0) and transit.status == "ANDÉN 01",
+		"capsule waits at platform 01 with the web placard")
+	_check(not transit.can_stand(0.0, 68.0), "closed apron gate blocks the platform")
+	transit.gate = 1.0
+	_check(transit.can_stand(3.0, 68.0) and not transit.can_stand(3.6, 68.0),
+		"open gate restores the source walking band")
+	_check(transit.inside(Vector3(15.0, 1.7, 100.0)) and not transit.inside(Vector3(13.0, 1.7, 100.0)),
+		"capsule volume matches the web bounds")
+	var player := Vector3(15.0, 1.7, 100.0)
+	var call := transit.use(&"railCallB", player)
+	_check(str(call.get("message", "")).contains("Cierre"), "platform call authorises departure")
+	transit.step(0.6, player, true, 0.0, 0.0)
+	_check(transit.door < 0.6, "doors close during the 1,4 s seal")
+	transit.step(0.9, player, true, 0.0, 0.0)
+	_check(transit.at > 102.0 and transit.status.ends_with("km/h"),
+		"capsule departs after the seal and shows its speed")
+	var riding := transit.step(5.0, player, true, 0.0, 0.0)
+	_check(riding.z > player.z + 100.0, "rider is carried along the axis")
+	transit.step(10.0, player, true, 0.0, 0.0)
+	_check(is_equal_approx(transit.at, 2042.0) and transit.status == "ANDÉN 02",
+		"capsule reaches platform 02 in ten seconds")
+	transit.use(&"railCallA", player)
+	transit.step(0.4, player, true, 0.0, 0.0)
+	transit.use(&"railBrake", player)
+	var held := transit.at
+	transit.step(2.0, player, true, 0.0, 0.0)
+	_check(transit.status == "RETENIDA" and is_equal_approx(transit.at, held),
+		"retention brake holds the capsule")
+	transit.use(&"railBrake", player)
+	transit.use(&"railSeat1", player)
+	_check(is_equal_approx(transit.step(0.016, player, true, 0.0, 0.0).y, 1.47),
+		"seats sit at the web height")
+	_check(not transit.use(&"railStand", player).get("position", Vector3.ZERO) == player,
+		"standing up clears the seat")
+
+	var car: CapsuleTransit = CapsuleTransit.new()
+	car.simulation = false
+	car.reset()
+	car._car_offset = Vector3(-12.0, 0.0, 109.0)
+	_check(str(car.use(&"railLoad", player).get("message", "")).contains("embarcando"),
+		"car transfer starts inside the amber frame")
+	car.step(2.0, player, true, 0.0, 0.0)
+	_check(car.car_position().x > -12.0 and car.car_position().x < 15.0,
+		"car travels towards the axis during the four seconds")
+	car.step(2.1, player, true, 0.0, 0.0)
+	_check(car.loaded and is_equal_approx(car.car_position().x, 15.0), "car locks onto the capsule")
+
+	var vehicle: VehiclePhysics = VehiclePhysics.new()
+	vehicle.reset(-12.0, 109.0, 0.0, true)
+	for _i in 240:
+		vehicle.step(1.0 / 120.0, 1.0, 0.0, false, false)
+	_check(vehicle.speed > 5.0 and vehicle.position.z > 109.0,
+		"rail car accelerates forwards with the web motor force")
+	_check(vehicle.kmh() > 18.0 and vehicle.gear != "N", "rail car reports speed and gear")
+	for _i in 120 * 3:
+		vehicle.step(1.0 / 120.0, 1.0, 0.0, false, true)
+	_check(vehicle.boost and vehicle.energy < 40.0, "turbo drains the capacitor at 24 per second")
+	vehicle.register_impact(6.7)
+	_check(is_equal_approx(vehicle.integrity, 93.4), "impact costs integrity like the web")
+	var restored := VehiclePhysics.new()
+	restored.from_dict(vehicle.to_dict())
+	_check(is_equal_approx(restored.energy, vehicle.energy), "rail car state survives a save round-trip")
+
+	var state := GameState.new()
+	state.power_simulation = false
+	state.register_transit(car)
+	_check(state.transit_snapshot().has("vehicle"), "game state stores the capsule snapshot")
+
 func _run() -> void:
 	await _validate_exported_pattern()
 	await _validate_portal_assembly()
@@ -328,6 +400,7 @@ func _run() -> void:
 	_validate_operations_panel()
 	_validate_bench_cycle()
 	_validate_w01_perception()
+	_validate_transit()
 	var main := packed.instantiate()
 	var test_state := main.get_node("GameState") as GameState
 	test_state.persistence_path = QA_SAVE_PATH

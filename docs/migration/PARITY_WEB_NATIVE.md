@@ -27,8 +27,9 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 | `Infrastructure.ts` | 440 | `zones/zone_*.tscn` (carcasas) | 🟡 | Volumen y colisión. `light_zone`/`area` del cuadro ya cubren la lectura por zona; faltan pasillos, anexos y rótulos. |
 | `Workshop.ts` | 448 | `bench_cycle.gd` (bancos) · pendiente el resto | 🟡 | Los dos bancos técnicos están portados; faltan los tres vasos de observación (`Pods`), instrumentos, tambores y luminarias. |
 | `BenchCycle.ts` | 216 | `scripts/systems/bench_cycle.gd` + `bench_station.gd` | ✅ | Cuna (8 s, 18 kW) y analizador (10 s, 9 kW) con la misma elección de equipo, etapas, corte por red y consumo real en `PowerGrid.machines`; 51 checks. Falta la geometría y las pantallas. |
-| `Transit.ts` | 669 | shells `transit_hub/road/rail` | ❌ | Cápsula, llamada, carga, freno, postura sentada, `use()` y `step()` del vehículo. |
-| `vehicle/*` (5 archivos) | 922 | — | ❌ | Modelo, física de cuatro apoyos, audio, cabina y perspectivas del coche. |
+| `Transit.ts` | 669 | `scripts/systems/capsule_transit.gd` + `transit_console.gd` | ✅ | Andenes 102/2042 sobre el eje 15, cierre de puertas, traslado con smoothstep de 10 s, freno de retención, compuerta por proximidad, cinco asientos, transferencia del carro en 4 s, `canStand`/`inside`, carteles y persistencia; 154 checks en `qa/validate_transit.gd`. Falta la geometría de la cápsula y el audio de puertas. |
+| `vehicle/VehiclePhysics.ts` | 263 | `scripts/systems/vehicle_physics.gd` | ✅ | Mismo contrato numérico (masa 1260, 4100 N de motor, punta 49, turbo −24/s, integridad por impacto, marchas 1–6, paso fijo 1/120 s) con integrador propio en vez de cannon-es; incluido en los 154 checks. |
+| `vehicle/*` (otros 4 archivos, 659 líneas) | 659 | — | ❌ | Modelo del coche, audio, cabina y perspectivas. |
 | `Monster.ts` + `MonsterAI.ts` + `Attention.ts` + `FieldSense.ts` | 438 | `monster_ai.gd` + `monster_attention.gd` + `field_memory.gd` + `w01_actor.gd` | ✅ | Estados, agresividad, ataque y recarga, cono de visión, audición por pasos, memoria de 5,4 s, intenciones, patrulla, señuelo, repliegue y malla de contención con memoria por sector; 66 checks. Faltan agarre/daño y la colisión física de la malla. |
 | `Tentacles.ts` + `Breath.ts` + `Larva.ts` | 704 | GLB de tentáculos | 🟡 | Los 20 tentáculos se ven, pero no hay dinámica por segmentos, agarre ni larvas con comportamiento. |
 | `EyeSystem.ts` + `OcularSurface.ts` + `Head.ts` | 449 | GLB de ojos | 🟡 | Seguimiento ocular limitado. Faltan parpadeo, iris reactivo y orientación de cabeza acoplada a la IA. |
@@ -50,8 +51,8 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 
 - **Portado con pruebas:** IA y percepción de W-01, red eléctrica, cuadro eléctrico + CCTV, bóveda V-03 (lógica), archivo D-02, bancos de carga y analizador, encuesta/raycast, contactos, caché de zonas, compuertas, streaming y persistencia de partida.
 - **Parcial:** W-01 (dinámica de tentáculos y agarre), jugador y carga, sectores/mobiliario, HUD, mapa, materiales.
-- **Sin empezar:** vasos de observación, tránsito/vehículo, pantallas y orquestación/cuadro eléctrico, taller, tránsito y vehículo, IA del sujeto, pantallas y telemetría, perfiles de calidad, orquestación de experiencias y distribución.
-- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **35 %**; el resto son sistemas por migrar.
+- **Sin empezar:** vasos de observación del taller, modelo/cabina/audio del coche, pantallas y telemetría, perfiles de calidad, orquestación de experiencias y distribución.
+- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **42 %**; el resto son sistemas por migrar.
 
 ## 3. Hoja de ruta propuesta
 
@@ -66,7 +67,7 @@ Cada fase termina con validador headless propio y una entrada en
 | **P-4** ✅ | Cuadro eléctrico + CCTV (`Operations.ts`, `Infrastructure.ts`) | P-1 | `validate_operations.gd` 77/77 + 11 checks en la suite · hecho |
 | **P-5** ✅ | Bancos de H-01 y B-02 (`BenchCycle.ts`, `Workshop.ts`) | P-1 | `validate_bench_cycle.gd` 51/51 + 11 checks en la suite · hecho (faltan los vasos, que son visuales) |
 | **P-6** ✅ | IA de W-01 (`MonsterAI`, `Attention`, `FieldSense`) | — | `validate_w01_ai.gd` 66/66 + 10 checks en la suite · hecho (falta agarre/daño y tentáculos dinámicos) |
-| **P-7** | Tránsito y vehículo (`Transit.ts`, `vehicle/*`) | P-1 | Cápsula con llamada/carga/freno y coche con solver de cuatro apoyos |
+| **P-7** ✅ | Tránsito y vehículo (`Transit.ts`, `vehicle/VehiclePhysics.ts`) | — | `validate_transit.gd` 154/154 + 21 checks en la suite · hecho (faltan geometría, cabina y audio) |
 | **P-8** | UI y orquestación (`App.tsx`, `SceneExperience.ts`, `CameraController`, `DisplayQuality`, `Visibility`) | P-2…P-7 | Ajustes, perfiles de calidad, mapa con estado y pantalla de recuperación |
 | **P-9** | Distribución | P-8 | Presets Windows/Android, builds reproducibles y QA en dispositivo real |
 

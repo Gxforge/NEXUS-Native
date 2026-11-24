@@ -8,7 +8,7 @@ signal zone_changed(previous_zone: StringName, current_zone: StringName)
 signal power_state_changed(snapshot: Dictionary)
 
 const SAVE_PATH := "user://nexus_native_save.json"
-const SAVE_VERSION := 7
+const SAVE_VERSION := 8
 
 var persistence_path: String = SAVE_PATH
 var current_zone: StringName = &""
@@ -27,6 +27,9 @@ var _vault_pending: Dictionary = {}
 ## Archivadores de D–02 (se registran al entrar en la zona).
 var files: FilesModule = null
 var _files_pending: Dictionary = {}
+## Cápsula de tránsito y vehículo de vía (se registran al entrar en la zona).
+var transit: CapsuleTransit = null
+var _transit_pending: Dictionary = {}
 ## Red eléctrica: port de `Power.ts` de la versión web.
 var power: PowerGrid = null
 ## Cuadro eléctrico y CCTV: port de `Operations.ts`.
@@ -86,6 +89,16 @@ func register_files(module: FilesModule) -> void:
 	if not _files_pending.is_empty():
 		files.from_dict(_files_pending)
 		_files_pending = {}
+
+func register_transit(module: CapsuleTransit) -> void:
+	transit = module
+	if not _transit_pending.is_empty():
+		transit.from_dict(_transit_pending)
+		_transit_pending = {}
+
+func transit_snapshot() -> Dictionary:
+	return transit.to_dict() if transit != null else {}
+
 
 func files_snapshot() -> Dictionary:
 	return files.to_dict() if files != null else {}
@@ -198,6 +211,7 @@ func save_game(path: String = "") -> bool:
 		"files": files.to_dict() if files != null else _files_pending,
 		"operations": operations.to_dict() if operations != null else {},
 		"benches": benches_snapshot(),
+		"transit": transit_snapshot() if transit != null else _transit_pending,
 	}
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	if file == null:
@@ -298,6 +312,13 @@ func load_game(path: String = "") -> bool:
 					if str(bench_cycle.id) == str(key):
 						bench_cycle.from_dict(saved_bench)
 						break
+
+	var saved_transit: Variant = parsed.get("transit", {})
+	if saved_transit is Dictionary and not (saved_transit as Dictionary).is_empty():
+		if transit != null:
+			transit.from_dict(saved_transit)
+		else:
+			_transit_pending = (saved_transit as Dictionary).duplicate(true)
 
 	var saved_operations: Variant = parsed.get("operations", {})
 	if saved_operations is Dictionary and operations != null:

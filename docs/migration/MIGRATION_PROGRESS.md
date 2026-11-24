@@ -47,7 +47,7 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - Godot 4.4.1 `--headless --editor --path . --quit`: importación/escaneo completado y scripts cargados.
 - `qa/validate_zone_graph.gd`: 303 checks, 0 fallos (identidad, manifiestos, colisión, AABB, sockets, portales y solapes de las 12 zonas).
 - `qa/validate_zone_traversal.gd`: 255 checks, 0 fallos (22 cruces por los portales con llegada a socket, una sola zona activa, liberación del módulo y un cruce físico caminando contra el umbral).
-- `qa/run_suite.gd`: 207 checks, 0 fallos (validación estructural de las 12 zonas, streaming C-04↔A-01, HUD/paneles con mapa de 12 módulos, armas UV/crio, pickup por rayo, linterna y sockets).
+- `qa/run_suite.gd`: 228 checks, 0 fallos (validación estructural de las 12 zonas, streaming C-04↔A-01, HUD/paneles con mapa de 12 módulos, armas UV/crio, pickup por rayo, linterna y sockets).
 - `qa/validate_game_state.gd`: 17 checks, 0 fallos (inventario, slots, puertas y serialización JSON, ahora con la red eléctrica dentro del guardado).
 - `qa/validate_power_grid.gd`: 45 checks, 0 fallos (capacidad, carga, reparto, picos, disparo, rearme y persistencia de la red).
 - `qa/validate_w01_ai.gd`: 66 checks, 0 fallos (estados, visión, audición, memoria, contención y persistencia).
@@ -58,6 +58,13 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `qa/validate_resume.gd`: 8 checks, 0 fallos (continúa en A-01 y evita transición accidental al aparecer junto al portal).
 - `qa/validate_zone_ownership.gd` (13 checks, política de propiedad espejo del grafo), `validate_contacts_survey.gd`, `validate_contact_fx.gd`, `validate_source_batch.gd`, además de los validadores de núcleo/ojos/tentáculos W-01: pasaron en la ejecución registrada.
 - Las pruebas son headless. No prueban renderizado móvil real ni sustituyen builds de plataforma.
+
+## Fase 20 · Tránsito y vehículo (P-7)
+- `scripts/systems/capsule_transit.gd`: port de `Transit.ts` — andenes 102/2042 sobre el eje x = 15, cierre de puertas de 1,2 s tras 1,4 s de espera, traslado con smoothstep de 10 s, freno de retención, compuerta por proximidad, cinco asientos a 1,47 m, transferencia del carro en 4 s, `can_stand`/`inside`, carteles y persistencia.
+- `scripts/systems/vehicle_physics.gd`: port de `VehiclePhysics.ts` con paso fijo de 1/120 s (masa 1260, motor 4100 N, punta 49 m/s, turbo −24/s con bloqueo de 3,5 s, integridad −(dv − 2,7)·1,65, marchas N/R/1–6).
+- `scripts/systems/transit_console.gd`: los diez puestos `railCallA/B`, `railBrake`, `railLoad`, `railCar` y `railSeat0…4`.
+- `zones/zone_transit_hub.tscn`: nodo `Transit` con cartel `Label3D` y los diez mandos; `GameState` guarda el bloque `transit` (`SAVE_VERSION` 8).
+- `qa/validate_transit.gd`: 154 checks, 0 fallos.
 
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.

@@ -1,9 +1,15 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
 [ext_resource type="PackedScene" path="res://assets/generated/transit_hub_structural_shell.glb" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="4"]
+[ext_resource type="Script" path="res://scripts/systems/capsule_transit.gd" id="5"]
+[ext_resource type="Script" path="res://scripts/systems/transit_console.gd" id="6"]
+[sub_resource type="BoxShape3D" id="RailConsoleShape"]
+size = Vector3(0.52, 1.24, 0.42)
+[sub_resource type="BoxShape3D" id="RailSeatShape"]
+size = Vector3(0.72, 0.6, 0.72)
 
 [node name="TransitHubSlice" type="Node3D"]
 script = ExtResource("1")
@@ -52,3 +58,96 @@ position = Vector3(9, 7, 97)
 omni_range = 32
 light_color = Color(0.62, 0.83, 0.87, 1)
 light_energy = 9
+
+[node name="Transit" type="Node3D" parent="."]
+script = ExtResource("5")
+
+[node name="Board" type="Label3D" parent="Transit"]
+position = Vector3(15, 3.1, 96.4)
+billboard = 1
+pixel_size = 0.006
+font_size = 96
+modulate = Color(0.72, 0.92, 0.86, 1)
+text = "ANDÉN 01"
+
+[node name="Stations" type="Node3D" parent="."]
+
+[node name="Anden01" type="StaticBody3D" parent="Stations"]
+position = Vector3(13.4, 0.62, 96.0)
+script = ExtResource("6")
+handle_id = &"railCallA"
+display_name = "Llamada · andén 01"
+[node name="Collision" type="CollisionShape3D" parent="Stations/Anden01"]
+shape = SubResource("RailConsoleShape")
+
+[node name="Anden02" type="StaticBody3D" parent="Stations"]
+position = Vector3(16.6, 0.62, 96.0)
+script = ExtResource("6")
+handle_id = &"railCallB"
+display_name = "Llamada · andén 02"
+[node name="Collision" type="CollisionShape3D" parent="Stations/Anden02"]
+shape = SubResource("RailConsoleShape")
+
+[node name="Retencion" type="StaticBody3D" parent="Stations"]
+position = Vector3(13.4, 0.62, 104.0)
+script = ExtResource("6")
+handle_id = &"railBrake"
+display_name = "Freno de retención"
+[node name="Collision" type="CollisionShape3D" parent="Stations/Retencion"]
+shape = SubResource("RailConsoleShape")
+
+[node name="Transferencia" type="StaticBody3D" parent="Stations"]
+position = Vector3(16.6, 0.62, 104.0)
+script = ExtResource("6")
+handle_id = &"railLoad"
+display_name = "Plataforma de transferencia"
+[node name="Collision" type="CollisionShape3D" parent="Stations/Transferencia"]
+shape = SubResource("RailConsoleShape")
+
+[node name="Carro" type="StaticBody3D" parent="Stations"]
+position = Vector3(12.2, 0.62, 109.0)
+script = ExtResource("6")
+handle_id = &"railCar"
+display_name = "Mando del carro"
+[node name="Collision" type="CollisionShape3D" parent="Stations/Carro"]
+shape = SubResource("RailConsoleShape")
+
+[node name="Asiento0" type="StaticBody3D" parent="Stations"]
+position = Vector3(13.05, 1.47, 98.78)
+script = ExtResource("6")
+handle_id = &"railSeat0"
+display_name = "Asiento 1"
+[node name="Collision" type="CollisionShape3D" parent="Stations/Asiento0"]
+shape = SubResource("RailSeatShape")
+
+[node name="Asiento1" type="StaticBody3D" parent="Stations"]
+position = Vector3(13.05, 1.47, 104.8)
+script = ExtResource("6")
+handle_id = &"railSeat1"
+display_name = "Asiento 2"
+[node name="Collision" type="CollisionShape3D" parent="Stations/Asiento1"]
+shape = SubResource("RailSeatShape")
+
+[node name="Asiento2" type="StaticBody3D" parent="Stations"]
+position = Vector3(16.95, 1.47, 98.78)
+script = ExtResource("6")
+handle_id = &"railSeat2"
+display_name = "Asiento 3"
+[node name="Collision" type="CollisionShape3D" parent="Stations/Asiento2"]
+shape = SubResource("RailSeatShape")
+
+[node name="Asiento3" type="StaticBody3D" parent="Stations"]
+position = Vector3(16.95, 1.47, 104.8)
+script = ExtResource("6")
+handle_id = &"railSeat3"
+display_name = "Asiento 4"
+[node name="Collision" type="CollisionShape3D" parent="Stations/Asiento3"]
+shape = SubResource("RailSeatShape")
+
+[node name="Asiento4" type="StaticBody3D" parent="Stations"]
+position = Vector3(15.0, 1.47, 97.25)
+script = ExtResource("6")
+handle_id = &"railSeat4"
+display_name = "Asiento 5"
+[node name="Collision" type="CollisionShape3D" parent="Stations/Asiento4"]
+shape = SubResource("RailSeatShape")

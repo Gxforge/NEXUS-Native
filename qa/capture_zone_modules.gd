@@ -56,7 +56,11 @@ func _face_room() -> void:
 		return
 	player.global_position = entry.global_position
 	player.velocity = Vector3.ZERO
-	var direction := manager.current_zone.global_position - entry.global_position
+	var focus := manager.current_zone.global_position
+	if manager.current_zone.get_node_or_null("Transit") != null:
+		# El andén 01 de la cápsula, no el origen de la zona (queda a la espalda).
+		focus = Vector3(CapsuleTransit.AXIS_X, 1.4, CapsuleTransit.STATION_A - 2.0)
+	var direction := focus - entry.global_position
 	direction.y = 0.0
 	if direction.length() > 0.2:
 		player.rotation.y = atan2(-direction.x, -direction.z)
