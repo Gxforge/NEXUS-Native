@@ -14,8 +14,6 @@ var state: String = "WATCHING"
 var intent: String = "Observando"
 var memory: float = 0.0
 var _time: float = 0.0
-var _state_elapsed: float = 0.0
-var _attack_cooldown: float = 0.0
 var _cold_remaining: float = 0.0
 var _uv_flash: float = 0.0
 var _persist_timer: float = 0.0
@@ -32,6 +30,9 @@ var _eye_roots: Array[Node3D] = []
 var _arms: Array[Node3D] = []
 var _effect_light: OmniLight3D
 var _game_state: GameState
+var ai: MonsterAI = MonsterAI.new()
+var attention: MonsterAttention = MonsterAttention.new()
+var grabbing := false
 
 func _ready() -> void:
 	add_to_group(&"w01_actor")
@@ -59,6 +60,12 @@ func _ready() -> void:
 	if target != null:
 		_prior_player_position = target.global_position
 		_last_known_position = target.global_position
+	if _game_state != null and _game_state.watcher_state.has("attention"):
+		var saved: Variant = _game_state.watcher_state.get("attention")
+		if saved is Dictionary:
+			attention.from_dict(saved)
+			memory = attention.memory
+			intent = attention.intent
 	_effect_light = OmniLight3D.new()
 	_effect_light.name = "ResponseLight"
 	_effect_light.position = Vector3(0.0, 3.0, 0.55)
@@ -69,8 +76,6 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
-	_state_elapsed += delta
-	_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
 	_cold_remaining = maxf(0.0, _cold_remaining - delta)
 	_uv_flash = maxf(0.0, _uv_flash - delta)
 	_lure_remaining = maxf(0.0, _lure_remaining - delta)
@@ -110,25 +115,34 @@ func _process(delta: float) -> void:
 			"aggression": aggression,
 			"memory": memory,
 			"intent": intent,
+			"attention": attention.to_dict(),
 		}
 
+## Copia el estado de la IA al actor para que el HUD lo vea al instante.
+func _sync_from_ai() -> void:
+	state = ai.state
+	aggression = ai.aggression
+
 func apply_uv() -> void:
-	_attack_cooldown = maxf(_attack_cooldown, 5.0)
 	_uv_flash = 1.1
 	_cold_remaining = 0.0
-	_transition_to("RECOVERY")
+	ai.recover()
+	_sync_from_ai()
 	aggression = minf(aggression, 0.35)
 	behavior_changed.emit(state, aggression, "Pulso UV · recuperación")
 
 func apply_cryo() -> void:
 	_cold_remaining = 7.0
-	_transition_to("RECOVERY")
+	ai.recover()
+	_sync_from_ai()
 	behavior_changed.emit(state, aggression, "Niebla criogénica · ralentizado")
 
 func investigate_lure(position: Vector3, duration: float = 5.4) -> void:
 	_lure_position = position
 	_lure_remaining = maxf(0.5, duration)
 	_last_known_position = position
+	attention.last_known = position
+	attention.memory = maxf(attention.memory, duration)
 	memory = maxf(memory, duration)
 	intent = "Investiga el señuelo"
 	behavior_changed.emit(state, aggression, intent)
@@ -140,126 +154,36 @@ func _update_behavior(delta: float) -> void:
 	if target == null:
 		return
 	var player_position := target.global_position
-	var delta_to_player := player_position - global_position
-	var distance := Vector2(delta_to_player.x, delta_to_player.z).length()
-	var bearing := atan2(delta_to_player.x, delta_to_player.z)
-	var facing := absf(wrapf(bearing - global_rotation.y, -PI, PI))
-	var seen := distance < 33.0 and facing < 1.29
-	var moving := player_position.distance_squared_to(_prior_player_position) > 0.00012
-	var running := target is NexusPlayer and (target as NexusPlayer).velocity.length() > 6.0
-	var heard := distance < (16.0 if running else 8.0) and moving
-	_prior_player_position = player_position
-	if seen or heard:
-		memory = 5.4
-		_last_known_position = player_position
-	else:
-		memory = maxf(0.0, memory - delta)
-
-	var next_state := _distance_state(distance)
-	if state == "ATTACK":
-		if _state_elapsed >= ATTACK_DURATION:
-			_transition_to("RECOVERY")
-	elif state == "RECOVERY":
-		if _state_elapsed >= RECOVERY_DURATION and _cold_remaining <= 0.0 and _uv_flash <= 0.0:
-			_transition_to(next_state)
-	elif distance < 5.45 and _attack_cooldown <= 0.0 and _cold_remaining <= 0.0:
-		_attack_cooldown = ATTACK_COOLDOWN
-		_transition_to("ATTACK")
-	else:
-		_transition_to(next_state)
-
-	var desired_aggression := 0.2
-	match state:
-		"IDLE": desired_aggression = 0.05
-		"WATCHING": desired_aggression = 0.2
-		"CURIOUS": desired_aggression = 0.46
-		"AGGRESSIVE": desired_aggression = 0.79
-		"ATTACK": desired_aggression = 1.0
-		"RECOVERY": desired_aggression = 0.31
-	aggression = lerpf(aggression, desired_aggression, 1.0 - exp(-1.55 * delta))
-	if _cold_remaining > 0.0:
-		aggression = minf(aggression, 0.4)
-
-	var destination := player_position
-	var speed := 0.0
-	var turn_speed := 0.35
+	var to_player := player_position - global_position
+	var distance := Vector2(to_player.x, to_player.z).length()
+	var sprint := target is NexusPlayer and (target as NexusPlayer).velocity.length() > 6.0
+	var bait: Variant = null
 	if _lure_remaining > 0.0:
-		destination = _lure_position
-		intent = "Investiga el señuelo"
-		speed = 0.45
-		turn_speed = 1.9
-	elif _cold_remaining > 0.0 or state == "RECOVERY":
-		intent = "Se repliega"
-		if distance < 6.0:
-			destination = global_position - delta_to_player
-			speed = 0.42
-		turn_speed = 0.5
-	elif state == "ATTACK":
-		intent = "Ataque"
-		destination = player_position
-		speed = 1.0
-		turn_speed = 2.1
-	elif seen or heard:
-		if heard and not seen:
-			intent = "Escucha pasos"
-		else:
-			intent = "Se aproxima" if distance < 10.0 else "Observa"
-		if distance >= 5.45:
-			speed = 1.12 if distance < 10.0 else 0.84
-		turn_speed = 1.35
-	elif memory > 0.0:
-		intent = "Busca el último contacto"
-		destination = _last_known_position
-		speed = 0.68
-		turn_speed = 1.1
-	else:
-		intent = "Explora"
-		destination = global_position + Vector3(9.8 * sin(_time * 0.18), 0.0, 9.8 * cos(_time * 0.18))
-		speed = 0.62
-		turn_speed = 0.35
+		bait = _lure_position
+	var cold := _cold_remaining > 0.0
+	var blocked := cold or _uv_flash > 0.0 or state == MonsterAI.RECOVERY
 
-	var planar := destination - global_position
-	planar.y = 0.0
-	var planar_length := planar.length()
-	if planar_length > 0.001:
-		planar /= planar_length
-		var desired_yaw := atan2(planar.x, planar.z)
-		global_rotation.y = rotate_toward(global_rotation.y, desired_yaw, turn_speed * delta)
-	if planar_length < 1.6 and speed > 0.0 and _lure_remaining <= 0.0:
-		speed = 0.0
-	if _cold_remaining > 0.0:
-		speed *= 0.35
-	if speed > 0.0:
-		var next_position := global_position + planar * speed * delta
-		# Keep W–01 inside the structural envelope used by the current C–04 slice.
-		next_position.x = clampf(next_position.x, -31.0, 31.0)
-		next_position.z = clampf(next_position.z, -37.0, 37.0)
-		global_position.x = next_position.x
-		global_position.z = next_position.z
+	# 1) Percepción y navegación (Attention.ts).
+	var step := attention.update(global_position, global_rotation.y, player_position,
+		delta, bait, state == MonsterAI.RECOVERY, grabbing, cold, sprint)
+	global_rotation.y = float(step.get("yaw", global_rotation.y))
+	var next_position: Vector3 = step.get("position", global_position)
+	# Envolvente de seguridad de la rebanada actual de C-04.
+	global_position.x = clampf(next_position.x, -40.0, 40.0)
+	global_position.z = clampf(next_position.z, -40.0, 45.0)
+	intent = str(step.get("intent", intent))
+	memory = float(step.get("memory", memory))
+
+	# 2) Máquina de estados (MonsterAI.ts).
+	ai.update(distance, delta, blocked)
+	state = ai.state
+	aggression = ai.aggression
+
 	if old_state != state or old_intent != intent:
 		behavior_changed.emit(state, aggression, intent)
 
-func _distance_state(distance: float) -> String:
-	if distance > 11.5:
-		return "IDLE"
-	if distance > 7.1:
-		return "WATCHING"
-	if distance > 5.05:
-		return "CURIOUS"
-	return "AGGRESSIVE"
-
-func _transition_to(next_state: String) -> void:
-	if next_state == state:
-		return
-	state = next_state
-	_state_elapsed = 0.0
-
 func _attack_drive() -> float:
-	if state == "ATTACK":
-		return sin(clampf(_state_elapsed / ATTACK_DURATION, 0.0, 1.0) * PI)
-	if state == "RECOVERY":
-		return 0.42 * exp(-_state_elapsed * 1.15)
-	return 0.0
+	return ai.attack_drive()
 
 func _set_mouth(value: float) -> void:
 	for mesh: MeshInstance3D in [_head, _gum, _throat]:

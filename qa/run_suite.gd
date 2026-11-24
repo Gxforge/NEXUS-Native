@@ -281,6 +281,38 @@ func check_bench_analyzer(analyzer: BenchCycle, player: NexusPlayer, state: Game
 		"analyzer marks the sample as analyzed")
 	_check(analyzer.stage == "VERIFICADO / RETIRAR", "analyzer screen asks to remove the vial")
 
+func _validate_w01_perception() -> void:
+	var ai: MonsterAI = MonsterAI.new()
+	_check(ai.state == "WATCHING" and is_equal_approx(ai.aggression, 0.2),
+		"W-01 starts watching with the web aggression")
+	_check(ai.state_for_distance(20.0) == "IDLE" and ai.state_for_distance(4.0) == "AGGRESSIVE",
+		"W-01 maps distance to states like the web")
+	ai.update(4.0, 0.1)
+	_check(ai.state == "ATTACK" and is_equal_approx(ai.attack_cooldown, 6.4),
+		"W-01 attacks inside 5,45 m with a 6,4 s cooldown")
+	ai.update(4.0, 1.4)
+	_check(ai.state == "RECOVERY", "W-01 recovers after the 1,22 s strike")
+	ai.update(4.0, 2.2)
+	_check(ai.state == "AGGRESSIVE", "W-01 returns to distance state after recovery")
+	var attention: MonsterAttention = MonsterAttention.new()
+	var monster := Vector3(0.0, 0.0, 22.0)
+	var seen_step := attention.update(monster, 0.0, Vector3(0.0, 1.72, 28.0), 0.1)
+	_check(bool(seen_step["seen"]) and is_equal_approx(attention.memory, 5.4),
+		"W-01 sees inside its 1,29 rad cone and remembers for 5,4 s")
+	attention.reset()
+	var mem_step := attention.update(monster, 0.0, Vector3(0.0, 1.72, 10.0), 0.1)
+	_check(not bool(mem_step["seen"]) and attention.memory < 5.4,
+		"W-01 ignores what is behind it and far away")
+	attention.reset()
+	attention.update(Vector3(0.0, 0.0, 35.0), 0.0, Vector3(0.0, 1.72, 60.0), 0.2)
+	_check(attention.intent == "Bordea la malla", "W-01 skirts the containment mesh")
+	var field: FieldMemory = FieldMemory.new()
+	_check(field.remember(5, 0.1) and is_equal_approx(field.sector_risk(5), 0.1),
+		"field memory records risk per sector")
+	var restored_field: FieldMemory = FieldMemory.new()
+	_check(restored_field.from_dict(field.to_dict()) and is_equal_approx(restored_field.sector_risk(5), 0.1),
+		"field memory survives serialisation")
+
 func _run() -> void:
 	await _validate_exported_pattern()
 	await _validate_portal_assembly()
@@ -295,6 +327,7 @@ func _run() -> void:
 	_validate_files_module()
 	_validate_operations_panel()
 	_validate_bench_cycle()
+	_validate_w01_perception()
 	var main := packed.instantiate()
 	var test_state := main.get_node("GameState") as GameState
 	test_state.persistence_path = QA_SAVE_PATH

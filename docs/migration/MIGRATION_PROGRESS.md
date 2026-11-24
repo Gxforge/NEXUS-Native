@@ -36,6 +36,7 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - [x] Archivo D–02 (fase 16: bandejas con giro, expedientes y bitácora). Faltan bancos de carga y el lector a pantalla completa.
 - [x] Cuadro eléctrico y CCTV (fase 17: circuitos, mandos, contadores, informe y selector de cámaras). Faltan geometría, pantallas y vídeo.
 - [x] Bancos técnicos (fase 18: cuna de carga en H–01 y analizador en B–02, con consumo real de la red).
+- [x] IA y percepción de W–01 (fase 19: estados, cono de visión, audición, memoria, malla de contención). Faltan agarre/daño y tentáculos dinámicos.
 - [ ] Vasos de observación de H–01 (visual) y resto de interactuables.
 - [ ] Transit: cápsula/carro, asientos, llamadas, carga, freno y solver de cuatro apoyos del vehículo.
 - [ ] Paneles de base de datos/mapa con el contenido completo de la web; ahora son una estructura inicial limitada a C-04/A-01.
@@ -46,9 +47,10 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - Godot 4.4.1 `--headless --editor --path . --quit`: importación/escaneo completado y scripts cargados.
 - `qa/validate_zone_graph.gd`: 303 checks, 0 fallos (identidad, manifiestos, colisión, AABB, sockets, portales y solapes de las 12 zonas).
 - `qa/validate_zone_traversal.gd`: 255 checks, 0 fallos (22 cruces por los portales con llegada a socket, una sola zona activa, liberación del módulo y un cruce físico caminando contra el umbral).
-- `qa/run_suite.gd`: 197 checks, 0 fallos (validación estructural de las 12 zonas, streaming C-04↔A-01, HUD/paneles con mapa de 12 módulos, armas UV/crio, pickup por rayo, linterna y sockets).
+- `qa/run_suite.gd`: 207 checks, 0 fallos (validación estructural de las 12 zonas, streaming C-04↔A-01, HUD/paneles con mapa de 12 módulos, armas UV/crio, pickup por rayo, linterna y sockets).
 - `qa/validate_game_state.gd`: 17 checks, 0 fallos (inventario, slots, puertas y serialización JSON, ahora con la red eléctrica dentro del guardado).
 - `qa/validate_power_grid.gd`: 45 checks, 0 fallos (capacidad, carga, reparto, picos, disparo, rearme y persistencia de la red).
+- `qa/validate_w01_ai.gd`: 66 checks, 0 fallos (estados, visión, audición, memoria, contención y persistencia).
 - `qa/validate_bench_cycle.gd`: 51 checks, 0 fallos (cuna, analizador, corte por red, consumo y guardado).
 - `qa/validate_operations.gd`: 77 checks, 0 fallos (circuitos, geografía de zonas, mandos, eco, contadores, CCTV y persistencia).
 - `qa/validate_files.gd`: 33 checks, 0 fallos (bandejas giradas, tope por proximidad, expedientes en la bitácora y persistencia).
