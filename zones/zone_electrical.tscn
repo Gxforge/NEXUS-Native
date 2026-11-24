@@ -48,7 +48,8 @@ display_name = "Celda de respaldo E-07"
 [node name="OperationsRoom" type="Node3D" parent="."]
 
 [node name="ZoneNext" type="StaticBody3D" parent="OperationsRoom"]
-position = Vector3(24, 0.62, 52)
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(27.2, 0.62, 64)
 script = ExtResource("6")
 handle_id = &"zoneNext"
 display_name = "Selector de zona"
@@ -56,7 +57,8 @@ display_name = "Selector de zona"
 shape = SubResource("OpsConsoleShape")
 
 [node name="DeviceNext" type="StaticBody3D" parent="OperationsRoom"]
-position = Vector3(26, 0.62, 52)
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(27.2, 0.62, 66.2)
 script = ExtResource("6")
 handle_id = &"deviceNext"
 display_name = "Selector de derivación"
@@ -64,7 +66,8 @@ display_name = "Selector de derivación"
 shape = SubResource("OpsConsoleShape")
 
 [node name="ZoneSwitch" type="StaticBody3D" parent="OperationsRoom"]
-position = Vector3(28, 0.62, 52)
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(27.2, 0.62, 68.4)
 script = ExtResource("6")
 handle_id = &"zoneSwitch"
 display_name = "Interruptor de zona"
@@ -72,7 +75,8 @@ display_name = "Interruptor de zona"
 shape = SubResource("OpsConsoleShape")
 
 [node name="BranchSwitch" type="StaticBody3D" parent="OperationsRoom"]
-position = Vector3(30, 0.62, 52)
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(27.2, 0.62, 70.6)
 script = ExtResource("6")
 handle_id = &"branchSwitch"
 display_name = "Palanca de derivación"
@@ -80,7 +84,8 @@ display_name = "Palanca de derivación"
 shape = SubResource("OpsConsoleShape")
 
 [node name="Illum" type="StaticBody3D" parent="OperationsRoom"]
-position = Vector3(32, 0.62, 52)
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(27.2, 0.62, 72.8)
 script = ExtResource("6")
 handle_id = &"illum"
 display_name = "Mando de iluminación"
@@ -96,7 +101,7 @@ script = ExtResource("7")
 kind = "telemetry"
 
 [node name="Phosphor" type="Node3D" parent="Displays"]
-position = Vector3(30.6, 1.55, 52.0)
+position = Vector3(26.9, 1.9, 68.4)
 rotation_degrees = Vector3(0, 90, 0)
 script = ExtResource("7")
 kind = "phosphor"

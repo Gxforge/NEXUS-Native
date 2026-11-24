@@ -83,9 +83,39 @@ repartida por el eje mayor.
 - Capturas (`qa/capture_dressing.tscn`, Xvfb 1280×720) en
   `reports/dressing-{h01,b02,electrical,surveillance,d02,c04,v03_gallery,v03_cryo}.png`.
 
+## Segunda pasada (24b): animación, ambiente y dispositivos
+
+- **Animación del mobiliario** (`ZoneDressing.animate(t)`, con el contrato de
+  `Pods.update`): 48 burbujas por vaso que ascienden y reinician a 2,75 m, latido
+  y giro de la larva (`sin(t·3,1)`+ desplazamiento en Y y giro), giro de las aspas
+  de cada turbina con ritmo propio, respiración de los anillos de contención y
+  parpadeo de los testigos. `running=false` permite congelarla para capturas
+  reproducibles. GIF de la secuencia en `reports/{h01,b02,c04}-anim.gif`.
+- **Ambiente global**: `main.tscn` tenía `ambient_light_source = 3` (SKY) sin
+  cielo, así que el ambiente salía **negro** y las caras en sombra se perdían.
+  Ahora es `COLOR` con `(0,42, 0,55, 0,68)` a 0,72, más cerca del
+  `AmbientLight(0xc1d7ed, 0.85)` de `Environment.ts`.
+- **Luminarias**: energía 2,4 → 3,6 y alcance `width·2,8` mínimo 7 m.
+- **Dispositivos interactivos recolocados**: las consolas del cuadro eléctrico
+  (`ZoneNext`…`Illum`) estaban en `z = 52`, **fuera** de la sala (58,2–84) y las
+  de vigilancia en `z = 56` (sala 66,2–84); ahora van contra el muro oeste de su
+  módulo con giro que mira al interior. La pantalla de fósforo, junto a ellas.
+- **Crioteca**: vitrinas con cuerpo de acero, zócalo, ventana, muestra iluminada
+  y placa de bronce; mesa de vigilancia con dos monitores encendidos y sillas
+  orientadas al puesto.
+- **Capturas en el juego real**: `qa/capture_zones.tscn` arranca `main.tscn`,
+  transita por las ocho zonas con `ZoneManager.transition_to`, coloca al operador
+  y captura con HUD e iluminación del juego (`reports/ingame-*.png`).
+
 ## Pendiente
 
 - Animación del mobiliario: burbujas y latido de los vasos, giro de las aspas,
   parpadeo de testigos y sillas.
 - Atrezzo GLB de alta fidelidad, mamparos de `Visibility.ts`, controles táctiles
   de `Touch.ts`, coche y audio.
+- **Auditoría de dispositivos pendiente en D–02, B–02 y crioteca**: los módulos
+  `Files`/`Vault`/`BenchCycle` siguen colocando sus bandejas y estaciones con las
+  coordenadas globales de la web (`files_module.apply_web_layout()` usa
+  `(-25, -37,3)`, `(36,6, -86,2)`, `(-35,2, -25,8)`…), que en las cáscaras nativas
+  caen fuera de la sala correspondiente. Requiere remapear el layout completo
+  (fase 25) y no sólo los nodos de escena.

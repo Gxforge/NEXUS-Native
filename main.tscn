@@ -13,9 +13,9 @@ height = 1.82
 [sub_resource type="Environment" id="GlobalEnvironment"]
 background_mode = 1
 background_color = Color(0.01, 0.018, 0.025, 1)
-ambient_light_source = 3
-ambient_light_color = Color(0.16, 0.24, 0.34, 1)
-ambient_light_energy = 0.45
+ambient_light_source = 2
+ambient_light_color = Color(0.42, 0.55, 0.68, 1)
+ambient_light_energy = 0.72
 
 [node name="Main" type="Node"]
 script = ExtResource("1")

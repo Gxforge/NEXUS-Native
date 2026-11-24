@@ -19,6 +19,14 @@ var built_meshes := 0
 var pods: Array[Node3D] = []
 var fans: Array[Node3D] = []
 var screens: Array[Node3D] = []
+var specimens: Array[Node3D] = []
+var bubbles: Array = []
+var rings: Array[MeshInstance3D] = []
+var indicators: Array[MeshInstance3D] = []
+
+## Ciclo de animación del mobiliario (mismo contrato que `Pods.update` de la web).
+var time := 0.0
+var running := true
 
 const W01_CORE := "res://assets/generated/w01_core.glb"
 const W01_TENTACLES := "res://assets/generated/w01_tentacles.glb"
@@ -40,6 +48,7 @@ const ROOMS := {
 
 func _ready() -> void:
 	build()
+	set_process(not bubbles.is_empty() or not fans.is_empty() or not specimens.is_empty())
 
 
 func build() -> void:
@@ -66,6 +75,47 @@ func build() -> void:
 		&"transit_hub", &"transit_road", &"transit_rail":
 			_build_transit()
 	built_meshes = count_meshes(self)
+
+
+func _process(delta: float) -> void:
+	if not running:
+		return
+	time += delta
+	animate(time)
+
+
+## Avanza la animación del mobiliario hasta el instante `t`.
+func animate(t: float) -> void:
+	# Burbujas del líquido de los vasos (`Workshop.ts`: 48 puntos por vaso).
+	for index in bubbles.size():
+		var group: Array = bubbles[index]
+		for j in group.size():
+			var bubble: Node3D = group[j]
+			var speed: float = 0.1 + float(j % 3) * 0.023
+			bubble.position.y = 0.92 + fmod(t * speed + float(j) * 0.149 + float(index) * 0.69, 2.75)
+	# Latido de la larva en suspensión.
+	for index in specimens.size():
+		var specimen: Node3D = specimens[index]
+		var a: float = t * 3.1 + float(index) * 1.62
+		var pulse: float = pow(maxf(0.0, sin(a)), 5.0)
+		specimen.scale = Vector3(0.42 * (1.0 + pulse * 0.12),
+			0.42 * (1.0 - pulse * 0.065), 0.42 * (1.0 + pulse * 0.1))
+		specimen.position.y = 2.25 + sin(a * 0.4) * 0.07
+		specimen.rotation.y = 1.27 + sin(a * 0.23) * 0.23
+	# Aspas de las turbinas; giran más despacio cuanto menor es el índice.
+	for index in fans.size():
+		var fan: Node3D = fans[index]
+		fan.rotation.z = t * (1.35 + 0.12 * float(index))
+	# Anillos de la malla de contención: respiración lenta.
+	for index in rings.size():
+		var ring := rings[index]
+		var wave: float = 1.0 + sin(t * 1.6 - float(index) * 0.55) * 0.012
+		ring.scale = Vector3(wave, 1.0, wave)
+	# Testigos intermitentes.
+	for index in indicators.size():
+		var led := indicators[index]
+		var blink: float = 0.45 + 0.55 * absf(sin(t * 1.9 + float(index) * 0.8))
+		led.scale = Vector3.ONE * blink
 
 
 func count_meshes(node: Node) -> int:
@@ -159,6 +209,17 @@ func _build_h01() -> void:
 		var tentacles := (load(W01_TENTACLES) as PackedScene).instantiate()
 		tentacles.name = "Tentacles"
 		creature.add_child(tentacles)
+		specimens.append(creature)
+		# Burbujas ascendentes del líquido (48 por vaso, como la web).
+		var group: Array = []
+		var bubble_material := BuildKit.emissive(Color(0.6, 0.81, 0.68), 0.35)
+		for j in 48:
+			var angle: float = float(j) * 2.399
+			var radius: float = 0.78 + 0.54 * float(j % 7) / 7.0
+			var bubble := BuildKit.bead(pod, bubble_material, cos(angle) * radius,
+				0.92 + 2.74 * float(j) / 48.0, sin(angle) * radius, 0.021, 6)
+			group.append(bubble)
+		bubbles.append(group)
 		# Boca de desagüe superior y manómetro.
 		BuildKit.bar(pod, bronze, Vector3(0.0, 4.41, 0.0), Vector3(0.0, 4.87, 0.0), 0.117)
 		BuildKit.bar(pod, bronze, Vector3(0.0, 4.87, 0.0), Vector3(-0.3, 5.12, 0.0), 0.117)
@@ -182,7 +243,8 @@ func _build_h01() -> void:
 		BuildKit.drum(pump, graphite, 0.0, 1.55, 0.0, 0.78, 1.7, true, 28)
 		BuildKit.ring(pump, bronze, 0.0, 1.55, 0.86, 0.62, 0.06)
 		BuildKit.bar(pump, metal, Vector3(0.0, 1.9, 0.0), Vector3(0.0, 3.4, 0.0), 0.24)
-		BuildKit.block(pump, BuildKit.emissive(BuildKit.AMBER, 1.0), 0.0, 1.02, 0.82, 0.5, 0.12, 0.05)
+		indicators.append(BuildKit.block(pump, BuildKit.emissive(BuildKit.AMBER, 1.0),
+			0.0, 1.02, 0.82, 0.5, 0.12, 0.05))
 		BuildKit.luminaire(pump, 0.0, 4.4, 0.0, 2.2, BuildKit.WARM, false)
 	BuildKit.plaque(self, "HIDRÁULICA", "H–01   /   VASOS DE OBSERVACIÓN", 9.0, 1.6,
 		18.0, 6.6, -62.0, -PI * 0.5)
@@ -225,6 +287,8 @@ func _build_b02() -> void:
 		for vent in 4:
 			BuildKit.block(machines, BuildKit.emissive(Color("#1b2a2e"), 1.0),
 				x - 1.2 + vent * 0.8, 1.1, -15.28, 0.55, 0.5, 0.03)
+		indicators.append(BuildKit.block(machines, BuildKit.emissive(BuildKit.GLOW, 1.2),
+			x + 1.5, 1.45, -15.28, 0.14, 0.14, 0.05))
 	# Armarios de servicio contra el muro este.
 	for index in 3:
 		BuildKit.cabinet(self, 42.6, -18.0 + float(index) * 2.4, -PI * 0.5, 1.6, 2.4, 0.8, 1,
@@ -332,12 +396,18 @@ func _build_surveillance() -> void:
 		_screen_frame(wall, screen.position, Vector2(2.4, 1.35))
 	# Mesa de operación con dos sillas, delante del muro.
 	BuildKit.block(self, metal, -17.6, 0.95, 75.6, 7.2, 0.16, 1.9)
-	BuildKit.block(self, graphite, -17.6, 0.45, 75.6, 6.6, 0.9, 1.6)
+	BuildKit.block(self, graphite, -17.6, 0.43, 75.6, 6.0, 0.86, 1.4)
+	BuildKit.block(self, BuildKit.material(BuildKit.BRONZE, 0.7, 0.3),
+		-17.6, 0.9, 74.66, 7.2, 0.06, 0.06)
+	for side in [-1, 1]:
+		BuildKit.block(self, graphite, -17.6 + float(side) * 2.6, 1.12, 75.0,
+			0.9, 0.36, 0.07)
+		BuildKit.block(self, BuildKit.emissive(Color("#8fe6d8"), 1.1),
+			-17.6 + float(side) * 2.6, 1.12, 74.95, 0.78, 0.26, 0.02)
 	for side in [-1, 1]:
 		var seat := Node3D.new()
 		seat.name = "Chair%d" % (side + 1)
 		seat.position = Vector3(-17.6 + float(side) * 1.9, 0.0, 73.4)
-		seat.rotation.y = PI
 		add_child(seat)
 		BuildKit.drum(seat, metal, 0.0, 0.12, 0.0, 0.3, 0.06, false, 20)
 		BuildKit.drum(seat, metal, 0.0, 0.26, 0.0, 0.07, 0.3, false, 12)
@@ -412,6 +482,7 @@ func _build_c04() -> void:
 		ring_mesh.material_override = BuildKit.emissive(BuildKit.GLOW, 1.0)
 		ring_mesh.position = Vector3(0.0, y, 0.0)
 		fence.add_child(ring_mesh)
+		rings.append(ring_mesh)
 	for index in 6:
 		var angle: float = float(index) * TAU / 6.0
 		BuildKit.block(fence, bronze, cos(angle) * radius, 0.0, sin(angle) * radius,
@@ -449,6 +520,8 @@ func _build_gallery() -> void:
 func _build_cryo() -> void:
 	var metal := BuildKit.material(BuildKit.METAL)
 	var graphite := BuildKit.material(BuildKit.GRAPHITE)
+	var steel := BuildKit.material(BuildKit.STEEL, 0.55, 0.35)
+	var bronze_plate := BuildKit.material(BuildKit.BRONZE, 0.7, 0.3)
 	# Dos hileras de vitrinas de criopreservación.
 	for row in 2:
 		var z: float = -95.0 + float(row) * 7.0
@@ -458,7 +531,13 @@ func _build_cryo() -> void:
 			tank.name = "CryoTank_%d_%d" % [row, index]
 			tank.position = Vector3(x, 0.0, z)
 			add_child(tank)
-			BuildKit.block(tank, graphite, 0.0, 0.9, 0.0, 2.2, 1.8, 1.6)
+			BuildKit.block(tank, graphite, 0.0, 0.16, 0.0, 2.2, 0.32, 1.6)
+			BuildKit.block(tank, steel, 0.0, 0.95, 0.0, 2.2, 1.42, 1.6)
+			BuildKit.block(tank, graphite, 0.0, 1.12, 0.0, 2.24, 0.06, 1.64)
+			BuildKit.block(tank, BuildKit.glass(), 0.0, 0.92, 0.0, 1.5, 0.72, 0.06)
+			BuildKit.block(tank, BuildKit.emissive(Color("#dff6ff"), 1.3),
+				0.0, 0.92, 0.02, 1.2, 0.5, 0.02)
+			BuildKit.block(tank, bronze_plate, 0.0, 0.92, 0.05, 0.5, 0.5, 0.03)
 			BuildKit.block(tank, BuildKit.glass(), 0.0, 2.25, 0.0, 2.0, 1.0, 1.4)
 			BuildKit.block(tank, BuildKit.emissive(Color("#cdeff8"), 1.1),
 				0.0, 2.74, 0.0, 1.7, 0.04, 1.1)

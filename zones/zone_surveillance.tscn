@@ -40,7 +40,8 @@ light_energy = 7
 [node name="OperationsRoom" type="Node3D" parent="."]
 
 [node name="CamNext" type="StaticBody3D" parent="OperationsRoom"]
-position = Vector3(-26, 0.62, 56)
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(-26.4, 0.62, 70)
 script = ExtResource("6")
 handle_id = &"camNext"
 display_name = "Avanzar cinta de cámaras"
@@ -48,7 +49,8 @@ display_name = "Avanzar cinta de cámaras"
 shape = SubResource("OpsConsoleShape")
 
 [node name="CamPrev" type="StaticBody3D" parent="OperationsRoom"]
-position = Vector3(-28, 0.62, 56)
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(-26.4, 0.62, 72.2)
 script = ExtResource("6")
 handle_id = &"camPrev"
 display_name = "Retroceder cinta de cámaras"
@@ -56,7 +58,8 @@ display_name = "Retroceder cinta de cámaras"
 shape = SubResource("OpsConsoleShape")
 
 [node name="Report" type="StaticBody3D" parent="OperationsRoom"]
-position = Vector3(-30, 0.62, 56)
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(-26.4, 0.62, 74.4)
 script = ExtResource("6")
 handle_id = &"report"
 display_name = "Panel maestro · cambiar página"

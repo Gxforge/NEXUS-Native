@@ -114,6 +114,22 @@ static func drum(parent: Node3D, material: Material, x: float, y: float, z: floa
 	return instance
 
 
+## Esfera pequeña (burbujas del líquido, testigos y remates).
+static func bead(parent: Node3D, material: Material, x: float, y: float, z: float,
+		radius: float, segments := 8) -> MeshInstance3D:
+	var mesh := SphereMesh.new()
+	mesh.radius = radius
+	mesh.height = radius * 2.0
+	mesh.radial_segments = segments
+	mesh.rings = maxi(4, segments / 2)
+	var instance := MeshInstance3D.new()
+	instance.mesh = mesh
+	instance.material_override = material
+	instance.position = Vector3(x, y, z)
+	parent.add_child(instance)
+	return instance
+
+
 ## Anillo (`ring` de la web).
 static func ring(parent: Node3D, material: Material, x: float, y: float, z: float,
 		radius: float, thickness: float, flat := false) -> MeshInstance3D:
@@ -195,8 +211,8 @@ static func luminaire(parent: Node3D, x: float, y: float, z: float, width := 3.2
 	if with_light:
 		var light := OmniLight3D.new()
 		light.light_color = tint
-		light.light_energy = 2.4
-		light.omni_range = maxf(6.0, width * 2.2)
+		light.light_energy = 3.6
+		light.omni_range = maxf(7.0, width * 2.8)
 		light.position = Vector3(0.0, -0.5, 0.0)
 		light.shadow_enabled = false
 		root.add_child(light)

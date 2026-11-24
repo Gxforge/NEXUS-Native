@@ -99,9 +99,86 @@ func _run() -> void:
 	_check(BuildKit.METAL.to_html(false) == "53686c", "paleta METAL igual que la web")
 	_check(BuildKit.GLOW.to_html(false) == "72f9e5", "paleta GLOW igual que la web")
 
+	await _validate_animation()
+
 	var passed := failures.is_empty()
 	print(JSON.stringify({"checks": checks, "failures": failures, "passed": passed}))
 	quit(0 if passed else 1)
+
+
+## La animación del mobiliario replica el contrato de `Pods.update` de la web.
+func _validate_animation() -> void:
+	var h01 := await _dressing("res://zones/zone_h01_hydraulics.tscn")
+	_check(h01 != null, "animación: H–01 cargada")
+	if h01 != null:
+		var bubbles: Array = h01.get("bubbles")
+		var specimens: Array = h01.get("specimens")
+		_check(bubbles.size() == 3, "animación: tres grupos de burbujas")
+		_check(specimens.size() == 3, "animación: tres larvas animadas")
+		if bubbles.size() == 3 and specimens.size() == 3:
+			var group: Array = bubbles[0]
+			_check(group.size() == 48, "animación: 48 burbujas por vaso")
+			h01.call("animate", 0.0)
+			var start_y: float = (group[0] as Node3D).position.y
+			var start_scale: Vector3 = (specimens[0] as Node3D).scale
+			h01.call("animate", 1.0)
+			var next_y: float = (group[0] as Node3D).position.y
+			_check(absf(next_y - start_y) > 0.05, "animación: las burbujas ascienden")
+			var in_range := true
+			for bubble in group:
+				var y: float = (bubble as Node3D).position.y
+				if y < 0.9 or y > 3.7:
+					in_range = false
+			_check(in_range, "animación: las burbujas no salen del líquido")
+			_check((specimens[0] as Node3D).scale != start_scale,
+				"animación: la larva late")
+			var rotation_a: float = (specimens[0] as Node3D).rotation.y
+			h01.call("animate", 2.4)
+			_check((specimens[0] as Node3D).rotation.y != rotation_a,
+				"animación: la larva gira sobre sí misma")
+			h01.call("animate", 1.0)
+			_check(is_equal_approx((group[0] as Node3D).position.y, next_y),
+				"animación: reproducible para el mismo instante")
+		h01.queue_free()
+
+	var b02 := await _dressing("res://zones/zone_b02_turbines.tscn")
+	if b02 != null:
+		var fans: Array = b02.get("fans")
+		var indicators: Array = b02.get("indicators")
+		_check(fans.size() == 4, "animación: cuatro aspas giratorias")
+		_check(indicators.size() >= 4, "animación: testigos de las turbinas")
+		if fans.size() == 4:
+			(b02 as Node3D).call("animate", 0.0)
+			var first: float = (fans[0] as Node3D).rotation.z
+			(b02 as Node3D).call("animate", 1.5)
+			_check(absf((fans[0] as Node3D).rotation.z - first) > 0.5,
+				"animación: las aspas giran")
+			_check(absf((fans[3] as Node3D).rotation.z - (fans[0] as Node3D).rotation.z) > 0.1,
+				"animación: cada turbina lleva su ritmo")
+		b02.queue_free()
+
+	var c04 := await _dressing("res://zones/zone_c04_shell.tscn")
+	if c04 != null:
+		var rings: Array = c04.get("rings")
+		_check(rings.size() == 6, "animación: seis anillos de contención")
+		if rings.size() == 6:
+			(c04 as Node3D).call("animate", 0.0)
+			var scale_a: float = (rings[0] as MeshInstance3D).scale.x
+			(c04 as Node3D).call("animate", 0.98)
+			_check(absf((rings[0] as MeshInstance3D).scale.x - scale_a) > 0.0005,
+				"animación: la malla respira")
+		c04.queue_free()
+	await process_frame
+
+
+func _dressing(path: String) -> Node3D:
+	var packed: PackedScene = load(path)
+	if packed == null:
+		return null
+	var zone: Node3D = packed.instantiate()
+	root.add_child(zone)
+	await process_frame
+	return zone.get_node_or_null("Dressing") as Node3D
 
 
 func _check_zone_props(id: String, dressing: Node3D) -> void:
