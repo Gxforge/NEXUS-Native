@@ -47,7 +47,7 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - Godot 4.4.1 `--headless --editor --path . --quit`: importación/escaneo completado y scripts cargados.
 - `qa/validate_zone_graph.gd`: 303 checks, 0 fallos (identidad, manifiestos, colisión, AABB, sockets, portales y solapes de las 12 zonas).
 - `qa/validate_zone_traversal.gd`: 255 checks, 0 fallos (22 cruces por los portales con llegada a socket, una sola zona activa, liberación del módulo y un cruce físico caminando contra el umbral).
-- `qa/run_suite.gd`: 272 checks, 0 fallos (validación estructural de las 12 zonas, streaming C-04↔A-01, HUD/paneles con mapa de 12 módulos, armas UV/crio, pickup por rayo, linterna y sockets).
+- `qa/run_suite.gd`: 300 checks, 0 fallos (validación estructural de las 12 zonas, streaming C-04↔A-01, HUD/paneles con mapa de 12 módulos, armas UV/crio, pickup por rayo, linterna y sockets).
 - `qa/validate_game_state.gd`: 17 checks, 0 fallos (inventario, slots, puertas y serialización JSON, ahora con la red eléctrica dentro del guardado).
 - `qa/validate_power_grid.gd`: 45 checks, 0 fallos (capacidad, carga, reparto, picos, disparo, rearme y persistencia de la red).
 - `qa/validate_w01_ai.gd`: 66 checks, 0 fallos (estados, visión, audición, memoria, contención y persistencia).
@@ -78,6 +78,12 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `main.gd`: `apply_quality_category()` aplica el perfil al viewport, sombras y glow; **F3** recorre low/medium/high y el HUD lo muestra.
 - `player.gd`: `apply_view_fov()` (68 en primera persona, 49/35 en órbita) al alternar la vista.
 - Estabilizada la prueba intermitente «approach requests door opening» de la suite.
+
+## Fase 23 · Ajustes, paneles y bitácora de sesión (P-8, tercer bloque)
+- `scripts/core/session_state.gd`: capa de interfaz de `App.tsx` — calidad y sensibilidad persistidas, detección de dispositivo, navegación de paneles con las reglas de cierre de la web, pausa/reanudación/reinicio, consejos de una sola vez (0,55 s / 5,95 s) y bitácora de 60 entradas; 95 checks.
+- HUD: paneles `cfg` (consejos, calidad BAJA/MEDIA/ALTA, deslizador de sensibilidad, manuales, reinicio) y `log`; la pausa mantiene la simulación detenida al abrir ajustes y vuelve a ella al cerrarlos.
+- `GameState.session` con `log_event()` y guardado (`SAVE_VERSION` 10); `player.apply_look` escala con la sensibilidad; `main.gd` dispara los consejos y reinicia el encuentro.
+- Captura nueva: `reports/panel-settings.png`.
 
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.

@@ -20,6 +20,12 @@ var _quick_slot_buttons: Array[Button] = []
 var _message_timer: Timer
 var _panel_root: PanelContainer
 var _panel_content: VBoxContainer
+signal quality_changed(preset: String)
+signal sensitivity_changed(value: float)
+signal guides_changed(enabled: bool)
+signal reset_requested
+signal log_requested
+
 var _active_panel: StringName = &""
 var _touch_start_position: Vector2 = Vector2.ZERO
 var _touch_start_time: int = 0
@@ -379,9 +385,18 @@ func _on_touch_look_input(event: InputEvent) -> void:
 			_player.interact()
 	
 ## Perfil gráfico activo (F3 lo recorre: low → medium → high).
+var _sensitivity_label: Label
+var _quality_value := "MEDIUM"
+
+## Sensibilidad de cámara activa (ajustes de `App.tsx`).
+func update_sensitivity_label(value: float) -> void:
+	if _sensitivity_label != null:
+		_sensitivity_label.text = "ENTER · SENS %.2f×" % value
+
 func update_quality_label(preset: String) -> void:
+	_quality_value = preset.to_upper()
 	if _quality_label != null:
-		_quality_label.text = "PERFIL · " + preset.to_upper()
+		_quality_label.text = "PERFIL · " + _quality_value
 
 func _make_label(node_name: String, text: String, font_size: int, color: Color) -> Label:
 	var label := Label.new()
@@ -493,6 +508,8 @@ func _on_panel_requested(panel_name: StringName) -> void:
 		_open_panel(panel_name)
 
 func _open_panel(panel_name: StringName) -> void:
+	# Ajustes y bitácora abiertos desde la pausa mantienen la simulación detenida.
+	var keep_pause := get_tree().paused and (panel_name == &"cfg" or panel_name == &"log")
 	_active_panel = panel_name
 	for child in _panel_content.get_children():
 		child.queue_free()
@@ -502,13 +519,20 @@ func _open_panel(panel_name: StringName) -> void:
 		&"database": _populate_database()
 		&"map": _populate_map()
 		&"pause": _populate_pause()
+		&"cfg": _populate_settings()
+		&"log": _populate_log()
 		_: _populate_map()
 	_panel_root.visible = true
-	get_tree().paused = panel_name == &"pause"
+	get_tree().paused = panel_name == &"pause" or keep_pause
 	panel_visibility_changed.emit(true)
 
 func _close_panel() -> void:
 	if _active_panel.is_empty():
+		return
+	# Como la web: cerrar los ajustes o la bitácora abiertos desde la pausa
+	# devuelve al panel de pausa, no al juego.
+	if (_active_panel == &"cfg" or _active_panel == &"log") and get_tree().paused:
+		_open_panel(&"pause")
 		return
 	_active_panel = &""
 	get_tree().paused = false
@@ -523,6 +547,8 @@ func _build_panel_header(panel_name: StringName) -> Control:
 		&"database": title.text = "BITÁCORA / BASE DE DATOS"
 		&"map": title.text = "MAPA DE INSTALACIÓN"
 		&"pause": title.text = "PAUSA / SISTEMA"
+		&"cfg": title.text = "AJUSTES / CONTROLES"
+		&"log": title.text = "BITÁCORA DE SESIÓN"
 		_: title.text = "NEXUS"
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.add_theme_font_size_override("font_size", 22)
@@ -612,9 +638,78 @@ func _populate_pause() -> void:
 	var save := _make_panel_button("GUARDAR PARTIDA")
 	save.pressed.connect(_save_from_panel)
 	_panel_content.add_child(save)
+	var settings := _make_panel_button("AJUSTAR CONTROLES")
+	settings.pressed.connect(func() -> void: _open_panel(&"cfg"))
+	_panel_content.add_child(settings)
+	var log_button := _make_panel_button("BITÁCORA DE SESIÓN")
+	log_button.pressed.connect(func() -> void: _open_panel(&"log"))
+	_panel_content.add_child(log_button)
 	var quit := _make_panel_button("GUARDAR Y SALIR")
 	quit.pressed.connect(_save_and_quit)
 	_panel_content.add_child(quit)
+
+## Ajustes de `App.tsx`: consejos, calidad gráfica, sensibilidad y reinicio.
+func _populate_settings() -> void:
+	var session: SessionState = _game_state.session if _game_state != null else null
+	if session == null:
+		_add_panel_label("Ajustes no disponibles · partida sin cargar.")
+		return
+	var guides_check := CheckBox.new()
+	guides_check.text = "Mostrar consejos una sola vez"
+	guides_check.button_pressed = session.guides
+	guides_check.focus_mode = Control.FOCUS_NONE
+	guides_check.toggled.connect(func(enabled: bool) -> void:
+		session.set_guides(enabled)
+		guides_changed.emit(enabled))
+	_panel_content.add_child(guides_check)
+	_add_panel_label("CALIDAD GRÁFICA")
+	var row := HBoxContainer.new()
+	for preset in ExperienceState.QUALITIES:
+		var button := _make_panel_button({"low": "BAJA", "medium": "MEDIA", "high": "ALTA"}[preset])
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.pressed.connect(func() -> void:
+			quality_changed.emit(preset))
+		row.add_child(button)
+	_panel_content.add_child(row)
+	_add_panel_label("Activa: %s · resolución 3D %d × %d píxeles. Alta prioriza nitidez; Baja reduce consumo."
+		% [session.quality.to_upper(), int(get_viewport().get_visible_rect().size.x),
+		int(get_viewport().get_visible_rect().size.y)])
+	var sensitivity_row := HBoxContainer.new()
+	var label := Label.new()
+	label.text = "SENSIBILIDAD DE CÁMARA %.2f×" % session.sensitivity
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.add_theme_color_override("font_color", Color(0.69, 0.82, 0.84))
+	sensitivity_row.add_child(label)
+	_panel_content.add_child(sensitivity_row)
+	var slider := HSlider.new()
+	slider.min_value = SessionState.SENSITIVITY_MIN
+	slider.max_value = SessionState.SENSITIVITY_MAX
+	slider.step = SessionState.SENSITIVITY_STEP
+	slider.value = session.sensitivity
+	slider.custom_minimum_size = Vector2(0, 28)
+	slider.value_changed.connect(func(value: float) -> void:
+		var applied: float = session.set_sensitivity(value)
+		label.text = "SENSIBILIDAD DE CÁMARA %.2f×" % applied
+		sensitivity_changed.emit(applied))
+	_panel_content.add_child(slider)
+	_add_panel_label("Entrada: %s. %s" % [session.device_label(), session.input_hint()])
+	for manual in session.manuals():
+		_add_panel_label(manual)
+	var reset := _make_panel_button("REINICIAR ENCUENTRO")
+	reset.pressed.connect(func() -> void: reset_requested.emit())
+	_panel_content.add_child(reset)
+
+## Bitácora de sesión (60 entradas con marca de hora, como en la web).
+func _populate_log() -> void:
+	var session: SessionState = _game_state.session if _game_state != null else null
+	if session == null:
+		_add_panel_label("Bitácora no disponible.")
+		return
+	if session.entries.is_empty():
+		_add_panel_label("Sin eventos registrados.")
+		return
+	for line in session.log_lines():
+		_add_panel_label(line)
 
 func _add_panel_label(text: String) -> void:
 	var label := Label.new()

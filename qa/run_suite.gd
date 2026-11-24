@@ -84,6 +84,39 @@ func _validate_structural_zone(zone: Dictionary) -> void:
 	instance.queue_free()
 	await process_frame
 
+func _find_button_named(node: Node, text: String) -> Button:
+	if node == null:
+		return null
+	if node is Button and (node as Button).text == text:
+		return node as Button
+	for child in node.get_children():
+		var found := _find_button_named(child, text)
+		if found != null:
+			return found
+	return null
+
+func _find_slider(node: Node) -> HSlider:
+	if node == null:
+		return null
+	if node is HSlider:
+		return node as HSlider
+	for child in node.get_children():
+		var found := _find_slider(child)
+		if found != null:
+			return found
+	return null
+
+func _find_checkbox(node: Node) -> CheckBox:
+	if node == null:
+		return null
+	if node is CheckBox:
+		return node as CheckBox
+	for child in node.get_children():
+		var found := _find_checkbox(child)
+		if found != null:
+			return found
+	return null
+
 func _find_node_named(node: Node, node_name: String) -> Node:
 	if node.name == node_name:
 		return node
@@ -524,6 +557,58 @@ func _validate_experience() -> void:
 	state.free()
 	reloaded.free()
 
+func _validate_session() -> void:
+	var session: SessionState = SessionState.new("high")
+	_check(is_equal_approx(session.set_sensitivity(0.1), 0.35)
+		and is_equal_approx(session.set_sensitivity(9.0), 2.5),
+		"camera sensitivity clamps to the web range 0,35-2,5")
+	_check(is_equal_approx(session.nudge_sensitivity(-1), 2.45),
+		"sensitivity moves in 0,05 steps")
+	_check(session.set_quality("low") == "low" and session.set_quality("ultra") == "low",
+		"session quality accepts only the three presets")
+	_check(SessionState.detect_device(true, false, false) == "android"
+		and SessionState.detect_device(false, true, true) == "touch"
+		and SessionState.detect_device(false, false, false) == "pc",
+		"device detection mirrors the web")
+	_check(session.open_panel("map") and not session.active(), "data panels pause the simulation")
+	session.close_panel()
+	_check(session.active(), "closing a data panel resumes the game")
+	_check(session.pause() and session.panel == "pause" and not session.active(),
+		"pause opens the pause panel")
+	session.close_panel()
+	_check(session.panel == "pause", "closing the pause panel keeps the pause")
+	_check(session.resume() and session.active(), "resume returns to the game")
+	_check(session.set_view(true) == "Operador en primera persona"
+		and session.first_person and session.zoom, "view switch is logged")
+	var nx := ExperienceState.new([&"lamp"])
+	_check(SessionState.tip_id(nx) == "lamp", "tip id follows the lamp inventory")
+	var tip_state := SessionState.new()
+	tip_state.first_person = true
+	_check(tip_state.update(0.3, nx).is_empty(), "tips wait 0,55 s")
+	_check(tip_state.update(0.3, nx) == SessionState.tip_text("lamp"), "tips appear once")
+	_check(tip_state.update(6.0, nx).is_empty() and tip_state.tip.is_empty(),
+		"tips disappear after 5,95 s")
+	_check(tip_state.update(2.0, nx).is_empty(), "a shown tip never returns")
+	for _i in 80:
+		session.log_entry("evento")
+	_check(session.entries.size() == 60, "session log keeps the last 60 entries")
+	_check(session.log_lines()[0].contains("evento"), "session log lines carry stamp and text")
+	var state := GameState.new()
+	state.power_simulation = false
+	state.persistence_path = "user://nexus_native_session_suite.json"
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(state.persistence_path))
+	state.session.set_sensitivity(1.5)
+	state.session.set_guides(false)
+	state.save_game()
+	var reloaded := GameState.new()
+	reloaded.power_simulation = false
+	reloaded.persistence_path = state.persistence_path
+	_check(reloaded.load_game() and is_equal_approx(reloaded.session.sensitivity, 1.5)
+		and not reloaded.session.guides, "session settings survive a save round-trip")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(state.persistence_path))
+	state.free()
+	reloaded.free()
+
 func _run() -> void:
 	await _validate_exported_pattern()
 	await _validate_portal_assembly()
@@ -543,6 +628,7 @@ func _run() -> void:
 	_validate_camera()
 	_validate_displays()
 	_validate_experience()
+	_validate_session()
 	var main := packed.instantiate()
 	var test_state := main.get_node("GameState") as GameState
 	test_state.persistence_path = QA_SAVE_PATH
@@ -578,6 +664,34 @@ func _run() -> void:
 		_check(map_view._entries.size() == 12, "schematic map draws the twelve modules")
 		_check(map_view._current == manager.current_zone.zone_id, "schematic map highlights the current module")
 	hud._close_panel()
+	hud._on_panel_requested(&"pause")
+	var cfg_button := _find_button_named(hud.get_node("FieldPanel"), "AJUSTAR CONTROLES")
+	_check(cfg_button != null, "pause panel offers the controls settings")
+	if cfg_button != null:
+		cfg_button.pressed.emit()
+		_check(_find_slider(hud.get_node("FieldPanel")) != null,
+			"settings panel exposes the camera sensitivity slider")
+		_check(_find_checkbox(hud.get_node("FieldPanel")) != null,
+			"settings panel exposes the once-only tips toggle")
+		_check(_find_button_named(hud.get_node("FieldPanel"), "REINICIAR ENCUENTRO") != null,
+			"settings panel offers the encounter reset")
+		var slider := _find_slider(hud.get_node("FieldPanel"))
+		if slider != null:
+			slider.value = 1.75
+			_check(is_equal_approx(main.game_state.session.sensitivity, 1.75),
+				"slider updates the camera sensitivity")
+	hud._on_panel_requested(&"pause")
+	var log_button := _find_button_named(hud.get_node("FieldPanel"), "BITÁCORA DE SESIÓN")
+	_check(log_button != null, "pause panel opens the session log")
+	if log_button != null:
+		log_button.pressed.emit()
+		_check(main.game_state.session.entries.size() >= 2, "session log keeps its entries")
+	_check(paused, "settings keep the simulation paused while open")
+	hud._close_panel()
+	_check(paused and hud._active_panel == &"pause",
+		"closing the settings returns to the pause panel")
+	hud._close_panel()
+	_check(not paused, "closing the pause panel resumes the game")
 	_check(main.apply_quality_category("low") == "low", "F3 applies the low profile at runtime")
 	_check(is_equal_approx(main.get_viewport().scaling_3d_scale, 0.85),
 		"low profile lowers the 3D render scale to the web density")

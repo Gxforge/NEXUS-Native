@@ -32,6 +32,10 @@ func _ready() -> void:
 	hud.bind_player(player, game_state)
 	hud.bind_zones(catalog)
 	hud.panel_visibility_changed.connect(_on_panel_visibility_changed)
+	hud.quality_changed.connect(_on_quality_changed)
+	hud.sensitivity_changed.connect(_on_sensitivity_changed)
+	hud.guides_changed.connect(_on_guides_changed)
+	hud.reset_requested.connect(restart_encounter)
 	zone_manager.transition_finished.connect(_on_zone_transition_finished)
 	zone_manager.transition_failed.connect(_on_zone_transition_failed)
 	if hud != null:
@@ -67,6 +71,8 @@ func start_game() -> bool:
 	return true
 
 func _process(delta: float) -> void:
+	if _game_started:
+		_tick_session_tips(delta)
 	if _startup_requested and not _game_started:
 		var progress: Array = []
 		var definition := catalog.zone(_startup_zone)
@@ -245,6 +251,48 @@ func _apply_glow(enabled: bool, strength: float) -> void:
 		return
 	world.environment.glow_enabled = enabled
 	world.environment.glow_intensity = strength
+
+func _on_quality_changed(preset: String) -> void:
+	var applied := apply_quality_category(preset)
+	game_state.log_event("Perfil gráfico · " + applied.to_upper())
+	player.show_message("Perfil gráfico · " + applied.to_upper())
+	hud.update_quality_label(applied)
+
+func _on_sensitivity_changed(value: float) -> void:
+	game_state.log_event("Sensibilidad de cámara · %.2f×" % value)
+	hud.update_sensitivity_label(value)
+
+func _on_guides_changed(enabled: bool) -> void:
+	game_state.log_event("Consejos " + ("activados" if enabled else ("mostrados" if enabled else "desactivados")))
+	if not enabled and game_state.session != null:
+		game_state.session.dismiss_tip()
+
+## Reinicia el encuentro como el botón de la web: estado fresco y módulo inicial.
+func restart_encounter() -> bool:
+	if game_state.session != null:
+		game_state.session.reset_session()
+	if game_state.experience != null:
+		game_state.experience.reset(game_state.inventory)
+	if game_state.watcher_state is Dictionary:
+		game_state.watcher_state["state"] = "WATCHING"
+		game_state.watcher_state["aggression"] = 0.2
+		game_state.watcher_state["memory"] = 0.0
+	player.restore_runtime_state({})
+	game_state.save_game()
+	var zone: StringName = game_state.current_zone if catalog.has_zone(game_state.current_zone) else &"c04"
+	player.show_message("Sesión de contención reiniciada")
+	hud.update_quality_label(game_state.quality())
+	return zone_manager.transition_to(zone, &"entry")
+
+## Consejos de una sola vez (al entrar en primera persona, como en la web).
+## Consejos de una sola vez (se llama desde `_process`).
+func _tick_session_tips(delta: float) -> void:
+	if game_state.session == null:
+		return
+	var previous := game_state.session.tip
+	var next := game_state.session.update(delta, game_state.experience)
+	if next != previous and not next.is_empty():
+		player.show_message(next)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"cycle_quality"):

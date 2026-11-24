@@ -47,7 +47,7 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 | `Sectors.ts` | 608 | `zones/` (12 escenas) + `data/zone_graph.json` | 🟡 | Las 12 zonas existen como módulo con colisión y portales; falta el mobiliario y la lógica interior de cada una. |
 | `SceneExperience.ts` (escena y render) | ~1.180 | `main.gd` + `zone_manager.gd` + `scene_experience_controller.gd` + `experience_state.gd` | 🟡 | Su contrato de estado está portado (fila anterior); lo que queda es el montaje de escena/render, que en Godot ya lo cubren la zona activa y `WorldEnvironment`. Faltan los eventos de sesión y el ciclo de vida unificado. |
 | Contrato de `SceneExperience.ts` + `protocols.ts` + `DisplayQuality.ts` | ~260 (lógica) | `scripts/core/experience_state.gd` | ✅ | Estado `nx` completo (energía, batería, protocolos, modos, ranuras, armas, frío, señuelo, agarre, pérdida), `spend`/`action`, `bindSlot`/`selectSlot`/`useSlot`, rótulos y notas de piezas, avisos y alcances, y perfiles de calidad (densidad, FOV, sombras, brillo, vídeo); 139 checks. Aplicado al motor desde `main.gd` (F3) y persistido en el guardado (`SAVE_VERSION` 9). |
-| `App.tsx` | 1.683 | `scripts/ui/nexus_hud.gd` (660) | 🟡 | HUD, inventario, ranuras, paneles de bitácora/mapa, pausa y etiqueta de perfil gráfico. Faltan la pantalla de ajustes completa, los perfiles en UI y los controles táctiles. |
+| `App.tsx` | 1.683 | `scripts/core/session_state.gd` + `scripts/ui/nexus_hud.gd` | 🟡 | Portada la lógica de interfaz: ajustes persistidos (calidad, sensibilidad 0,35–2,5, consejos), detección de dispositivo, navegación de paneles con las reglas de cierre de la web, pausa/reanudación/reinicio, consejos de una sola vez, bitácora de 60 entradas y textos de ayuda; el HUD incorpora los paneles `cfg` y `log` con selector de calidad, deslizador, manuales y reinicio (95 checks). Faltan los controles táctiles de `Touch.ts` y la pantalla de instalación/PWA, que no tiene equivalente nativo. |
 | `DepotMap.tsx` | 142 | `scripts/ui/zone_map_view.gd` | 🟡 | Mapa con 12 módulos y conexiones. Falta el estado de puertas/energía en el mapa. |
 
 ## 2. Resumen cuantitativo
@@ -55,7 +55,7 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 - **Portado con pruebas:** IA y percepción de W-01, red eléctrica, cuadro eléctrico + CCTV, bóveda V-03 (lógica), archivo D-02, bancos de carga y analizador, encuesta/raycast, contactos, caché de zonas, compuertas, streaming y persistencia de partida.
 - **Parcial:** W-01 (dinámica de tentáculos y agarre), jugador y carga, sectores/mobiliario, HUD, mapa, materiales.
 - **Sin empezar:** vasos de observación del taller, modelo/cabina/audio del coche, pantallas y telemetría, perfiles de calidad, orquestación de experiencias y distribución.
-- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **52 %**; el resto son sistemas por migrar.
+- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **57 %**; el resto son sistemas por migrar.
 
 ## 3. Hoja de ruta propuesta
 
@@ -71,7 +71,7 @@ Cada fase termina con validador headless propio y una entrada en
 | **P-5** ✅ | Bancos de H-01 y B-02 (`BenchCycle.ts`, `Workshop.ts`) | P-1 | `validate_bench_cycle.gd` 51/51 + 11 checks en la suite · hecho (faltan los vasos, que son visuales) |
 | **P-6** ✅ | IA de W-01 (`MonsterAI`, `Attention`, `FieldSense`) | — | `validate_w01_ai.gd` 66/66 + 10 checks en la suite · hecho (falta agarre/daño y tentáculos dinámicos) |
 | **P-7** ✅ | Tránsito y vehículo (`Transit.ts`, `vehicle/VehiclePhysics.ts`) | — | `validate_transit.gd` 154/154 + 21 checks en la suite · hecho (faltan geometría, cabina y audio) |
-| **P-8** 🟡 | UI y orquestación (`App.tsx`, `SceneExperience.ts`, `CameraController`, `DisplayQuality`, `Visibility`) | — | Vista (113), pantallas (89) y estado/perfiles (139) hechos · faltan la pantalla de ajustes de `App.tsx`, los eventos de sesión y `Visibility` |
+| **P-8** 🟡 | UI y orquestación (`App.tsx`, `SceneExperience.ts`, `CameraController`, `DisplayQuality`, `Visibility`) | — | Vista (113), pantallas (89), estado/perfiles (139) y ajustes/paneles/bitácora (95) hechos · faltan los controles táctiles y `Visibility` |
 | **P-9** | Distribución | P-8 | Presets Windows/Android, builds reproducibles y QA en dispositivo real |
 
 ## 4. Orden recomendado y por qué

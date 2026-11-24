@@ -192,8 +192,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 
 func apply_look(relative_motion: Vector2) -> void:
-	rotate_y(-relative_motion.x * mouse_sensitivity)
-	_pitch = clampf(_pitch - relative_motion.y * mouse_sensitivity, -1.42, 1.42)
+	var scale := 1.0
+	if game_state != null and game_state.session != null:
+		scale = game_state.session.look_scale()
+	rotate_y(-relative_motion.x * mouse_sensitivity * scale)
+	_pitch = clampf(_pitch - relative_motion.y * mouse_sensitivity * scale, -1.42, 1.42)
 	camera.rotation.x = _pitch
 	view.yaw = rotation.y
 	view.pitch = -_pitch
@@ -218,6 +221,9 @@ func toggle_view() -> String:
 			camera.look_at(view.focal_point, Vector3.UP)
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	apply_view_fov()
+	if game_state != null:
+		game_state.log_event("Operador en primera persona" if next == "first-person"
+			else "Cámara orbital activa")
 	show_message("Vista orbital" if not view.is_first_person() else "Primera persona")
 	return next
 

@@ -8,7 +8,7 @@ signal zone_changed(previous_zone: StringName, current_zone: StringName)
 signal power_state_changed(snapshot: Dictionary)
 
 const SAVE_PATH := "user://nexus_native_save.json"
-const SAVE_VERSION := 9
+const SAVE_VERSION := 10
 
 var persistence_path: String = SAVE_PATH
 var current_zone: StringName = &""
@@ -29,6 +29,8 @@ var files: FilesModule = null
 var _files_pending: Dictionary = {}
 ## Estado de la experiencia (energía, protocolos, ranuras y perfil de calidad).
 var experience: ExperienceState = null
+## Ajustes de sesión (calidad, sensibilidad, consejos y bitácora).
+var session: SessionState = null
 ## Cápsula de tránsito y vehículo de vía (se registran al entrar en la zona).
 var transit: CapsuleTransit = null
 var _transit_pending: Dictionary = {}
@@ -44,6 +46,9 @@ var power_simulation := true
 
 func _init() -> void:
 	experience = ExperienceState.new(inventory)
+	session = SessionState.new(experience.quality)
+	session.device = SessionState.detect_device(OS.has_feature("android") or OS.has_feature("mobile"),
+		DisplayServer.is_touchscreen_available(), DisplayServer.is_touchscreen_available())
 	power = PowerGrid.new()
 	# Orden de la web: primero los doce inversores y los extractores del cuadro.
 	operations = OperationsPanel.new(power)
@@ -109,7 +114,18 @@ func quality() -> String:
 func set_quality(preset: String) -> String:
 	if experience == null:
 		return "medium"
-	return experience.set_quality(preset)
+	var applied := experience.set_quality(preset)
+	if session != null:
+		session.set_quality(applied)
+	return applied
+
+func session_snapshot() -> Dictionary:
+	return session.to_dict() if session != null else {}
+
+## Registra un evento en la bitácora de sesión.
+func log_event(text: String) -> void:
+	if session != null:
+		session.log_entry(text)
 
 func transit_snapshot() -> Dictionary:
 	return transit.to_dict() if transit != null else {}
@@ -228,6 +244,7 @@ func save_game(path: String = "") -> bool:
 		"benches": benches_snapshot(),
 		"transit": transit_snapshot() if transit != null else _transit_pending,
 		"experience": experience.to_dict() if experience != null else {},
+		"session": session.to_dict() if session != null else {},
 	}
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	if file == null:
@@ -328,6 +345,14 @@ func load_game(path: String = "") -> bool:
 					if str(bench_cycle.id) == str(key):
 						bench_cycle.from_dict(saved_bench)
 						break
+
+	var saved_session: Variant = parsed.get("session", {})
+	if saved_session is Dictionary and not (saved_session as Dictionary).is_empty():
+		if session == null:
+			session = SessionState.new(quality())
+		session.from_dict(saved_session)
+		if experience != null:
+			experience.set_quality(session.quality)
 
 	var saved_experience: Variant = parsed.get("experience", {})
 	if saved_experience is Dictionary and not (saved_experience as Dictionary).is_empty():
