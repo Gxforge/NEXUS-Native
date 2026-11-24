@@ -92,6 +92,11 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - Fase 25: `FilesModule.apply_web_layout()` ancla las diez bandejas al muro oeste de D–02 (`WALL_X = 32.2`, paso 3,78, boca a +X) y `zone_d02_records.tscn` instancia las diez; `VaultModule` reparte puestos y cajones entre `EAST_X = 29.9` y `WEST_X = 24.4`; los cuatro tipos de dispositivo interactivo (bandeja, puesto de bóveda, bancada y mando) dejan de ser volumen invisible y se construyen con `BuildKit`; la platina de B–02 se mueve dentro de su sala.
 - `qa/validate_layouts.gd` (65 checks) audita la posición de los nodos de las diez zonas contra `ZoneDressing.ROOMS` y exige mallas en los dispositivos; `run_suite` sube a 335. QA total: **2008 checks**. Detalle en `PHASE_25_NATIVE_LAYOUTS.md`.
 
+## Fase 26 · Densidad de C–04 y A–01
+- C–04: franja de peligro, pasarela perimetral con barandilla y borde luminoso, balizas de sector animadas, pórtico de mantenimiento, banco de instrumentación con tres pantallas de fósforo y dos hileras extra de luminarias (la fila central dejaba el anillo a oscuras). `reports/ingame-c04.png` reencuadrado.
+- A–01: dos estanterías de carga, muelle con franja y topes, bancada de carga de tres alojamientos, carro, bidones, pasillo marcado, tuberías, baliza y rótulo «MUELLE». Vista propia en `qa/capture_zones.tscn` (nueve zonas).
+- «GALERÍA AXIAL» reducido y desplazado al extremo de V–03 para que no se coma los planos rasantes. Hoja `reports/phase26-ingame.png`. QA total sin cambios: **2008 checks**. Detalle en `PHASE_26_ROOM_DENSITY.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.

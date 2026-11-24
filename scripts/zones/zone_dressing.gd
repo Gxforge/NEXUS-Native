@@ -460,7 +460,9 @@ func _build_d02() -> void:
 # --------------------------------------------------------------------------- #
 func _build_c04() -> void:
 	var metal := BuildKit.material(BuildKit.STEEL, 0.5, 0.4)
+	var graphite := BuildKit.material(BuildKit.GRAPHITE, 0.5, 0.45)
 	var bronze := BuildKit.material(BuildKit.BRONZE)
+	var hazard := BuildKit.emissive(BuildKit.AMBER, 0.95)
 	var fence := Node3D.new()
 	fence.name = "ContainmentMesh"
 	fence.position = Vector3(2.0, 0.0, 26.0)
@@ -487,10 +489,99 @@ func _build_c04() -> void:
 		var angle: float = float(index) * TAU / 6.0
 		BuildKit.block(fence, bronze, cos(angle) * radius, 0.0, sin(angle) * radius,
 			0.6, 0.5, 0.6)
+	# Franja de peligro en el suelo, por fuera de la malla.
+	for index in 24:
+		var angle: float = float(index) * TAU / 24.0
+		var dash := BuildKit.block(self, hazard, 2.0 + cos(angle) * 14.6, 0.035,
+			26.0 + sin(angle) * 14.6, 0.86, 0.03, 0.4)
+		dash.rotation.y = -angle
+	# Pasarela perimetral con barandilla y borde luminoso.
+	var catwalk := Node3D.new()
+	catwalk.name = "C04Catwalk"
+	add_child(catwalk)
+	for index in 24:
+		var angle: float = float(index) * TAU / 24.0
+		var segment := Node3D.new()
+		segment.name = "Walk%d" % index
+		segment.position = Vector3(2.0 + cos(angle) * 17.2, 3.1, 26.0 + sin(angle) * 17.2)
+		segment.rotation.y = -angle
+		catwalk.add_child(segment)
+		BuildKit.block(segment, metal, 0.0, 0.0, 0.0, 1.7, 0.14, 4.6)
+		BuildKit.block(segment, BuildKit.emissive(BuildKit.GLOW, 0.9),
+			0.8, 0.1, 0.0, 0.07, 0.05, 4.5)
+		BuildKit.block(segment, graphite, 0.82, 0.62, 0.0, 0.06, 1.1, 0.06)
+		BuildKit.bar(segment, metal, Vector3(0.82, 1.16, -2.2), Vector3(0.82, 1.16, 2.2), 0.06)
+		BuildKit.bar(segment, metal, Vector3(0.82, 0.72, -2.2), Vector3(0.82, 0.72, 2.2), 0.04)
+		if index % 3 == 0:
+			BuildKit.drum(catwalk, graphite, 2.0 + cos(angle) * 17.2, 1.55,
+				26.0 + sin(angle) * 17.2, 0.18, 3.0, false, 10)
+	# Balizas de sector sobre la pasarela.
+	for index in 4:
+		var angle: float = float(index) * TAU / 4.0 + TAU * 0.125
+		BuildKit.drum(self, graphite, 2.0 + cos(angle) * 15.4, 0.9,
+			26.0 + sin(angle) * 15.4, 0.11, 1.8, false, 10)
+		indicators.append(BuildKit.bead(self, BuildKit.emissive(BuildKit.AMBER, 1.2),
+			2.0 + cos(angle) * 15.4, 1.86, 26.0 + sin(angle) * 15.4, 0.13, 10))
+	# Pórtico de mantenimiento sobre la cuba.
+	var gantry := Node3D.new()
+	gantry.name = "C04Gantry"
+	add_child(gantry)
+	for side in [-1, 1]:
+		BuildKit.bar(gantry, metal, Vector3(-19.0, 8.0, 26.0 + float(side) * 13.6),
+			Vector3(23.0, 8.0, 26.0 + float(side) * 13.6), 0.22)
+	BuildKit.block(gantry, graphite, 2.0, 7.86, 26.0, 41.0, 0.34, 0.6)
+	BuildKit.block(gantry, metal, 2.0, 7.4, 26.0, 1.5, 0.6, 1.5)
+	BuildKit.bar(gantry, BuildKit.emissive(BuildKit.GLOW, 0.8),
+		Vector3(2.0, 7.2, 26.0), Vector3(2.0, 5.9, 26.0), 0.05)
+	BuildKit.drum(gantry, bronze, 2.0, 5.8, 26.0, 0.16, 0.24, false, 12)
+	# Banco de instrumentación contra el muro oeste.
+	for index in 4:
+		BuildKit.cabinet(self, -25.9, 18.0 + float(index) * 4.2, PI * 0.5,
+			1.9, 2.4, 0.7, 2, "C04Rack%d" % (index + 1))
+	BuildKit.block(self, metal, -25.4, 2.9, 26.6, 0.9, 0.16, 15.4)
+	BuildKit.block(self, BuildKit.emissive(Color("#9fe8ff"), 1.4), -25.0, 2.98, 26.6,
+		0.06, 0.05, 15.0)
+	for index in 3:
+		var screen := WallScreen.new()
+		screen.kind = "phosphor"
+		screen.screen_size = Vector2(2.2, 1.24)
+		screen.position = Vector3(-25.1, 5.4, 20.0 + float(index) * 6.2)
+		screen.rotation.y = PI * 0.5
+		add_child(screen)
+		screens.append(screen)
+		screen.push_phosphor("CONTENCIÓN C–04", "MALLA ACTIVA",
+			"anillo %d · tensión nominal" % (index + 1), 0.5 + float(index) * 0.07)
+	# Cajas de utillaje junto al acceso norte.
+	for index in 3:
+		BuildKit.block(self, graphite, -20.0 + float(index) * 1.5, 0.42, 6.4, 1.2, 0.84, 1.2)
+		BuildKit.block(self, BuildKit.emissive(BuildKit.AMBER, 0.8),
+			-20.0 + float(index) * 1.5, 0.86, 6.4, 1.0, 0.04, 0.06)
 	BuildKit.plaque(self, "CONTENCIÓN", "C–04   /   MALLA ACTIVA", 9.0, 1.6,
 		44.6, 7.2, 26.0, -PI * 0.5)
 	BuildKit.plaque(self, "GALERÍA", "V–03   /   EJE NORTE", 7.0, 1.4,
 		-26.6, 7.2, 12.0, PI * 0.5)
+	# Dos hileras más de luminarias sobre la cuba: la sala es muy ancha y la fila
+	# central de `_ceiling_lights` dejaba el anillo a oscuras.
+	for row in 2:
+		var light_z: float = 14.0 + float(row) * 48.0
+		var light_x: float = -22.0
+		while light_x <= 42.0:
+			BuildKit.luminaire(self, light_x, ceiling() - 1.1, light_z, 3.2,
+				Color("#cfe9f2"))
+			light_x += 12.0
+	# Utillaje y bidones arrimados a los muros para romper el vacío del suelo.
+	for index in 6:
+		var side: float = -1.0 if index % 2 == 0 else 1.0
+		var bx: float = 2.0 + side * 21.0
+		var bz: float = 8.0 + float(index) * 2.0
+		BuildKit.drum(self, metal, bx, 0.6, bz, 0.55, 1.2, false, 16)
+		BuildKit.ring(self, bronze, bx, 0.9, bz, 0.56, 0.04, true)
+	for index in 4:
+		var side: float = -1.0 if index % 2 == 0 else 1.0
+		BuildKit.block(self, graphite, 2.0 + side * 24.0, 0.5,
+			46.0 + float(index) * 2.4, 1.4, 1.0, 1.4)
+		BuildKit.block(self, BuildKit.emissive(BuildKit.AMBER, 0.7), 2.0 + side * 24.0,
+			1.02, 46.0 + float(index) * 2.4, 1.2, 0.04, 0.06)
 	_ceiling_lights(Color("#cfe9f2"), 12.0)
 
 
@@ -513,8 +604,8 @@ func _build_gallery() -> void:
 		BuildKit.block(arch, BuildKit.emissive(BuildKit.GLOW, 1.0), 0.0, 4.0, 0.0, 6.4, 0.06, 0.1)
 		BuildKit.luminaire(arch, 0.0, 4.3, 0.0, 1.6, Color("#cfe9f2"), false)
 		z -= 6.4
-	BuildKit.plaque(self, "GALERÍA AXIAL", "V–03   /   EJE DE COMUNICACIÓN", 6.4, 1.2,
-		30.6, 3.4, -40.0, -PI * 0.5)
+	BuildKit.plaque(self, "GALERÍA AXIAL", "V–03   /   EJE DE COMUNICACIÓN", 5.2, 0.95,
+		30.6, 3.9, -76.0, -PI * 0.5)
 
 
 func _build_cryo() -> void:
@@ -562,15 +653,91 @@ func _build_cryo() -> void:
 # A–01 · archivo biométrico y estación
 # --------------------------------------------------------------------------- #
 func _build_a01() -> void:
+	var metal := BuildKit.material(BuildKit.METAL, 0.5, 0.4)
+	var graphite := BuildKit.material(BuildKit.GRAPHITE, 0.5, 0.45)
+	var steel := BuildKit.material(BuildKit.STEEL, 0.6, 0.34)
+	var bronze := BuildKit.material(BuildKit.BRONZE, 0.7, 0.3)
+	# Taquillas del vestuario, junto al muro sur.
 	for index in 4:
 		var x: float = -14.0 + float(index) * 4.4
 		BuildKit.cabinet(self, x, -23.2, 0.0, 3.4, 1.4, 1.0, 3, "Locker%d" % (index + 1))
-	BuildKit.block(self, BuildKit.material(BuildKit.METAL, 0.5, 0.4),
-		2.0, 0.95, -14.0, 5.0, 0.16, 1.8)
-	BuildKit.block(self, BuildKit.material(BuildKit.GRAPHITE, 0.5, 0.45),
-		2.0, 0.45, -14.0, 4.6, 0.9, 1.5)
+	# Estantería de carga a lo largo del muro oeste.
+	for bank in 2:
+		var z: float = -6.0 - float(bank) * 8.4
+		var rack := Node3D.new()
+		rack.name = "A01Rack%d" % (bank + 1)
+		rack.position = Vector3(-24.6, 0.0, z)
+		add_child(rack)
+		for level in 3:
+			var y: float = 0.7 + float(level) * 1.1
+			BuildKit.block(rack, steel, 0.0, y, 0.0, 1.5, 0.12, 7.4)
+			BuildKit.block(rack, BuildKit.emissive(BuildKit.GLOW, 0.7),
+				0.76, y + 0.1, 0.0, 0.05, 0.04, 7.2)
+		for upright in 3:
+			BuildKit.block(rack, metal, 0.0, 1.7, -3.6 + float(upright) * 3.6, 0.1, 3.4, 0.1)
+		for crate in 3:
+			BuildKit.block(rack, graphite, 0.0, 1.1, -2.2 + float(crate) * 2.2,
+				1.1, 0.66, 1.5)
+			BuildKit.block(rack, bronze, 0.0, 1.1, -1.44 + float(crate) * 2.2,
+				0.3, 0.06, 0.05)
+	# Muelle de carga: plataforma, topes y rampa de acceso.
+	BuildKit.block(self, graphite, 2.0, 0.12, -14.0, 7.4, 0.24, 2.6)
+	BuildKit.block(self, BuildKit.emissive(BuildKit.AMBER, 0.9), 2.0, 0.26, -12.68,
+		7.2, 0.05, 0.08)
+	for side in [-1, 1]:
+		BuildKit.block(self, metal, 2.0 + float(side) * 3.6, 0.6, -14.0, 0.16, 1.2, 2.4)
+	BuildKit.bar(self, BuildKit.emissive(BuildKit.GLOW, 0.8),
+		Vector3(-1.3, 0.3, -14.0), Vector3(5.3, 0.3, -14.0), 0.06)
+	# Bancada de carga de equipo con tres alojamientos.
+	var bay := Node3D.new()
+	bay.name = "A01ChargeBay"
+	bay.position = Vector3(4.6, 0.0, -5.2)
+	add_child(bay)
+	BuildKit.block(bay, graphite, 0.0, 0.5, 0.0, 1.0, 1.0, 3.4)
+	BuildKit.block(bay, steel, 0.0, 1.02, 0.0, 1.1, 0.1, 3.6)
+	for slot in 3:
+		var z: float = -1.2 + float(slot) * 1.2
+		BuildKit.block(bay, BuildKit.emissive(BuildKit.GLOW, 1.1), -0.5, 0.62, z,
+			0.06, 0.5, 0.9)
+		BuildKit.bead(bay, BuildKit.emissive(BuildKit.AMBER, 1.0), -0.52, 1.12, z, 0.05, 8)
+		BuildKit.bar(bay, metal, Vector3(0.5, 0.98, z), Vector3(0.5, 0.6, z + 0.4), 0.04)
+	# Carro de transporte y bidones.
+	var cart := Node3D.new()
+	cart.name = "A01Cart"
+	cart.position = Vector3(-14.0, 0.0, -18.0)
+	add_child(cart)
+	BuildKit.block(cart, steel, 0.0, 0.62, 0.0, 1.6, 0.12, 2.6)
+	for corner in 4:
+		BuildKit.drum(cart, graphite, -0.62 + float(corner % 2) * 1.24, 0.16,
+			-1.06 + float(corner / 2) * 2.12, 0.16, 0.12, true, 10)
+	BuildKit.bar(cart, metal, Vector3(0.0, 0.7, 1.3), Vector3(0.0, 1.3, 1.3), 0.06)
+	BuildKit.block(cart, graphite, 0.0, 1.0, 0.0, 1.2, 0.6, 1.8)
+	for index in 2:
+		BuildKit.drum(self, metal, -9.4 + float(index) * 1.4, 0.6, -20.6, 0.55, 1.2, false, 16)
+		BuildKit.ring(self, bronze, -9.4 + float(index) * 1.4, 0.9, -20.6, 0.56, 0.04, true)
+	# Pasillo marcado en el suelo, del muelle a la puerta.
+	var dash_index := 0
+	var z: float = -22.0
+	while z <= -2.0:
+		BuildKit.block(self, BuildKit.emissive(BuildKit.AMBER, 0.55), -6.0, 0.03, z,
+			0.9, 0.02, 0.5)
+		dash_index += 1
+		z += 2.0
+	# Tuberías y bandejas de cables sobre la nave.
+	for run in 3:
+		BuildKit.bar(self, metal, Vector3(-26.0, 8.7 - float(run) * 0.34, -4.0 - float(run) * 6.0),
+			Vector3(8.0, 8.7 - float(run) * 0.34, -4.0 - float(run) * 6.0), 0.14)
+	BuildKit.block(self, graphite, -6.0, 8.9, -13.0, 33.0, 0.12, 0.9)
+	# Baliza del muelle.
+	BuildKit.drum(self, graphite, 6.4, 1.1, -9.0, 0.1, 2.2, false, 10)
+	indicators.append(BuildKit.bead(self, BuildKit.emissive(BuildKit.AMBER, 1.2),
+		6.4, 2.28, -9.0, 0.12, 10))
+	BuildKit.block(self, metal, 2.0, 0.95, -14.0, 5.0, 0.16, 1.8)
+	BuildKit.block(self, graphite, 2.0, 0.45, -14.0, 4.6, 0.9, 1.5)
 	BuildKit.plaque(self, "ARCHIVO BIOMÉTRICO", "A–01   /   ESTACIÓN DE CARGA", 9.0, 1.5,
 		2.0, 5.6, -23.0, 0.0)
+	BuildKit.plaque(self, "MUELLE", "A–01   /   CARGA DE EQUIPO", 6.4, 1.3,
+		-26.6, 4.6, -12.0, PI * 0.5)
 	_ceiling_lights(BuildKit.WARM)
 
 
