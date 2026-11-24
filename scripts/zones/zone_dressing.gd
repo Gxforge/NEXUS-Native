@@ -753,6 +753,21 @@ func _build_gallery() -> void:
 
 
 func _build_cryo() -> void:
+	# Consolas originales de `vault.glb`: panel de 1 m junto a las vitrinas y
+	# lector de muestras sobre el banco.
+	var panel := PropLibrary.group("vault", "Node98")
+	if panel != null:
+		panel.name = "CryoConsole"
+		panel.position = Vector3(40.4, 0.0, -91.0)
+		panel.rotation.y = -PI * 0.5
+		add_child(panel)
+	var reader := PropLibrary.group("vault", "Node99")
+	if reader != null:
+		reader.name = "CryoReader"
+		reader.position = Vector3(35.6, 1.02, -95.6)
+		reader.rotation.y = -PI * 0.5
+		reader.scale = Vector3(1.4, 1.4, 1.4)
+		add_child(reader)
 	var metal := BuildKit.material(BuildKit.METAL)
 	var graphite := BuildKit.material(BuildKit.GRAPHITE)
 	var steel := BuildKit.material(BuildKit.STEEL, 0.55, 0.35)
@@ -909,6 +924,22 @@ func _build_transit() -> void:
 	for side in [-1, 1]:
 		BuildKit.block(self, BuildKit.emissive(BuildKit.AMBER, 0.9),
 			15.0 + float(side) * 3.2, 0.14, 99.0, 0.08, 0.04, 13.6)
+	# Vehículo original (`vehicle.glb`): chasis y cuatro ruedas, aparcado en la
+	# calzada del túnel.
+	if zone_id == &"transit_road":
+		var rover := Node3D.new()
+		rover.name = "Vehicle"
+		rover.position = Vector3(1.5, 0.0, 132.0)
+		add_child(rover)
+		for key in ["Node2", "Node5", "Node6", "Node7", "Node8"]:
+			var part := PropLibrary.group("vehicle", key)
+			if part != null:
+				part.name = "Vehicle" + key
+				rover.add_child(part)
+		BuildKit.block(self, BuildKit.emissive(BuildKit.AMBER, 0.8), 1.5, 0.05, 126.0,
+			2.6, 0.02, 0.2)
+		BuildKit.block(self, BuildKit.emissive(BuildKit.AMBER, 0.8), 1.5, 0.05, 139.0,
+			2.6, 0.02, 0.2)
 	# Tornos y plano del eje, originales de `transit.glb`.
 	if zone_id == &"transit_hub":
 		for index in 2:

@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
 [ext_resource type="PackedScene" path="res://assets/generated/transit_road_structural_shell.glb" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="4"]
+[ext_resource type="Script" path="res://scripts/zones/zone_dressing.gd" id="5"]
 
 [node name="TransitRoadSlice" type="Node3D"]
 script = ExtResource("1")
@@ -128,3 +129,7 @@ position = Vector3(1.55, 3.8, 2090)
 omni_range = 26
 light_color = Color(0.62, 0.83, 0.87, 1)
 light_energy = 6
+
+[node name="Dressing" type="Node3D" parent="."]
+script = ExtResource("5")
+zone_id = &"transit_road"

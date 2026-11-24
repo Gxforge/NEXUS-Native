@@ -113,6 +113,12 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `transit.glb`: `Node4`/`Node9` van a los dos tornos del hub L–01 y `Node14` al plano del eje; la cápsula sigue procedural porque la web la construye con primitivas.
 - Vista nueva de `transit_hub` en `qa/capture_zones.gd` (diez zonas) y hoja `reports/phase29-ingame.png`. `validate_dressing` 116 → **120 checks**; total **2018 checks**, 0 fallos. Detalle en `PHASE_29_TRANSIT_AND_STATIONS.md`.
 
+## Fase 30 · Vehículo, calzada y consolas de crioteca
+- `vehicle.glb` montado entero (chasis + cuatro ruedas) en la calzada; `zone_transit_road.tscn` gana su `Dressing` y `_build_transit()` se parte por zona para que la cápsula y el andén no se construyan fuera del túnel.
+- Calzada con eje discontinuo y balizas cada 24 m; el tramo de vía con banda emisiva de guiado.
+- Crioteca con `CryoConsole` (`Node98`) y `CryoReader` (`Node99`) de `vault.glb`.
+- Validador nuevo `qa/validate_original_models.gd` (19 checks) que comprueba mallas de vasos, larva, puerta, puesto, consolas, tornos y vehículo. Total **2037 checks**, 0 fallos. Detalle en `PHASE_30_VEHICLE_AND_CRYO.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.
