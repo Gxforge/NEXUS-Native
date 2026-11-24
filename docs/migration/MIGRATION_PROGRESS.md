@@ -108,6 +108,11 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `Environment` con ACES + glow + SSAO, `DirectionalLight3D` `#a6caff`, suelo con la textura de `createFloorTexture()` (repetida cada 12 m), relleno de luz por sala con rebote a 0,7 m y polvo biológico de `Effects.ts`.
 - Capturas con `--rendering-method mobile` (llvmpipe no da para Forward+): nueve zonas y hoja `reports/phase28-ingame.png`. Detalle en `PHASE_28_ORIGINAL_MODELS.md`.
 
+## Fase 29 · Tránsito y puestos originales
+- `vault.glb`: `Node83` y `Node89` son ya el mostrador y el terminal del puesto de control de la galería V–03 (escala 0,62).
+- `transit.glb`: `Node4`/`Node9` van a los dos tornos del hub L–01 y `Node14` al plano del eje; la cápsula sigue procedural porque la web la construye con primitivas.
+- Vista nueva de `transit_hub` en `qa/capture_zones.gd` (diez zonas) y hoja `reports/phase29-ingame.png`. `validate_dressing` 116 → **120 checks**; total **2018 checks**, 0 fallos. Detalle en `PHASE_29_TRANSIT_AND_STATIONS.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.

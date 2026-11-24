@@ -205,6 +205,16 @@ func _check_zone_props(id: String, dressing: Node3D) -> void:
 			_check(door_meshes >= 40, "B–02: puerta de la bóveda con su modelo original (%d mallas)" % door_meshes)
 		"v03_gallery":
 			_check(_count_prefixed(dressing, "Arch") >= 7, "V–03: al menos siete arcos")
+			_check(dressing.get_node_or_null("GalleryDesk") != null,
+				"V–03: puesto de control original de `vault.glb`")
+			_check(dressing.get_node_or_null("GalleryTerminal") != null,
+				"V–03: terminal original de `vault.glb`")
+		"transit_hub":
+			_check(dressing.get_node_or_null("Torno1") != null
+				and dressing.get_node_or_null("Torno2") != null,
+				"Tránsito: dos tornos originales de `transit.glb`")
+			_check(dressing.get_node_or_null("PlanoEje") != null,
+				"Tránsito: plano del eje original")
 		"v03_cryo":
 			_check(_count_prefixed(dressing, "CryoTank") == 12, "V–03: doce vitrinas")
 		"surveillance":

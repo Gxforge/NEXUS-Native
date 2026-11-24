@@ -53,7 +53,6 @@ static func vault_door() -> Node3D:
 	return found.get("Node2") as Node3D
 
 
-## Cápsula del andén (`transit.glb`, grupo del vehículo).
-static func transit_capsule() -> Node3D:
-	var found := groups("transit")
-	return found.get("Node15") as Node3D
+## Grupo suelto de un lote (`null` si el lote no lo trae).
+static func group(asset: String, key: String) -> Node3D:
+	return groups(asset).get(key) as Node3D

@@ -733,6 +733,21 @@ func _build_gallery() -> void:
 		BuildKit.block(arch, BuildKit.emissive(BuildKit.GLOW, 1.0), 0.0, 4.0, 0.0, 6.4, 0.06, 0.1)
 		BuildKit.luminaire(arch, 0.0, 4.3, 0.0, 1.6, Color("#cfe9f2"), false)
 		z -= 6.4
+	# Puesto de control y terminal originales de `vault.glb`.
+	var desk := PropLibrary.group("vault", "Node83")
+	if desk != null:
+		desk.name = "GalleryDesk"
+		desk.position = Vector3(24.2, 0.0, -52.0)
+		desk.rotation.y = PI * 0.5
+		desk.scale = Vector3(0.62, 0.62, 0.62)
+		add_child(desk)
+	var terminal := PropLibrary.group("vault", "Node89")
+	if terminal != null:
+		terminal.name = "GalleryTerminal"
+		terminal.position = Vector3(24.5, 1.05, -52.0)
+		terminal.rotation.y = PI * 0.5
+		terminal.scale = Vector3(0.62, 0.62, 0.62)
+		add_child(terminal)
 	BuildKit.plaque(self, "GALERÍA AXIAL", "V–03   /   EJE DE COMUNICACIÓN", 5.2, 0.95,
 		30.6, 3.9, -76.0, -PI * 0.5)
 
@@ -894,6 +909,22 @@ func _build_transit() -> void:
 	for side in [-1, 1]:
 		BuildKit.block(self, BuildKit.emissive(BuildKit.AMBER, 0.9),
 			15.0 + float(side) * 3.2, 0.14, 99.0, 0.08, 0.04, 13.6)
+	# Tornos y plano del eje, originales de `transit.glb`.
+	if zone_id == &"transit_hub":
+		for index in 2:
+			var gate := PropLibrary.group("transit", "Node4" if index == 0 else "Node9")
+			if gate != null:
+				gate.name = "Torno%d" % (index + 1)
+				gate.position = Vector3(10.0, 0.0, 90.0 + float(index) * 14.0)
+				gate.rotation.y = PI * 0.5
+				add_child(gate)
+		var plan := PropLibrary.group("transit", "Node14")
+		if plan != null:
+			plan.name = "PlanoEje"
+			plan.position = Vector3(-26.2, 3.4, 97.0)
+			plan.rotation.y = PI * 0.5
+			plan.scale = Vector3(1.6, 1.6, 1.6)
+			add_child(plan)
 	BuildKit.plaque(self, "ANDÉN 01", "EJE L–01   /   CÁPSULA", 6.4, 1.4,
 		15.0, 5.4, 92.6, 0.0)
 	BuildKit.plaque(self, "ANDÉN 02", "EJE L–01", 6.0, 1.3, 15.0, 5.4, 105.4, PI)
