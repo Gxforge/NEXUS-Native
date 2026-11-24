@@ -47,7 +47,7 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - Godot 4.4.1 `--headless --editor --path . --quit`: importación/escaneo completado y scripts cargados.
 - `qa/validate_zone_graph.gd`: 303 checks, 0 fallos (identidad, manifiestos, colisión, AABB, sockets, portales y solapes de las 12 zonas).
 - `qa/validate_zone_traversal.gd`: 255 checks, 0 fallos (22 cruces por los portales con llegada a socket, una sola zona activa, liberación del módulo y un cruce físico caminando contra el umbral).
-- `qa/run_suite.gd`: 228 checks, 0 fallos (validación estructural de las 12 zonas, streaming C-04↔A-01, HUD/paneles con mapa de 12 módulos, armas UV/crio, pickup por rayo, linterna y sockets).
+- `qa/run_suite.gd`: 251 checks, 0 fallos (validación estructural de las 12 zonas, streaming C-04↔A-01, HUD/paneles con mapa de 12 módulos, armas UV/crio, pickup por rayo, linterna y sockets).
 - `qa/validate_game_state.gd`: 17 checks, 0 fallos (inventario, slots, puertas y serialización JSON, ahora con la red eléctrica dentro del guardado).
 - `qa/validate_power_grid.gd`: 45 checks, 0 fallos (capacidad, carga, reparto, picos, disparo, rearme y persistencia de la red).
 - `qa/validate_w01_ai.gd`: 66 checks, 0 fallos (estados, visión, audición, memoria, contención y persistencia).
@@ -65,6 +65,12 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `scripts/systems/transit_console.gd`: los diez puestos `railCallA/B`, `railBrake`, `railLoad`, `railCar` y `railSeat0…4`.
 - `zones/zone_transit_hub.tscn`: nodo `Transit` con cartel `Label3D` y los diez mandos; `GameState` guarda el bloque `transit` (`SAVE_VERSION` 8).
 - `qa/validate_transit.gd`: 154 checks, 0 fallos.
+
+## Fase 21 · Vista, pantallas y telemetría (P-8, primer bloque)
+- `scripts/world/camera_controller.gd`: port de `CameraController.ts` — órbita con amortiguación del 6 % por frame y límites 3,1–13 m / polar 0,38–π·0,49, primera persona con aguante (14/s, espera 1,05 s, rearme 26), cadencia, balanceo de cabeza, agachado de −0,44 m, corona de escape y entrada del vehículo; 113 checks.
+- `player.gd`: acciones `toggle_view` (V) y `crouch` (Ctrl); la altura base de la cámara se conserva al agacharse.
+- Pantallas: `phosphor_display.gd` (640×320, 72 muestras), `telemetry_model.gd` (1024×576, 75 filas, tres páginas), `screen_surface.gd` (dibujo), `wall_screen.gd` (SubViewport + quad) y `telemetry_feed.gd`; montadas en `zone_electrical.tscn`; 89 checks.
+- Captura nueva: `reports/displays-cam04.png` (CAM 04 y panel de fósforo con datos de simulación).
 
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.

@@ -34,6 +34,10 @@ var cell_charged: bool = true
 var selected_quick_slot: int = 0
 var active_weapon: int = -1
 var tool_cooldowns: Dictionary = {"uv": 0.0, "gas": 0.0, "lure": 0.0}
+## Vista del explorador: órbita y primera persona (port de `CameraController.ts`).
+var view: CameraController = CameraController.new()
+var orbit_drag := false
+var _eye_base := Vector3(0.0, 1.72, 0.0)
 var _field_light: SpotLight3D
 var _prompt_timer: float = 0.0
 var _status_timer: float = 0.0
@@ -51,6 +55,14 @@ func _ready() -> void:
 	_field_light.spot_angle = 32.0
 	_field_light.visible = false
 	camera.add_child(_field_light)
+	# El juego nativo arranca en primera persona (la web lo hace en órbita); `V`
+	# alterna entre ambas y la órbita sigue disponible como vista de conjunto.
+	_eye_base = camera.position
+	view.set_mode("first-person")
+	view.focal_point = global_position + Vector3(0.0, 1.6, 0.0)
+	view.first_position = global_position
+	view.yaw = rotation.y
+	camera.top_level = false
 
 func configure(state: GameState, experience: SceneExperienceController) -> void:
 	game_state = state
@@ -111,9 +123,27 @@ func show_message(text: String) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not controls_enabled:
 		return
-	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+	if event is InputEventMouseMotion:
 		var motion := event as InputEventMouseMotion
-		apply_look(motion.relative)
+		if view.is_first_person() and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			apply_look(motion.relative)
+			return
+		if not view.is_first_person() and orbit_drag:
+			view.orbit_rotate(motion.relative.x * 0.0042, motion.relative.y * 0.0042)
+			return
+	if event is InputEventMouseButton and not view.is_first_person():
+		var button := event as InputEventMouseButton
+		if button.button_index == MOUSE_BUTTON_LEFT:
+			orbit_drag = button.pressed
+			return
+		if button.pressed and button.button_index == MOUSE_BUTTON_WHEEL_UP:
+			view.orbit_zoom(-0.12)
+			return
+		if button.pressed and button.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			view.orbit_zoom(0.12)
+			return
+	if event.is_action_pressed(&"toggle_view"):
+		toggle_view()
 		return
 	if event is InputEventMouseButton and event.pressed and Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -145,6 +175,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		panel_requested.emit(&"database")
 	elif event.is_action_pressed(&"open_map"):
 		panel_requested.emit(&"map")
+	elif event.is_action_pressed(&"crouch"):
+		view.crouch = not view.crouch
 	elif event.is_action_pressed(&"pause_game"):
 		panel_requested.emit(&"pause")
 	elif event.is_action_pressed(&"quick_slot_1"):
@@ -163,10 +195,39 @@ func apply_look(relative_motion: Vector2) -> void:
 	rotate_y(-relative_motion.x * mouse_sensitivity)
 	_pitch = clampf(_pitch - relative_motion.y * mouse_sensitivity, -1.42, 1.42)
 	camera.rotation.x = _pitch
+	view.yaw = rotation.y
+	view.pitch = -_pitch
+
+## Cambia entre la vista orbital (por defecto en la web) y la primera persona.
+func toggle_view() -> String:
+	var next := view.toggle_mode()
+	if view.is_first_person():
+		camera.top_level = false
+		camera.position = _eye_base
+		camera.rotation = Vector3(_pitch, 0.0, 0.0)
+		view.first_position = global_position
+		view.yaw = rotation.y
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if controls_enabled else Input.MOUSE_MODE_VISIBLE
+	else:
+		orbit_drag = false
+		view.focal_point = global_position + Vector3(0.0, 1.6, 0.0)
+		view.set_mode("orbit")
+		camera.top_level = true
+		camera.global_position = view.update_orbit(0.0)
+		if camera.is_inside_tree():
+			camera.look_at(view.focal_point, Vector3.UP)
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	show_message("Vista orbital" if not view.is_first_person() else "Primera persona")
+	return next
+
+func view_mode() -> String:
+	return view.mode
 
 func _process(delta: float) -> void:
 	if not controls_enabled:
 		return
+	if not view.is_first_person():
+		_update_orbit(delta)
 	_prompt_timer -= delta
 	if _prompt_timer <= 0.0:
 		_prompt_timer = 0.12
@@ -195,6 +256,9 @@ func _physics_process(delta: float) -> void:
 	var world_direction := global_transform.basis * local_direction
 	var moving := input.length() > 0.1
 	var running := Input.is_action_pressed(&"sprint") and stamina > 0.0 and moving
+	view.stamina = stamina
+	view.running = running
+	view.gait += delta * (CameraController.GAIT_RUN if running else CameraController.GAIT_WALK)
 	var speed := RUN_SPEED if running else WALK_SPEED
 	velocity.x = lerpf(velocity.x, world_direction.x * speed, 1.0 - exp(-18.0 * delta))
 	velocity.z = lerpf(velocity.z, world_direction.z * speed, 1.0 - exp(-18.0 * delta))
@@ -211,6 +275,21 @@ func _physics_process(delta: float) -> void:
 		if stamina_recovery_delay <= 0.0:
 			stamina = minf(100.0, stamina + delta * (8.0 if moving else 13.0))
 	stamina_changed.emit(stamina)
+	_apply_eye_height()
+
+## Altura de los ojos: agachado y balanceo de cabeza (contrato de la web).
+func _apply_eye_height() -> void:
+	if not view.is_first_person():
+		return
+	camera.position = _eye_base + Vector3(0.0,
+		-CameraController.CROUCH_DROP if view.crouch else 0.0, 0.0)
+	camera.position.y += view.bob_offset()
+
+func _update_orbit(delta: float) -> void:
+	view.focal_point = global_position + Vector3(0.0, 1.6, 0.0)
+	camera.global_position = view.update_orbit(delta)
+	if camera.is_inside_tree():
+		camera.look_at(view.focal_point, Vector3.UP)
 
 func _first_hit(max_distance: float) -> Dictionary:
 	var world := get_world_3d()

@@ -36,9 +36,10 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 | `Survey.ts` | 168 | `scripts/interaction/survey_system.gd` + `survey_highlight.gd` | ✅ | Raycast, resaltado, registro y bitácora persistente. Falta el contenido de expedientes completo (depende de `Files.ts`). |
 | `Contacts.ts` | 176 | `contact_query_3d.gd` + `contact_fx_3d.gd` | ✅ | Consultas y VFX de contacto con el sujeto. |
 | `Glove.ts` + `Loadout.ts` + `Instruments.ts` | 590 | `scripts/world/player.gd` | 🟡 | Linterna, energía y ranuras existen. Faltan guante con animación, instrumentos de mano y carga de herramientas como en la web. |
-| `Environment.ts` + `Displays.ts` + `TelemetryScreen.ts` + `PortalLight.ts` + `materials.ts` + `protocols.ts` | 874 | — | ❌ | Iluminación por zona, pantallas Canvas (hay que rehacerlas en Godot), telemetría y materiales dinámicos. |
+| `Displays.ts` + `TelemetryScreen.ts` + `SceneExperience`-feed | 228 | `phosphor_display.gd` + `telemetry_model.gd` + `screen_surface.gd` + `wall_screen.gd` + `telemetry_feed.gd` | ✅ | Panel de fósforo 640×320 con traza de 72 muestras y `CAM 04` 1024×576 con búfer de 75 filas, tres páginas, series y pies de estado; montadas en `zone_electrical` con datos vivos de `PowerGrid` y W–01; 89 checks. Falta el vídeo real de CCTV. |
+| `Environment.ts` + `PortalLight.ts` + `materials.ts` + `protocols.ts` | 646 | `OperationsPanel` (iluminación) | 🟡 | Iluminación por zona y protocolos básicos. Faltan materiales dinámicos. |
 | `Effects.ts` | 80 | `scripts/effects/contact_fx_3d.gd` | 🟡 | Sólo el efecto de contacto. |
-| `CameraController.ts` | 364 | `player.gd` | 🟡 | Mouse-look y primera persona. Faltan cámara orbital, cambios de perspectiva y sacudidas. |
+| `CameraController.ts` | 364 | `scripts/world/camera_controller.gd` + `player.gd` | ✅ | Órbita con amortiguación del 6 % por frame, límites 3,1–13 m y polar 0,38–π·0,49, primera persona con aguante (14/s, espera 1,05 s, rearme 26), cadencia, balanceo de cabeza, agachado de −0,44 m, corona de escape y entrada del vehículo; 113 checks. Faltan las sacudidas y las transiciones entre zonas. |
 | `Visibility.ts` + `DisplayQuality.ts` | 148 | — | ❌ | Perfiles de calidad y visibilidad por distancia. |
 | `ZoneCache.ts` | 98 | `zone_manager.gd` + `PHASE_10B` | ✅ | Streaming con precarga, descarga y política de propiedad. |
 | `ZoneGates.ts` | 93 | `sector_door.gd`, `streaming_sector_door.gd` | ✅ | Compuertas con umbral y bloqueo durante la transición. |
@@ -52,7 +53,7 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 - **Portado con pruebas:** IA y percepción de W-01, red eléctrica, cuadro eléctrico + CCTV, bóveda V-03 (lógica), archivo D-02, bancos de carga y analizador, encuesta/raycast, contactos, caché de zonas, compuertas, streaming y persistencia de partida.
 - **Parcial:** W-01 (dinámica de tentáculos y agarre), jugador y carga, sectores/mobiliario, HUD, mapa, materiales.
 - **Sin empezar:** vasos de observación del taller, modelo/cabina/audio del coche, pantallas y telemetría, perfiles de calidad, orquestación de experiencias y distribución.
-- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **42 %**; el resto son sistemas por migrar.
+- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **46 %**; el resto son sistemas por migrar.
 
 ## 3. Hoja de ruta propuesta
 
@@ -68,7 +69,7 @@ Cada fase termina con validador headless propio y una entrada en
 | **P-5** ✅ | Bancos de H-01 y B-02 (`BenchCycle.ts`, `Workshop.ts`) | P-1 | `validate_bench_cycle.gd` 51/51 + 11 checks en la suite · hecho (faltan los vasos, que son visuales) |
 | **P-6** ✅ | IA de W-01 (`MonsterAI`, `Attention`, `FieldSense`) | — | `validate_w01_ai.gd` 66/66 + 10 checks en la suite · hecho (falta agarre/daño y tentáculos dinámicos) |
 | **P-7** ✅ | Tránsito y vehículo (`Transit.ts`, `vehicle/VehiclePhysics.ts`) | — | `validate_transit.gd` 154/154 + 21 checks en la suite · hecho (faltan geometría, cabina y audio) |
-| **P-8** | UI y orquestación (`App.tsx`, `SceneExperience.ts`, `CameraController`, `DisplayQuality`, `Visibility`) | P-2…P-7 | Ajustes, perfiles de calidad, mapa con estado y pantalla de recuperación |
+| **P-8** 🟡 | UI y orquestación (`App.tsx`, `SceneExperience.ts`, `CameraController`, `DisplayQuality`, `Visibility`) | — | Vista (113 checks) y pantallas/telemetría (89 checks) hechas · faltan `SceneExperience.ts`, ajustes/perfiles y `DisplayQuality`/`Visibility` |
 | **P-9** | Distribución | P-8 | Presets Windows/Android, builds reproducibles y QA en dispositivo real |
 
 ## 4. Orden recomendado y por qué

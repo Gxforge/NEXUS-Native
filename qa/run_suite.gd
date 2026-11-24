@@ -385,6 +385,94 @@ func _validate_transit() -> void:
 	state.register_transit(car)
 	_check(state.transit_snapshot().has("vehicle"), "game state stores the capsule snapshot")
 
+func _validate_camera() -> void:
+	var view: CameraController = CameraController.new()
+	_check(view.mode == "orbit" and is_equal_approx(view.stamina, 100.0),
+		"camera controller starts in orbit with full stamina")
+	_check(view.orbit_position().distance_to(CameraController.ORBIT_CAMERA) < 0.001,
+		"orbit starts where the web places the camera")
+	for _i in 240:
+		view.orbit_zoom(1.0)
+		view.update_orbit(1.0 / 60.0)
+	_check(is_equal_approx(view.orbit_distance(), CameraController.ORBIT_MAX_DISTANCE),
+		"orbit zoom stops at the web distance limit")
+	view.set_mode("first-person")
+	_check(view.is_first_person() and view.first_position.distance_to(Vector3(1.8, 1.72, 42.0)) < 0.001,
+		"first person starts at the web eye position")
+	view.look(0.0, -100000.0, 0.0021)
+	_check(is_equal_approx(view.pitch, CameraController.PITCH_LIMIT),
+		"first person pitch clamps like the web")
+	view.crouch = true
+	_check(is_equal_approx(view.eye_position().y, 1.72 - 0.44), "crouch lowers the eyes 44 cm")
+	view.crouch = false
+	view.stamina = 50.0
+	view.gait = PI * 0.5
+	_check(is_equal_approx(view.bob_offset(), 0.027 * 0.5), "head bob scales with fatigue")
+	var walker: CameraController = CameraController.new()
+	walker.set_mode("first-person")
+	walker.first_position = Vector3(0.0, 1.72, 0.0)
+	for _i in 60 * 8:
+		walker.update_walk(1.0 / 60.0, Vector2(0.0, 1.0), true)
+	_check(walker.spent and walker.stamina < 1.0,
+		"sprinting drains 14 stamina per second and marks the runner spent")
+	var car: CameraController = CameraController.new()
+	car.move("w", true)
+	car.move("d", true)
+	_check(car.transit_input().is_equal_approx(Vector2(1.0, 1.0)),
+		"keyboard drives the rail car like the web bindings")
+	_check(InputMap.has_action(&"toggle_view") and InputMap.has_action(&"crouch"),
+		"view toggle and crouch are mapped")
+
+func _validate_displays() -> void:
+	var model: TelemetryModel = TelemetryModel.new()
+	var bus := {"load": 68.0, "temp": 43.5, "capacity": 112, "tripped": false,
+		"feeds": [true, false], "fans": [true, true], "cause": "Estable"}
+	_check(model.sample(0.0, bus, 95.0, 9.0, "WATCHING", Vector3.ZERO, "Vigila", 2, 0.2),
+		"telemetry takes the first sample")
+	_check(not model.sample(0.1, bus, 95.0, 9.0, "WATCHING", Vector3.ZERO, "Vigila", 2, 0.2),
+		"telemetry throttles samples to 0,35 s")
+	_check(str(model.values()[0][1]) == "95 %" and str(model.values()[1][1]) == "9.0 m",
+		"telemetry formats integrity and distance")
+	model.set_page(1)
+	_check(str(model.values()[0][1]) == "112 kW" and model.track_line() == "> feeds = 10    cooling = 11",
+		"telemetry diagnostic page mirrors the web values")
+	model.set_page(2)
+	_check(model.series_indices() == [3, 4, 2] and str(model.values()[1][1]) == "20 %",
+		"telemetry tracking page plots distance, threat and integrity")
+	var panel: PhosphorDisplay = PhosphorDisplay.new()
+	for _i in 100:
+		panel.paint("RED · E-07", "68 kW", "este", 0.61)
+	_check(panel.history.size() == 72 and panel.trace_points().size() == 72,
+		"phosphor display keeps a 72 sample trace")
+	_check(panel.trace_points()[71].x > panel.trace_points()[0].x, "phosphor trace advances")
+	var screen: WallScreen = WallScreen.new()
+	screen.kind = "telemetry"
+	root.add_child(screen)
+	screen._ready()
+	_check(screen.viewport.size == Vector2i(1024, 576)
+		and (screen.mesh.mesh as QuadMesh).size == Vector2(2.36, 1.328),
+		"CAM 04 renders 1024x576 onto a 2,36 x 1,328 m quad")
+	_check(screen.push_telemetry(0.0, bus, 90.0, 5.0, "AGGRESSIVE", Vector3.ZERO, "Carga", 1, 0.6),
+		"CAM 04 accepts a live sample")
+	var state := GameState.new()
+	state.power_simulation = false
+	var feed := TelemetryFeed.new()
+	feed.screen = screen
+	var sampled := feed.grid_snapshot(state)
+	_check(sampled.has("load") and sampled.has("feeds"), "telemetry feed reads the power grid")
+	feed.clock = 1.0
+	_check(feed.sample(state), "telemetry feed pushes a frame to the screen")
+	root.remove_child(screen)
+	screen.free()
+	feed.free()
+	var electrical := load("res://zones/zone_electrical.tscn") as PackedScene
+	var zone := electrical.instantiate()
+	var cam := zone.get_node_or_null("Displays/Cam04") as WallScreen
+	_check(cam != null and cam.kind == "telemetry", "electrical zone mounts the CAM 04 screen")
+	_check(zone.get_node_or_null("Displays/TelemetryFeed") != null,
+		"electrical zone feeds the screen from the game state")
+	zone.free()
+
 func _run() -> void:
 	await _validate_exported_pattern()
 	await _validate_portal_assembly()
@@ -401,6 +489,8 @@ func _run() -> void:
 	_validate_bench_cycle()
 	_validate_w01_perception()
 	_validate_transit()
+	_validate_camera()
+	_validate_displays()
 	var main := packed.instantiate()
 	var test_state := main.get_node("GameState") as GameState
 	test_state.persistence_path = QA_SAVE_PATH
