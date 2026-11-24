@@ -8,7 +8,7 @@ signal zone_changed(previous_zone: StringName, current_zone: StringName)
 signal power_state_changed(snapshot: Dictionary)
 
 const SAVE_PATH := "user://nexus_native_save.json"
-const SAVE_VERSION := 3
+const SAVE_VERSION := 4
 
 var persistence_path: String = SAVE_PATH
 var current_zone: StringName = &""
@@ -21,6 +21,9 @@ var survey_records: Array[Dictionary] = []
 var watcher_state: Dictionary = {
 	"zone": "c04", "state": "WATCHING", "aggression": 0.2, "memory": 0.0,
 }
+## Bóveda V–03 (se registra sola al entrar en la zona).
+var vault: VaultModule = null
+var _vault_pending: Dictionary = {}
 ## Red eléctrica: port de `Power.ts` de la versión web.
 var power: PowerGrid = PowerGrid.for_laboratory()
 ## Si es `false`, la red no avanza sola (QA y capturas controlan el paso a mano).
@@ -44,6 +47,16 @@ func power_aggression_source() -> float:
 
 func _on_power_state_changed(snapshot: Dictionary) -> void:
 	power_state_changed.emit(snapshot)
+
+## La bóveda se registra al instanciarse la zona; si venía estado guardado, se aplica aquí.
+func register_vault(module: VaultModule) -> void:
+	vault = module
+	if not _vault_pending.is_empty():
+		vault.from_dict(_vault_pending)
+		_vault_pending = {}
+
+func vault_snapshot() -> Dictionary:
+	return vault.to_dict() if vault != null else {}
 
 func power_snapshot() -> Dictionary:
 	return power.snapshot() if power != null else {}
@@ -130,6 +143,7 @@ func save_game(path: String = "") -> bool:
 		"survey_records": saved_records,
 		"watcher_state": _to_json_value(watcher_state),
 		"power": power.to_dict() if power != null else {},
+		"vault": vault.to_dict() if vault != null else _vault_pending,
 	}
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	if file == null:
@@ -199,6 +213,13 @@ func load_game(path: String = "") -> bool:
 	var saved_watcher: Variant = parsed.get("watcher_state", {})
 	if saved_watcher is Dictionary:
 		watcher_state = saved_watcher.duplicate(true)
+
+	var saved_vault: Variant = parsed.get("vault", {})
+	if saved_vault is Dictionary and not (saved_vault as Dictionary).is_empty():
+		if vault != null:
+			vault.from_dict(saved_vault)
+		else:
+			_vault_pending = (saved_vault as Dictionary).duplicate(true)
 
 	var saved_power: Variant = parsed.get("power", {})
 	if saved_power is Dictionary and power != null:

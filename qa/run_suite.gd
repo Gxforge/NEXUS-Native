@@ -166,6 +166,31 @@ func _validate_power_grid() -> void:
 	_check(restored.from_dict(grid.to_dict()), "power grid state round-trips through a dictionary")
 	_check(is_equal_approx(restored.capacity, grid.capacity), "restored grid keeps its capacity")
 
+func _validate_vault_module() -> void:
+	var vault: VaultModule = VaultModule.new()
+	vault.apply_web_layout()
+	root.add_child(vault)
+	_check(vault.phase == "Sellada" and not vault.opened_once, "vault starts sealed")
+	_check(vault.stations.size() == 4, "vault declares four use stations")
+	_check(vault.drawers.size() == 5, "vault declares five drawers")
+	_check(vault.station_near(Vector3(24.5, 1.6, -37.0)) == &"rearm", "vault detects the rearm station")
+	_check(vault.begin_opening(), "vault opening starts")
+	vault.update(6.0, Vector3.INF)
+	_check(vault.phase == "Liberando pestillos", "vault phase follows the web timeline")
+	vault.update(16.0, Vector3.INF)
+	_check(vault.opened_once and vault.phase == "Abierta", "vault opens after 22 seconds")
+	_check(vault.open_drawer(0, true), "opened vault lets drawers slide out")
+	for _step in 60:
+		vault.update(1.0 / 30.0, Vector3(float(vault.drawers[0]["bx"]) + 6.0, 1.0, float(vault.drawers[0]["bz"])))
+	_check(vault.drawer_visible_item(0), "drawer contents become visible")
+	var state: GameState = GameState.new()
+	state.register_vault(vault)
+	var saved: bool = state.save_game(QA_SAVE_PATH)
+	_check(saved and not state.vault_snapshot().is_empty(), "game state stores the vault")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(QA_SAVE_PATH))
+	state.queue_free()
+	vault.queue_free()
+
 func _run() -> void:
 	await _validate_exported_pattern()
 	await _validate_portal_assembly()
@@ -176,6 +201,7 @@ func _run() -> void:
 		_finish()
 		return
 	_validate_power_grid()
+	_validate_vault_module()
 	var main := packed.instantiate()
 	var test_state := main.get_node("GameState") as GameState
 	test_state.persistence_path = QA_SAVE_PATH

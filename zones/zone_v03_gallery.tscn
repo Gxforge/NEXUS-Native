@@ -1,10 +1,15 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
 [ext_resource type="PackedScene" path="res://assets/generated/v03_gallery_structural_shell.glb" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/entities/field_flashlight.tscn" id="5"]
+[ext_resource type="Script" path="res://scripts/zones/vault_module.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/zones/vault_station.gd" id="7"]
+
+[sub_resource type="BoxShape3D" id="VaultStationShape"]
+size = Vector3(1.7, 1.25, 0.9)
 
 [node name="V03GallerySlice" type="Node3D"]
 script = ExtResource("1")
@@ -80,3 +85,25 @@ light_energy = 6
 position = Vector3(27, 0, -52)
 item_id = &"sample"
 display_name = "Muestra V-03"
+
+[node name="VaultModule" type="Node3D" parent="."]
+script = ExtResource("6")
+zone_id = &"v03_gallery"
+
+[node name="VaultConsole" type="StaticBody3D" parent="VaultModule"]
+position = Vector3(27, 0.62, -44)
+script = ExtResource("7")
+station_id = &"vault"
+display_name = "Consola de la bóveda V–03"
+vault_path = NodePath("..")
+[node name="Collision" type="CollisionShape3D" parent="VaultModule/VaultConsole"]
+shape = SubResource("VaultStationShape")
+
+[node name="RearmConsole" type="StaticBody3D" parent="VaultModule"]
+position = Vector3(23, 0.62, -44)
+script = ExtResource("7")
+station_id = &"rearm"
+display_name = "Rearme del cuadro eléctrico"
+vault_path = NodePath("..")
+[node name="Collision" type="CollisionShape3D" parent="VaultModule/RearmConsole"]
+shape = SubResource("VaultStationShape")
