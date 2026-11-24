@@ -20,6 +20,9 @@ const DRAWER_TRAVEL := 0.85
 const DRAWER_APPROACH := 0.96
 const DRAWER_DAMP := 5.0
 const ITEM_VISIBLE_FACTOR := 0.22
+## Paredes útiles de la galería V–03 (23–31) para puestos y cajones.
+const EAST_X := 29.9
+const WEST_X := 24.4
 
 ## Fases en el mismo orden y con los mismos umbrales que la web.
 const PHASES := [
@@ -364,15 +367,20 @@ func _game_state() -> GameState:
 # --------------------------------------------------------------------------- #
 # disposición de la web
 # --------------------------------------------------------------------------- #
-## Estaciones en las coordenadas de `Vault.ts` (rearm 24/−37.64, hydro 7.5/−69.77,
-## records 29.5/−89.77) más el puesto de apertura y los cajones de los bancos.
+## Estaciones y cajones dentro de la galería V–03 nativa (23–31 × −82..−24).
+##
+## `Vault.ts` sitúa cada estación en su sala de la planta web (rearme 24/−37,64,
+## hidráulica 7,5/−69,77, archivo 29,5/−89,77), coordenadas que aquí caen fuera
+## del módulo. El módulo nativo vive en la galería, así que sus puestos se
+## alinean en las dos paredes del pasillo, entre los arcos (z = −31,2, −37,6,
+## −44, −50,4, −56,8, −63,2 y −69,6).
 func apply_web_layout() -> void:
-	add_station(&"vault", "Consola de la bóveda V–03", Vector3(18.0, 1.64, -31.0))
-	add_station(&"rearm", "Rearme del cuadro eléctrico", Vector3(24.0, 1.64, -37.64))
-	add_station(&"hydro", "Estación hidráulica H–01", Vector3(7.5, 1.64, -69.77))
-	add_station(&"records", "Archivo de expedientes D–02", Vector3(29.5, 1.64, -89.77))
-	add_drawer(&"bank_a", &"lamp", "Linterna de repuesto", 20.5, -33.0)
-	add_drawer(&"bank_b", &"cell", "Celda de energía", 23.5, -33.0)
-	add_drawer(&"bank_c", &"sample", "Muestra criogénica", 26.0, -41.0)
-	add_drawer(&"bank_d", &"card", "Tarjeta de acceso V–03", 21.0, -41.0)
-	add_drawer(&"bank_e", &"recorder", "Registrador de campo", 27.5, -47.5)
+	add_station(&"vault", "Consola de la bóveda V–03", Vector3(EAST_X, 1.64, -44.0))
+	add_station(&"rearm", "Rearme del cuadro eléctrico", Vector3(WEST_X, 1.64, -44.0))
+	add_station(&"hydro", "Estación hidráulica H–01", Vector3(EAST_X, 1.64, -56.8))
+	add_station(&"records", "Archivo de expedientes D–02", Vector3(WEST_X, 1.64, -56.8))
+	add_drawer(&"bank_a", &"lamp", "Linterna de repuesto", EAST_X, -31.2)
+	add_drawer(&"bank_b", &"cell", "Celda de energía", EAST_X, -37.6)
+	add_drawer(&"bank_c", &"sample", "Muestra criogénica", WEST_X, -31.2)
+	add_drawer(&"bank_d", &"card", "Tarjeta de acceso V–03", WEST_X, -37.6)
+	add_drawer(&"bank_e", &"recorder", "Registrador de campo", WEST_X, -50.4)

@@ -194,6 +194,46 @@ func _validate_zone_dressing() -> void:
 			continue
 
 
+## Fase 25: la disposición de módulos y dispositivos cae dentro de su sala.
+func _validate_module_layouts() -> void:
+	var files := FilesModule.new()
+	files.apply_web_layout()
+	root.add_child(files)
+	await process_frame
+	var room: Array = ZoneDressing.ROOMS[&"d02"]
+	_check(files.tray_count() == 10, "archivo: diez bandejas")
+	var outside := 0
+	for index in files.tray_count():
+		var home: Vector3 = files.trays[index]["home"]
+		if home.x < float(room[0]) or home.x > float(room[1]) \
+				or home.z < float(room[2]) or home.z > float(room[3]):
+			outside += 1
+	_check(outside == 0, "archivo: bandejas dentro de D–02")
+	files.queue_free()
+	await process_frame
+
+	var vault := VaultModule.new()
+	vault.apply_web_layout()
+	root.add_child(vault)
+	await process_frame
+	var gallery: Array = ZoneDressing.ROOMS[&"v03_gallery"]
+	var stray := 0
+	for station in vault.stations:
+		var point: Vector3 = station["position"]
+		if point.x < float(gallery[0]) or point.x > float(gallery[1]) \
+				or point.z < float(gallery[2]) or point.z > float(gallery[3]):
+			stray += 1
+	for drawer in vault.drawers:
+		var bx := float(drawer["bx"])
+		var bz := float(drawer["bz"])
+		if bx < float(gallery[0]) or bx > float(gallery[1]) \
+				or bz < float(gallery[2]) or bz > float(gallery[3]):
+			stray += 1
+	_check(stray == 0, "bóveda: puestos dentro de la galería V–03")
+	vault.queue_free()
+	await process_frame
+
+
 func _validate_portal_assembly() -> void:
 	var packed := load("res://scenes/validation/a01_portal_assembly.tscn") as PackedScene
 	_check(packed != null, "A-01 movable portal assembly loads")
@@ -252,7 +292,7 @@ func _validate_vault_module() -> void:
 	_check(vault.phase == "Sellada" and not vault.opened_once, "vault starts sealed")
 	_check(vault.stations.size() == 4, "vault declares four use stations")
 	_check(vault.drawers.size() == 5, "vault declares five drawers")
-	_check(vault.station_near(Vector3(24.5, 1.6, -37.0)) == &"rearm", "vault detects the rearm station")
+	_check(vault.station_near(Vector3(24.4, 1.6, -44.0)) == &"rearm", "vault detects the rearm station")
 	_check(vault.begin_opening(), "vault opening starts")
 	vault.update(6.0, Vector3.INF)
 	_check(vault.phase == "Liberando pestillos", "vault phase follows the web timeline")
@@ -660,6 +700,7 @@ func _run() -> void:
 	await _validate_portal_assembly()
 	await _validate_all_structural_zones()
 	await _validate_zone_dressing()
+	await _validate_module_layouts()
 	var packed := load("res://main.tscn") as PackedScene
 	_check(packed != null, "main scene loads")
 	if packed == null:

@@ -92,7 +92,8 @@ script = ExtResource("6")
 zone_id = &"v03_gallery"
 
 [node name="VaultConsole" type="StaticBody3D" parent="VaultModule"]
-position = Vector3(27, 0.62, -44)
+rotation_degrees = Vector3(0, -90, 0)
+position = Vector3(29.9, 0.62, -44)
 script = ExtResource("7")
 station_id = &"vault"
 display_name = "Consola de la bóveda V–03"
@@ -101,10 +102,11 @@ vault_path = NodePath("..")
 shape = SubResource("VaultStationShape")
 
 [node name="RearmConsole" type="StaticBody3D" parent="VaultModule"]
-position = Vector3(23, 0.62, -44)
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(24.4, 0.62, -44)
 script = ExtResource("7")
 station_id = &"rearm"
-display_name = "Rearme del cuadro eléctrico"
+display_name = "Rearme de la esclusa V–03"
 vault_path = NodePath("..")
 [node name="Collision" type="CollisionShape3D" parent="VaultModule/RearmConsole"]
 shape = SubResource("VaultStationShape")

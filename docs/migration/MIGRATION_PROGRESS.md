@@ -87,6 +87,11 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `GameState.session` con `log_event()` y guardado (`SAVE_VERSION` 10); `player.apply_look` escala con la sensibilidad; `main.gd` dispara los consejos y reinicia el encuentro.
 - Captura nueva: `reports/panel-settings.png`.
 
+## Fase 24b/25 · Atrezzo animado y planos nativos
+- Fase 24b: `ZoneDressing.animate(t)` anima burbujas (48 por vaso), larvas, aspas, anillos y testigos; ambiente de `main.tscn` a `ambient_light_source = 2` con (0.42, 0.55, 0.68) y energía 0.72; luminarias a 3,6 de energía y alcance `w*2.8`; capturas `reports/ingame-*.png`.
+- Fase 25: `FilesModule.apply_web_layout()` ancla las diez bandejas al muro oeste de D–02 (`WALL_X = 32.2`, paso 3,78, boca a +X) y `zone_d02_records.tscn` instancia las diez; `VaultModule` reparte puestos y cajones entre `EAST_X = 29.9` y `WEST_X = 24.4`; los cuatro tipos de dispositivo interactivo (bandeja, puesto de bóveda, bancada y mando) dejan de ser volumen invisible y se construyen con `BuildKit`; la platina de B–02 se mueve dentro de su sala.
+- `qa/validate_layouts.gd` (65 checks) audita la posición de los nodos de las diez zonas contra `ZoneDressing.ROOMS` y exige mallas en los dispositivos; `run_suite` sube a 335. QA total: **2008 checks**. Detalle en `PHASE_25_NATIVE_LAYOUTS.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.

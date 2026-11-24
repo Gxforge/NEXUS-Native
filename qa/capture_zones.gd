@@ -10,11 +10,11 @@ extends Node
 const VIEWS := {
 	"h01": [Vector3(3.5, 0.0, -49.0), Vector3(-5.5, 2.0, -62.0)],
 	"b02": [Vector3(30.0, 0.0, -3.0), Vector3(22.0, 2.8, -17.0)],
-	"electrical": [Vector3(33.0, 0.0, 79.0), Vector3(43.0, 1.9, 70.0)],
-	"surveillance": [Vector3(-17.6, 0.0, 69.0), Vector3(-17.6, 3.4, 83.4)],
-	"d02": [Vector3(33.0, 0.0, -30.0), Vector3(44.0, 1.6, -56.0)],
+	"electrical": [Vector3(35.0, 0.0, 74.5), Vector3(27.0, 1.2, 68.0)],
+	"surveillance": [Vector3(-12.0, 0.0, 68.0), Vector3(-25.0, 2.4, 80.0)],
+	"d02": [Vector3(36.2, 0.0, -26.0), Vector3(32.2, 1.0, -58.0)],
 	"c04": [Vector3(12.0, 0.0, 8.0), Vector3(2.0, 1.8, 26.0)],
-	"v03_gallery": [Vector3(27.0, 0.0, -26.0), Vector3(27.0, 2.0, -52.0)],
+	"v03_gallery": [Vector3(27.4, 0.0, -38.0), Vector3(29.9, 1.0, -44.0)],
 	"v03_cryo": [Vector3(31.0, 0.0, -84.0), Vector3(26.0, 1.6, -94.0)],
 }
 

@@ -43,17 +43,18 @@ func _run() -> void:
 	var home: Vector3 = files.trays[0]["home"]
 	_check(files.toggle(0), "la bandeja acepta apertura")
 	_check(files.tray_open(0), "la bandeja queda marcada como abierta")
-	_settle(files, 0, home + Vector3(6.0, 0.0, 0.0))
+	_settle(files, 0, _ahead(files, 0, 6.0))
 	_check(files.tray_factor(0) > 0.95, "sin nadie delante la bandeja sale del todo")
 	_check(files.tray_revealed(0), "con la bandeja fuera el folio es legible")
-	_check(files.solid(home.x, two_metres_ahead(files, 0)), "la bandeja abierta bloquea el paso")
+	var ahead := two_metres_ahead(files, 0)
+	_check(files.solid(ahead.x, ahead.z), "la bandeja abierta bloquea el paso")
 	_settle(files, 0, home + _forward(files, 0) * 1.3)
 	_check(files.tray_factor(0) < 0.15, "de pie delante la bandeja se detiene sin empujar")
 	_check(not files.tray_revealed(0), "con la bandeja detenida el folio no se puede leer")
 	_check(files.toggle(0), "la bandeja se puede cerrar")
-	_settle(files, 0, home + Vector3(6.0, 0.0, 0.0))
+	_settle(files, 0, _ahead(files, 0, 6.0))
 	_check(files.tray_factor(0) < 0.05, "cerrada vuelve a su sitio")
-	_check(not files.solid(home.x, two_metres_ahead(files, 0)), "cerrada ya no bloquea el paso")
+	_check(not files.solid(ahead.x, ahead.z), "cerrada ya no bloquea el paso")
 
 	print("== Archivo D–02: lectura y bitácora ==")
 	var state: GameState = GameState.new()
@@ -65,7 +66,7 @@ func _run() -> void:
 	_check(closed_read.contains("cerrada") or closed_read.contains("cerrado"),
 		"no se lee un expediente con la bandeja cerrada")
 	files.toggle(0)
-	_settle(files, 0, home + Vector3(6.0, 0.0, 0.0))
+	_settle(files, 0, _ahead(files, 0, 6.0))
 	var read := files.read_tray(0, null)
 	_check(read.contains("Ciclo de retorno"), "la lectura devuelve el título del expediente")
 	_check(state.survey_records.size() == 1, "el expediente entra en la bitácora")
@@ -76,7 +77,7 @@ func _run() -> void:
 	_check(state.survey_records.size() == 1, "releer no duplica el registro")
 	_check(files.is_read(0), "el expediente queda marcado como leído")
 	files.toggle(6)
-	_settle(files, 6, (files.trays[6]["home"] as Vector3) + Vector3(0.0, 0.0, 6.0))
+	_settle(files, 6, _ahead(files, 6, 6.0))
 	files.read_tray(6, null)
 	_check(state.survey_records.size() == 2, "un segundo expediente añade otro registro")
 
@@ -123,8 +124,13 @@ func _run() -> void:
 ## Vector unitario "hacia fuera" de la bandeja según su giro.
 func _forward(files: FilesModule, index: int) -> Vector3:
 	var rotation: float = files.trays[index]["rotation"]
-	return Vector3(-sin(rotation), 0.0, cos(rotation))
+	return Vector3(sin(rotation), 0.0, cos(rotation))
 
-func two_metres_ahead(files: FilesModule, index: int) -> float:
+## Punto a `distance` metros por delante de la boca de la bandeja.
+func _ahead(files: FilesModule, index: int, distance: float) -> Vector3:
 	var home: Vector3 = files.trays[index]["home"]
-	return home.z + _forward(files, index).z * 2.0
+	return home + _forward(files, index) * distance
+
+## Coordenadas (x, z) del punto a dos metros por delante, para `solid()`.
+func two_metres_ahead(files: FilesModule, index: int) -> Vector3:
+	return _ahead(files, index, 2.0)

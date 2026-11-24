@@ -57,6 +57,10 @@ var read_dossiers: Array[int] = []
 
 var _player_position := Vector3.INF
 
+## Muro oeste del archivo D–02 y separación entre bandejas (z de −28 a −62).
+const WALL_X := 32.2
+const SLOT_STEP := 3.78
+
 
 func _ready() -> void:
 	add_to_group(&"files_module")
@@ -71,20 +75,17 @@ func _physics_process(delta: float) -> void:
 	update(delta, _player_position)
 
 
-## Bandejas en las mismas coordenadas y giros que `Files.ts`.
+## Bandejas repartidas por el archivo D–02 nativo.
+##
+## La web las coloca en coordenadas globales de su propia planta
+## (`(-25, -37,3)`, `(36,6, -86,2)`, `(-35,2, -25,8)`…), que en el módulo portado
+## caen fuera de la sala (31–46 × −82..−24). Se conservan el número, el orden y
+## los giros hacia el pasillo, pero anclados al muro oeste del archivo, de z = −28
+## a z = −62, con la boca del cajón hacia +X (el pasillo).
 func apply_web_layout() -> void:
-	var layout := [
-		[Vector3(-25.0, 0.0, -37.34), 0.0],
-		[Vector3(-19.8, 0.0, -37.34), 0.0],
-		[Vector3(36.61, 0.0, -86.2), -PI / 2.0],
-		[Vector3(36.61, 0.0, -81.8), -PI / 2.0],
-		[Vector3(36.61, 0.0, -77.4), -PI / 2.0],
-		[Vector3(-35.22, 0.0, -31.0), PI / 2.0],
-		[Vector3(-35.22, 0.0, -25.8), PI / 2.0],
-		[Vector3(-35.22, 0.0, -20.6), PI / 2.0],
-		[Vector3(-0.68, 0.0, -28.1), -PI / 2.0],
-		[Vector3(-0.68, 0.0, -22.9), -PI / 2.0],
-	]
+	var layout := []
+	for index in 10:
+		layout.append([Vector3(WALL_X, 0.0, -28.0 - float(index) * SLOT_STEP), PI / 2.0])
 	for index in layout.size():
 		trays.append({
 			"home": layout[index][0],

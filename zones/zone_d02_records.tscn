@@ -50,7 +50,8 @@ display_name = "Bitácora de custodia D-02"
 script = ExtResource("6")
 
 [node name="Tray0" type="StaticBody3D" parent="FilesModule"]
-position = Vector3(-25, 0.55, -37.34)
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(32.2, 0.55, -28.00)
 script = ExtResource("7")
 tray_index = 0
 display_name = "Bandeja · Ciclo de retorno"
@@ -59,7 +60,8 @@ files_path = NodePath("..")
 shape = SubResource("FilesTrayShape")
 
 [node name="Tray1" type="StaticBody3D" parent="FilesModule"]
-position = Vector3(-19.8, 0.55, -37.34)
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(32.2, 0.55, -31.78)
 script = ExtResource("7")
 tray_index = 1
 display_name = "Bandeja · Memoria del perímetro"
@@ -68,12 +70,83 @@ files_path = NodePath("..")
 shape = SubResource("FilesTrayShape")
 
 [node name="Tray2" type="StaticBody3D" parent="FilesModule"]
-position = Vector3(-35.22, 0.55, -25.8)
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(32.2, 0.55, -35.56)
 script = ExtResource("7")
-tray_index = 6
-display_name = "Bandeja · Parte de inspección"
+tray_index = 2
+display_name = "Bandeja · Transferencia de carga"
 files_path = NodePath("..")
 [node name="Collision" type="CollisionShape3D" parent="FilesModule/Tray2"]
+shape = SubResource("FilesTrayShape")
+
+[node name="Tray3" type="StaticBody3D" parent="FilesModule"]
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(32.2, 0.55, -39.34)
+script = ExtResource("7")
+tray_index = 3
+display_name = "Bandeja · Cadena de custodia"
+files_path = NodePath("..")
+[node name="Collision" type="CollisionShape3D" parent="FilesModule/Tray3"]
+shape = SubResource("FilesTrayShape")
+
+[node name="Tray4" type="StaticBody3D" parent="FilesModule"]
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(32.2, 0.55, -43.12)
+script = ExtResource("7")
+tray_index = 4
+display_name = "Bandeja · Inventario de turno"
+files_path = NodePath("..")
+[node name="Collision" type="CollisionShape3D" parent="FilesModule/Tray4"]
+shape = SubResource("FilesTrayShape")
+
+[node name="Tray5" type="StaticBody3D" parent="FilesModule"]
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(32.2, 0.55, -46.90)
+script = ExtResource("7")
+tray_index = 5
+display_name = "Bandeja · Parte de inspección"
+files_path = NodePath("..")
+[node name="Collision" type="CollisionShape3D" parent="FilesModule/Tray5"]
+shape = SubResource("FilesTrayShape")
+
+[node name="Tray6" type="StaticBody3D" parent="FilesModule"]
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(32.2, 0.55, -50.68)
+script = ExtResource("7")
+tray_index = 6
+display_name = "Bandeja · Ciclo de retorno"
+files_path = NodePath("..")
+[node name="Collision" type="CollisionShape3D" parent="FilesModule/Tray6"]
+shape = SubResource("FilesTrayShape")
+
+[node name="Tray7" type="StaticBody3D" parent="FilesModule"]
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(32.2, 0.55, -54.46)
+script = ExtResource("7")
+tray_index = 7
+display_name = "Bandeja · Memoria del perímetro"
+files_path = NodePath("..")
+[node name="Collision" type="CollisionShape3D" parent="FilesModule/Tray7"]
+shape = SubResource("FilesTrayShape")
+
+[node name="Tray8" type="StaticBody3D" parent="FilesModule"]
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(32.2, 0.55, -58.24)
+script = ExtResource("7")
+tray_index = 8
+display_name = "Bandeja · Transferencia de carga"
+files_path = NodePath("..")
+[node name="Collision" type="CollisionShape3D" parent="FilesModule/Tray8"]
+shape = SubResource("FilesTrayShape")
+
+[node name="Tray9" type="StaticBody3D" parent="FilesModule"]
+rotation_degrees = Vector3(0, 90, 0)
+position = Vector3(32.2, 0.55, -62.02)
+script = ExtResource("7")
+tray_index = 9
+display_name = "Bandeja · Cadena de custodia"
+files_path = NodePath("..")
+[node name="Collision" type="CollisionShape3D" parent="FilesModule/Tray9"]
 shape = SubResource("FilesTrayShape")
 
 [node name="Dressing" type="Node3D" parent="."]

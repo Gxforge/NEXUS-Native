@@ -32,7 +32,7 @@ func _run() -> void:
 	_check(vault.stations.size() == 4, "cuatro estaciones de uso declaradas")
 	_check(vault.drawers.size() == 5, "cinco cajones declarados")
 	_check(vault.items.has(&"card"), "la tarjeta V–03 vive en los cajones")
-	_check(vault.station_near(Vector3(24.5, 1.6, -37.0)) == &"rearm",
+	_check(vault.station_near(Vector3(24.4, 1.6, -44.0)) == &"rearm",
 		"el rearme se detecta a menos de 4 m")
 	_check(vault.station_near(Vector3(40.0, 1.6, -37.0)) == &"", "fuera de 4 m no hay estación")
 

@@ -62,7 +62,8 @@ display_name = "Celda de carga B-02"
 [node name="Bench" type="Node3D" parent="."]
 
 [node name="AnalyzerBench" type="StaticBody3D" parent="Bench"]
-position = Vector3(20, 0.6, -32)
+rotation_degrees = Vector3(0, 180, 0)
+position = Vector3(13.2, 0.6, -3.2)
 script = ExtResource("6")
 bench_id = &"analyzer"
 display_name = "Platina del analizador B–02"
