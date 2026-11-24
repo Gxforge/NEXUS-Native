@@ -148,6 +148,52 @@ func _validate_all_structural_zones() -> void:
 	for zone: Dictionary in zones:
 		await _validate_structural_zone(zone)
 
+## Fase 24: cada zona lleva su mobiliario (`ZoneDressing`) dentro del volumen.
+func _validate_zone_dressing() -> void:
+	var zones := ["h01", "b02", "electrical", "surveillance", "d02", "c04",
+		"v03_gallery", "v03_cryo"]
+	for id: String in zones:
+		var layer := root.get_node_or_null("PersistentWorld")
+		var zone_path := "res://zones/zone_%s" % id
+		var packed: PackedScene = null
+		for candidate in [zone_path + ".tscn", zone_path + "_shell.tscn",
+				zone_path + "_hydraulics.tscn", zone_path + "_turbines.tscn",
+				zone_path + "_records.tscn", "res://zones/zone_v03_cryotheque.tscn",
+				"res://zones/zone_v03_gallery.tscn"]:
+			if ResourceLoader.exists(candidate):
+				packed = load(candidate)
+				break
+		_check(packed != null, "%s: zona con mobiliario cargable" % id)
+		if packed == null:
+			continue
+		var instance := packed.instantiate() as Node3D
+		root.add_child(instance)
+		await process_frame
+		var dressing := instance.get_node_or_null("Dressing") as ZoneDressing
+		_check(dressing != null, "%s: nodo Dressing presente" % id)
+		if dressing != null:
+			_check(dressing.built_meshes >= 20, "%s: %d mallas de mobiliario" % [id, dressing.built_meshes])
+			var room: Array = dressing.room()
+			var outside := 0
+			var stack: Array[Node] = [dressing]
+			while not stack.is_empty():
+				var node: Node = stack.pop_back()
+				for child in node.get_children():
+					stack.append(child)
+				var mesh := node as MeshInstance3D
+				if mesh == null or mesh.mesh == null:
+					continue
+				var center: Vector3 = (mesh.global_transform * mesh.get_aabb()).get_center()
+				if center.x < float(room[0]) - 0.6 or center.x > float(room[1]) + 0.6 \
+						or center.z < float(room[2]) - 0.6 or center.z > float(room[3]) + 0.6:
+					outside += 1
+			_check(outside == 0, "%s: mobiliario dentro de las paredes" % id)
+		instance.queue_free()
+		await process_frame
+		if layer == null:
+			continue
+
+
 func _validate_portal_assembly() -> void:
 	var packed := load("res://scenes/validation/a01_portal_assembly.tscn") as PackedScene
 	_check(packed != null, "A-01 movable portal assembly loads")
@@ -613,6 +659,7 @@ func _run() -> void:
 	await _validate_exported_pattern()
 	await _validate_portal_assembly()
 	await _validate_all_structural_zones()
+	await _validate_zone_dressing()
 	var packed := load("res://main.tscn") as PackedScene
 	_check(packed != null, "main scene loads")
 	if packed == null:

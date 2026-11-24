@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://scripts/systems/operations_console.gd" id="6"]
 [ext_resource type="Script" path="res://scripts/ui/wall_screen.gd" id="7"]
 [ext_resource type="Script" path="res://scripts/ui/telemetry_feed.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/zones/zone_dressing.gd" id="90"]
 [sub_resource type="BoxShape3D" id="OpsConsoleShape"]
 size = Vector3(1.4, 1.2, 0.8)
 
@@ -104,3 +105,7 @@ screen_size = Vector2(0.9, 0.45)
 [node name="TelemetryFeed" type="Node" parent="Displays"]
 script = ExtResource("8")
 screen_path = NodePath("../Cam04")
+
+[node name="Dressing" type="Node3D" parent="."]
+script = ExtResource("90")
+zone_id = &"electrical"

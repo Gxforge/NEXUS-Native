@@ -1,10 +1,11 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/zones/zone_root.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/zones/structural_shell.gd" id="2"]
 [ext_resource type="PackedScene" path="res://assets/generated/surveillance_structural_shell.glb" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/validation/a01_portal_assembly.tscn" id="4"]
 [ext_resource type="Script" path="res://scripts/systems/operations_console.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/zones/zone_dressing.gd" id="90"]
 [sub_resource type="BoxShape3D" id="OpsConsoleShape"]
 size = Vector3(1.4, 1.2, 0.8)
 
@@ -61,3 +62,7 @@ handle_id = &"report"
 display_name = "Panel maestro · cambiar página"
 [node name="Collision" type="CollisionShape3D" parent="OperationsRoom/Report"]
 shape = SubResource("OpsConsoleShape")
+
+[node name="Dressing" type="Node3D" parent="."]
+script = ExtResource("90")
+zone_id = &"surveillance"

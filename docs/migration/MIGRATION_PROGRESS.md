@@ -29,7 +29,8 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 
 ## Sistemas Web todavía pendientes de migrar
 - [x] 10 zonas restantes de las 12 documentadas: registro, sockets, portales, hull estructural, colisión, luces y streaming real en ambos sentidos (fase 13).
-- [ ] Contenido interactivo real de esas 10 zonas (bóveda, CCTV, cuadro eléctrico, archivo óptico, hidráulica, cápsula de Transit) y mobiliario detallado desde el GLB combinado.
+- [x] Mobiliario y rotulación de las zonas (fase 24: `scripts/world/build_kit.gd` + `scripts/zones/zone_dressing.gd`): vasos, turbinas, puerta de bóveda, armarios, muro CCTV, archivadores, malla de contención, arcos, vitrinas, bancos de bombas, andén y luces de techo, colocados dentro del volumen real de cada módulo; 95 checks + 32 en `run_suite` y ocho capturas en `reports/dressing-*.png`.
+- [ ] Contenido interactivo real de esas 10 zonas (bóveda, CCTV, cuadro eléctrico, archivo óptico, hidráulica, cápsula de Transit) y atrezzo GLB de alta fidelidad.
 - [ ] Bóveda V-03 completa: lector/tarjeta, fases de apertura, celdas, muestra, analizador y bitácora.
 - [x] Grid/energía de instalación (fase 14: `scripts/systems/power_grid.gd`, port de `Power.ts`). Queda el panel 3D, la telemetría y el CCTV interactivo.
 - [x] Bóveda V–03 (fase 15: secuencia, estaciones, cajones por proximidad, objetos y persistencia). Falta su geometría animada.
@@ -37,7 +38,8 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - [x] Cuadro eléctrico y CCTV (fase 17: circuitos, mandos, contadores, informe y selector de cámaras). Faltan geometría, pantallas y vídeo.
 - [x] Bancos técnicos (fase 18: cuna de carga en H–01 y analizador en B–02, con consumo real de la red).
 - [x] IA y percepción de W–01 (fase 19: estados, cono de visión, audición, memoria, malla de contención). Faltan agarre/daño y tentáculos dinámicos.
-- [ ] Vasos de observación de H–01 (visual) y resto de interactuables.
+- [x] Vasos de observación de H–01 (visual, fase 24): tres vasos con cristal, líquido, larva en suspensión, manómetro, desagüe y luminaria.
+- [ ] Animación de los vasos (burbujas, latido) y resto de interactuables.
 - [ ] Transit: cápsula/carro, asientos, llamadas, carga, freno y solver de cuatro apoyos del vehículo.
 - [ ] Paneles de base de datos/mapa con el contenido completo de la web; ahora son una estructura inicial limitada a C-04/A-01.
 - [ ] Audio, VFX, feedback fisiológico, settings/gráficos y paridad visual completa.
