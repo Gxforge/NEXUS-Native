@@ -136,6 +136,36 @@ func _validate_portal_assembly() -> void:
 	portal.queue_free()
 	await process_frame
 
+func _validate_power_grid() -> void:
+	var grid: PowerGrid = PowerGrid.for_laboratory()
+	grid.reset()
+	grid.machines = 6.0
+	grid.update(0.0, false, 0.0)
+	_check(grid.feeds.size() == 12, "power grid declares twelve feeds")
+	_check(is_equal_approx(grid.capacity, 112.0), "power grid capacity matches web (112 kW)")
+	_check(is_equal_approx(grid.load_kw, 70.0), "power grid steady load matches web (70 kW)")
+	_check(is_equal_approx(grid.outputs[0], 17.5), "power grid splits load per feed")
+	grid.spike("qa surge", 60.0, 6.0)
+	var tripped := false
+	for _step in 20:
+		if grid.update(0.5, false, 0.0):
+			tripped = true
+			break
+	_check(tripped, "power grid trips on sustained overload")
+	grid.update(0.0, false, 0.0)
+	_check(is_equal_approx(grid.load_kw, 17.0) and is_zero_approx(grid.delivered),
+		"tripped grid keeps only residual load")
+	for _index in 4:
+		grid.set_fan(_index, true)
+	for _step in 400:
+		grid.update(0.25, false, 0.0)
+		if grid.temp < 60.0:
+			break
+	_check(grid.rearm().contains("Red restablecida"), "power grid rearm restores the breaker")
+	var restored: PowerGrid = PowerGrid.for_laboratory()
+	_check(restored.from_dict(grid.to_dict()), "power grid state round-trips through a dictionary")
+	_check(is_equal_approx(restored.capacity, grid.capacity), "restored grid keeps its capacity")
+
 func _run() -> void:
 	await _validate_exported_pattern()
 	await _validate_portal_assembly()
@@ -145,6 +175,7 @@ func _run() -> void:
 	if packed == null:
 		_finish()
 		return
+	_validate_power_grid()
 	var main := packed.instantiate()
 	var test_state := main.get_node("GameState") as GameState
 	test_state.persistence_path = QA_SAVE_PATH

@@ -5,9 +5,10 @@ signal inventory_changed(items: Array)
 signal quick_slots_changed(slots: Array)
 signal survey_records_changed(records: Array)
 signal zone_changed(previous_zone: StringName, current_zone: StringName)
+signal power_state_changed(snapshot: Dictionary)
 
 const SAVE_PATH := "user://nexus_native_save.json"
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
 
 var persistence_path: String = SAVE_PATH
 var current_zone: StringName = &""
@@ -20,6 +21,32 @@ var survey_records: Array[Dictionary] = []
 var watcher_state: Dictionary = {
 	"zone": "c04", "state": "WATCHING", "aggression": 0.2, "memory": 0.0,
 }
+## Red eléctrica: port de `Power.ts` de la versión web.
+var power: PowerGrid = PowerGrid.for_laboratory()
+## Si es `false`, la red no avanza sola (QA y capturas controlan el paso a mano).
+var power_simulation := true
+
+func _init() -> void:
+	if power.has_signal("state_changed") and not power.state_changed.is_connected(_on_power_state_changed):
+		power.state_changed.connect(_on_power_state_changed)
+
+func _process(delta: float) -> void:
+	if not power_simulation or power == null:
+		return
+	var motor := bool(player_state.get("motor", false))
+	var aggression := float(power_aggression_source())
+	power.update(delta, motor, aggression)
+
+## Gancho para que la IA de W-01 (o una prueba) module la carga. Por defecto usa
+## la agresividad registrada del sujeto.
+func power_aggression_source() -> float:
+	return float(watcher_state.get("aggression", 0.2))
+
+func _on_power_state_changed(snapshot: Dictionary) -> void:
+	power_state_changed.emit(snapshot)
+
+func power_snapshot() -> Dictionary:
+	return power.snapshot() if power != null else {}
 
 func has_item(item_id: StringName) -> bool:
 	return inventory.has(item_id)
@@ -102,6 +129,7 @@ func save_game(path: String = "") -> bool:
 		"player_state": _to_json_value(player_state),
 		"survey_records": saved_records,
 		"watcher_state": _to_json_value(watcher_state),
+		"power": power.to_dict() if power != null else {},
 	}
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	if file == null:
@@ -171,6 +199,11 @@ func load_game(path: String = "") -> bool:
 	var saved_watcher: Variant = parsed.get("watcher_state", {})
 	if saved_watcher is Dictionary:
 		watcher_state = saved_watcher.duplicate(true)
+
+	var saved_power: Variant = parsed.get("power", {})
+	if saved_power is Dictionary and power != null:
+		power.from_dict(saved_power)
+	power_state_changed.emit(power.snapshot() if power != null else {})
 	inventory_changed.emit(inventory.duplicate())
 	quick_slots_changed.emit(quick_slots.duplicate())
 	survey_records_changed.emit(survey_records.duplicate(true))

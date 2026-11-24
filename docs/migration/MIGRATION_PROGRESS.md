@@ -31,7 +31,7 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - [x] 10 zonas restantes de las 12 documentadas: registro, sockets, portales, hull estructural, colisión, luces y streaming real en ambos sentidos (fase 13).
 - [ ] Contenido interactivo real de esas 10 zonas (bóveda, CCTV, cuadro eléctrico, archivo óptico, hidráulica, cápsula de Transit) y mobiliario detallado desde el GLB combinado.
 - [ ] Bóveda V-03 completa: lector/tarjeta, fases de apertura, celdas, muestra, analizador y bitácora.
-- [ ] Grid/energía de instalación, inversores, ventiladores, purga térmica, telemetría y CCTV interactivo.
+- [x] Grid/energía de instalación (fase 14: `scripts/systems/power_grid.gd`, port de `Power.ts`). Queda el panel 3D, la telemetría y el CCTV interactivo.
 - [ ] Archivos, bandejas/documentos, bancos de carga y el resto de pickups/interactuables.
 - [ ] Transit: cápsula/carro, asientos, llamadas, carga, freno y solver de cuatro apoyos del vehículo.
 - [ ] Paneles de base de datos/mapa con el contenido completo de la web; ahora son una estructura inicial limitada a C-04/A-01.
@@ -42,13 +42,15 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - Godot 4.4.1 `--headless --editor --path . --quit`: importación/escaneo completado y scripts cargados.
 - `qa/validate_zone_graph.gd`: 303 checks, 0 fallos (identidad, manifiestos, colisión, AABB, sockets, portales y solapes de las 12 zonas).
 - `qa/validate_zone_traversal.gd`: 255 checks, 0 fallos (22 cruces por los portales con llegada a socket, una sola zona activa, liberación del módulo y un cruce físico caminando contra el umbral).
-- `qa/run_suite.gd`: 148 checks, 0 fallos (validación estructural de las 12 zonas, streaming C-04↔A-01, HUD/paneles con mapa de 12 módulos, armas UV/crio, pickup por rayo, linterna y sockets).
-- `qa/validate_game_state.gd`: 17 checks, 0 fallos (inventario, slots, puertas y serialización JSON).
+- `qa/run_suite.gd`: 157 checks, 0 fallos (validación estructural de las 12 zonas, streaming C-04↔A-01, HUD/paneles con mapa de 12 módulos, armas UV/crio, pickup por rayo, linterna y sockets).
+- `qa/validate_game_state.gd`: 17 checks, 0 fallos (inventario, slots, puertas y serialización JSON, ahora con la red eléctrica dentro del guardado).
+- `qa/validate_power_grid.gd`: 45 checks, 0 fallos (capacidad, carga, reparto, picos, disparo, rearme y persistencia de la red).
 - `qa/validate_resume.gd`: 8 checks, 0 fallos (continúa en A-01 y evita transición accidental al aparecer junto al portal).
 - `qa/validate_zone_ownership.gd` (13 checks, política de propiedad espejo del grafo), `validate_contacts_survey.gd`, `validate_contact_fx.gd`, `validate_source_batch.gd`, además de los validadores de núcleo/ojos/tentáculos W-01: pasaron en la ejecución registrada.
 - Las pruebas son headless. No prueban renderizado móvil real ni sustituyen builds de plataforma.
 
 ## Siguiente bloque de trabajo
+0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.
 2. Migrar la bóveda V-03 y su ciclo de items como primer módulo interactivo completo sobre la galería y la crioteca.
 3. Incorporar los sistemas eléctricos/CCTV/archivos y su estado persistente en `electrical`, `surveillance` y `d02`.

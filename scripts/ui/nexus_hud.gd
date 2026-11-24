@@ -12,6 +12,7 @@ var _message_label: Label
 var _inventory_label: Label
 var _status_label: Label
 var _resource_label: Label
+var _power_label: Label
 var _stamina_bar: ProgressBar
 var _hint_label: Label
 var _quick_slot_buttons: Array[Button] = []
@@ -58,6 +59,9 @@ func bind_player(player: NexusPlayer, state: GameState) -> void:
 		if not state.inventory_changed.is_connected(_on_inventory_changed):
 			state.inventory_changed.connect(_on_inventory_changed)
 		_on_inventory_changed(state.inventory)
+		if not state.power_state_changed.is_connected(_on_power_state_changed):
+			state.power_state_changed.connect(_on_power_state_changed)
+		_on_power_state_changed(state.power_snapshot())
 
 func bind_zones(catalog: ZoneCatalog) -> void:
 	_zone_catalog = catalog
@@ -139,6 +143,16 @@ func _build_interface() -> void:
 	_resource_label.offset_top = 48
 	_resource_label.offset_bottom = 76
 	_resource_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+
+	_power_label = _make_label("Power", "RED ESTABLE · 0/0 kW · 0 °C", 13,
+		Color(0.45, 0.78, 0.7))
+	_power_label.anchor_left = 1.0
+	_power_label.anchor_right = 1.0
+	_power_label.offset_left = -380
+	_power_label.offset_right = -24
+	_power_label.offset_top = 76
+	_power_label.offset_bottom = 100
+	_power_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 
 	var stamina_title := _make_label("StaminaTitle", "O₂ / RESISTENCIA", 12, Color(0.45, 0.61, 0.65))
 	stamina_title.position = Vector2(24, 98)
@@ -410,6 +424,19 @@ func _on_tool_state_changed(energy: float, battery: float, weapon: int) -> void:
 	elif weapon == 2:
 		weapon_name = "PROYECTOR CRIO"
 	_resource_label.text = "ENERGÍA  %02d%%  ·  %s  ·  BATERÍA %02d%%" % [roundi(energy), weapon_name, roundi(battery)]
+
+func _on_power_state_changed(snapshot: Dictionary) -> void:
+	if _power_label == null or snapshot.is_empty():
+		return
+	_power_label.text = str(snapshot.get("status", ""))
+	var tripped := bool(snapshot.get("tripped", false))
+	var stress := float(snapshot.get("stress", 0.0))
+	if tripped:
+		_power_label.add_theme_color_override("font_color", Color(0.95, 0.42, 0.36))
+	elif stress > 0.6:
+		_power_label.add_theme_color_override("font_color", Color(0.96, 0.78, 0.44))
+	else:
+		_power_label.add_theme_color_override("font_color", Color(0.45, 0.78, 0.7))
 
 func _on_stamina_changed(value: float) -> void:
 	_stamina_bar.value = clampf(value, 0.0, 100.0)
