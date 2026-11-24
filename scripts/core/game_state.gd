@@ -42,6 +42,11 @@ func _init() -> void:
 	if not power.state_changed.is_connected(_on_power_state_changed):
 		power.state_changed.connect(_on_power_state_changed)
 
+func _ready() -> void:
+	# El cuadro es un nodo más de la partida (evita nodos sueltos fuera del árbol).
+	if operations != null and operations.get_parent() == null:
+		add_child(operations)
+
 func _process(delta: float) -> void:
 	if not power_simulation or power == null:
 		return
