@@ -217,8 +217,16 @@ func toggle_view() -> String:
 		if camera.is_inside_tree():
 			camera.look_at(view.focal_point, Vector3.UP)
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	apply_view_fov()
 	show_message("Vista orbital" if not view.is_first_person() else "Primera persona")
 	return next
+
+## Campo de visión según el modo y la proporción de pantalla (web: 68 / 49 / 35).
+func apply_view_fov() -> void:
+	if camera == null:
+		return
+	var size := get_viewport().get_visible_rect().size if is_inside_tree() else Vector2(1280.0, 720.0)
+	camera.fov = ExperienceState.fov_for(view.is_first_person(), size.x, size.y)
 
 func view_mode() -> String:
 	return view.mode

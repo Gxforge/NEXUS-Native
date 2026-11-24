@@ -34,10 +34,13 @@ func _ready() -> void:
 	hud.panel_visibility_changed.connect(_on_panel_visibility_changed)
 	zone_manager.transition_finished.connect(_on_zone_transition_finished)
 	zone_manager.transition_failed.connect(_on_zone_transition_failed)
+	if hud != null:
+		hud.update_quality_label(game_state.quality())
 	var start_button := $UI/MainMenu/Panel/Content/Start as Button
 	start_button.text = "CONTINUAR EN " + str(game_state.current_zone).to_upper() if catalog.has_zone(game_state.current_zone) else "ENTRAR EN C–04"
 	start_button.pressed.connect(start_game)
 	$UI/MainMenu/Panel/Content/Quit.pressed.connect(_quit_game)
+	apply_quality_category()
 	player.set_controls_enabled(false)
 	main_menu.show()
 	loading_screen.hide()
@@ -208,3 +211,46 @@ func _register_zones() -> void:
 		for neighbor: StringName in neighbor_sets[zone_id]:
 			definition.neighbors.append(neighbor)
 	print("NEXUS zone graph: %d zones, %d connections" % [neighbor_sets.size(), graph.get("connections", []).size()])
+
+## Aplica el perfil gráfico de `DisplayQuality.ts` al motor.
+## Densidad de render en el escalado 3D, sombras sólo en `high` y brillo
+## (glow) desactivado en `low` con 0,13 / 0,19 de intensidad.
+func apply_quality_category(preset := "") -> String:
+	var active := game_state.set_quality(preset) if not preset.is_empty() else game_state.quality()
+	var size := Vector2(get_viewport().get_visible_rect().size)
+	var density := ExperienceState.render_density(active, size.x, size.y,
+		DisplayServer.is_touchscreen_available())
+	var viewport := get_viewport()
+	if viewport != null:
+		# Por debajo de 1 se reduce la resolución interna (perfil low). Los topes
+		# superiores a 1 de la web se quedan en resolución nativa: el objetivo del
+		# proyecto es móvil y el sobremuestreo no compensa el coste.
+		viewport.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
+		viewport.scaling_3d_scale = minf(density, 1.0)
+	var shadows := ExperienceState.shadows_enabled(active)
+	_apply_shadows(self, shadows)
+	_apply_glow(ExperienceState.bloom_enabled(active), ExperienceState.bloom_strength(active))
+	player.apply_view_fov()
+	return active
+
+func _apply_shadows(node: Node, enabled: bool) -> void:
+	if node is DirectionalLight3D or node is SpotLight3D:
+		(node as Light3D).shadow_enabled = enabled
+	for child in node.get_children():
+		_apply_shadows(child, enabled)
+
+func _apply_glow(enabled: bool, strength: float) -> void:
+	var world := get_node_or_null("PersistentWorld/WorldEnvironment") as WorldEnvironment
+	if world == null or world.environment == null:
+		return
+	world.environment.glow_enabled = enabled
+	world.environment.glow_intensity = strength
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed(&"cycle_quality"):
+		var next := apply_quality_category(ExperienceState.QUALITIES[
+			(ExperienceState.QUALITIES.find(game_state.quality()) + 1) % ExperienceState.QUALITIES.size()])
+		player.show_message("Perfil gráfico · " + next.to_upper())
+		if hud != null:
+			hud.update_quality_label(next)
+		get_viewport().set_input_as_handled()

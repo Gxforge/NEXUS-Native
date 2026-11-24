@@ -47,7 +47,7 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - Godot 4.4.1 `--headless --editor --path . --quit`: importación/escaneo completado y scripts cargados.
 - `qa/validate_zone_graph.gd`: 303 checks, 0 fallos (identidad, manifiestos, colisión, AABB, sockets, portales y solapes de las 12 zonas).
 - `qa/validate_zone_traversal.gd`: 255 checks, 0 fallos (22 cruces por los portales con llegada a socket, una sola zona activa, liberación del módulo y un cruce físico caminando contra el umbral).
-- `qa/run_suite.gd`: 251 checks, 0 fallos (validación estructural de las 12 zonas, streaming C-04↔A-01, HUD/paneles con mapa de 12 módulos, armas UV/crio, pickup por rayo, linterna y sockets).
+- `qa/run_suite.gd`: 272 checks, 0 fallos (validación estructural de las 12 zonas, streaming C-04↔A-01, HUD/paneles con mapa de 12 módulos, armas UV/crio, pickup por rayo, linterna y sockets).
 - `qa/validate_game_state.gd`: 17 checks, 0 fallos (inventario, slots, puertas y serialización JSON, ahora con la red eléctrica dentro del guardado).
 - `qa/validate_power_grid.gd`: 45 checks, 0 fallos (capacidad, carga, reparto, picos, disparo, rearme y persistencia de la red).
 - `qa/validate_w01_ai.gd`: 66 checks, 0 fallos (estados, visión, audición, memoria, contención y persistencia).
@@ -71,6 +71,13 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `player.gd`: acciones `toggle_view` (V) y `crouch` (Ctrl); la altura base de la cámara se conserva al agacharse.
 - Pantallas: `phosphor_display.gd` (640×320, 72 muestras), `telemetry_model.gd` (1024×576, 75 filas, tres páginas), `screen_surface.gd` (dibujo), `wall_screen.gd` (SubViewport + quad) y `telemetry_feed.gd`; montadas en `zone_electrical.tscn`; 89 checks.
 - Captura nueva: `reports/displays-cam04.png` (CAM 04 y panel de fósforo con datos de simulación).
+
+## Fase 22 · Estado de la experiencia y perfiles de calidad (P-8, segundo bloque)
+- `scripts/core/experience_state.gd`: port del contrato de `SceneExperience.ts` (`nx`, `spend`/`action`, ranuras, rótulos y avisos, alcances) y de `DisplayQuality.ts` (densidad de render, FOV, sombras, brillo, vídeo); 139 checks.
+- `GameState.experience` con el perfil gráfico y el estado del equipo en el guardado (`SAVE_VERSION` 9).
+- `main.gd`: `apply_quality_category()` aplica el perfil al viewport, sombras y glow; **F3** recorre low/medium/high y el HUD lo muestra.
+- `player.gd`: `apply_view_fov()` (68 en primera persona, 49/35 en órbita) al alternar la vista.
+- Estabilizada la prueba intermitente «approach requests door opening» de la suite.
 
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.

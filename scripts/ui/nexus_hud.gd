@@ -13,6 +13,7 @@ var _inventory_label: Label
 var _status_label: Label
 var _resource_label: Label
 var _power_label: Label
+var _quality_label: Label
 var _stamina_bar: ProgressBar
 var _hint_label: Label
 var _quick_slot_buttons: Array[Button] = []
@@ -153,6 +154,15 @@ func _build_interface() -> void:
 	_power_label.offset_top = 128
 	_power_label.offset_bottom = 152
 	_power_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+
+	_quality_label = _make_label("Quality", "PERFIL · MEDIUM", 13, Color(0.72, 0.62, 0.42))
+	_quality_label.anchor_left = 1.0
+	_quality_label.anchor_right = 1.0
+	_quality_label.offset_left = -380
+	_quality_label.offset_right = -24
+	_quality_label.offset_top = 152
+	_quality_label.offset_bottom = 176
+	_quality_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 
 	var stamina_title := _make_label("StaminaTitle", "O₂ / RESISTENCIA", 12, Color(0.45, 0.61, 0.65))
 	stamina_title.position = Vector2(24, 98)
@@ -368,6 +378,11 @@ func _on_touch_look_input(event: InputEvent) -> void:
 		elif Time.get_ticks_msec() - _touch_start_time < 260 and touch.position.distance_to(_touch_start_position) < 14.0:
 			_player.interact()
 	
+## Perfil gráfico activo (F3 lo recorre: low → medium → high).
+func update_quality_label(preset: String) -> void:
+	if _quality_label != null:
+		_quality_label.text = "PERFIL · " + preset.to_upper()
+
 func _make_label(node_name: String, text: String, font_size: int, color: Color) -> Label:
 	var label := Label.new()
 	label.name = node_name

@@ -473,6 +473,57 @@ func _validate_displays() -> void:
 		"electrical zone feeds the screen from the game state")
 	zone.free()
 
+func _validate_experience() -> void:
+	var nx := ExperienceState.new([&"lamp", &"pulse", &"cryo", &"cell"])
+	_check(is_equal_approx(float(ExperienceState.PROTOCOLS["uv"]["cost"]), 32.0)
+		and is_equal_approx(float(ExperienceState.PROTOCOLS["gas"]["cd"]), 12.0),
+		"protocol costs and cooldowns match the web")
+	_check(nx.action("uv").contains("reflejo") and is_equal_approx(nx.energy, 68.0)
+		and is_equal_approx(nx.uv, 8.0), "UV pulse costs 32 energy and locks the grid for 8 s")
+	_check(not nx.spend("uv"), "protocol is unavailable while recharging")
+	_check(nx.action("gas").contains("criogénica") and is_equal_approx(nx.cold, 7.0),
+		"cryogenic fog slows the subject for 7 s")
+	_check(nx.bind_slot(0, "pulse") and str(nx.slots[0]) == "pulse", "slot binding works")
+	_check(nx.bind_slot(2, "pulse") and nx.slots[0] == null, "binding moves an item between slots")
+	_check(not nx.bind_slot(1, "lamp") and not nx.bind_slot(1, "medkit"),
+		"the lamp and unknown items are rejected from slots")
+	nx.bind_slot(3, "cell")
+	nx.energy = 40.0
+	nx.battery = 20.0
+	_check(nx.use_slot("cell").contains("Celda conectada") and is_equal_approx(nx.energy, 90.0)
+		and is_equal_approx(nx.battery, 100.0) and not nx.charged,
+		"the field cell restores the battery and adds 50 energy")
+	_check(nx.use_slot("cell").contains("agotada"), "a drained cell cannot be reused")
+	_check(ExperienceState.prompt_for("bin2", false, false, true) == "Cajón 2 · cerrar",
+		"drawer prompts follow the web wording")
+	_check(ExperienceState.part_name("eye-3") == "Ojo satélite 3"
+		and ExperienceState.part_note("maw").contains("mandíbula"), "subject part labels match")
+	var density := ExperienceState.render_density("high", 1920.0, 1080.0, false, 2.0)
+	_check(is_equal_approx(density, 1.65), "render density follows the web desktop caps")
+	_check(is_equal_approx(ExperienceState.fov_for(true, 1920.0, 1080.0), 68.0)
+		and is_equal_approx(ExperienceState.fov_for(false, 600.0, 900.0), 49.0),
+		"field of view depends on mode and aspect")
+	_check(ExperienceState.shadows_enabled("high") and not ExperienceState.bloom_enabled("low")
+		and is_equal_approx(ExperienceState.bloom_strength("medium"), 0.13),
+		"quality presets drive shadows and bloom")
+	var state := GameState.new()
+	state.power_simulation = false
+	state.persistence_path = "user://nexus_native_quality_check.json"
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(state.persistence_path))
+	state.set_quality("low")
+	state.experience.bind_slot(0, &"pulse")
+	_check(state.save_game(), "quality profile is written to the save")
+	var reloaded := GameState.new()
+	reloaded.power_simulation = false
+	reloaded.persistence_path = state.persistence_path
+	_check(reloaded.load_game(), "quality profile is read back")
+	_check(reloaded.quality() == "low" and str(reloaded.experience.slots[0]) == "pulse",
+		"experience state survives a save round-trip")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(state.persistence_path))
+	_check(InputMap.has_action(&"cycle_quality"), "quality cycling is mapped")
+	state.free()
+	reloaded.free()
+
 func _run() -> void:
 	await _validate_exported_pattern()
 	await _validate_portal_assembly()
@@ -491,6 +542,7 @@ func _run() -> void:
 	_validate_transit()
 	_validate_camera()
 	_validate_displays()
+	_validate_experience()
 	var main := packed.instantiate()
 	var test_state := main.get_node("GameState") as GameState
 	test_state.persistence_path = QA_SAVE_PATH
@@ -526,6 +578,12 @@ func _run() -> void:
 		_check(map_view._entries.size() == 12, "schematic map draws the twelve modules")
 		_check(map_view._current == manager.current_zone.zone_id, "schematic map highlights the current module")
 	hud._close_panel()
+	_check(main.apply_quality_category("low") == "low", "F3 applies the low profile at runtime")
+	_check(is_equal_approx(main.get_viewport().scaling_3d_scale, 0.85),
+		"low profile lowers the 3D render scale to the web density")
+	_check(main.apply_quality_category("high") == "high"
+		and is_equal_approx(main.get_viewport().scaling_3d_scale, 1.0),
+		"high profile restores native resolution")
 	_check(manager.catalog.has_zone(&"v03_cryo") and manager.catalog.connections_of(&"c04").size() == 5,
 		"catalog exposes the twelve-module graph and C-04 five-way junction")
 	player.panel_requested.emit(&"pause")
@@ -559,9 +617,13 @@ func _run() -> void:
 	var threshold := portal_a01.transition_threshold.get_node("Collision") as CollisionShape3D
 	_check((proximity.shape as BoxShape3D).size == Vector3(6.8, 3.6, 8.0), "proximity sensor preserves original 6.8 x 8 m footprint")
 	_check((threshold.shape as BoxShape3D).size == Vector3(4.4, 3.6, 0.5), "crossing threshold matches portal width")
-	_check(portal_a01.begin_approach(player), "approach starts asynchronous A-01 preload")
+	# La petición de apertura es síncrona: se lee antes de ceder frames, porque la
+	# compuerta vuelve a su estado por proximidad en cuanto el jugador se aleja.
+	var approach_requested := portal_a01.begin_approach(player)
+	var requested_aperture := portal_a01.target_aperture
+	_check(approach_requested, "approach starts asynchronous A-01 preload")
 	_check(await _wait_preloaded(manager, &"a01"), "A-01 preload completes before crossing")
-	_check(portal_a01.target_aperture == 1.0, "approach requests door opening")
+	_check(requested_aperture == 1.0, "approach requests door opening")
 
 	var old_zone: WeakRef = weakref(manager.current_zone)
 	_check(portal_a01.commit_crossing(player), "portal crossing commits C-04 to A-01")
