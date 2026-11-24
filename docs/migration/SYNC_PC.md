@@ -3,7 +3,30 @@
 `tools/sync_nexus.py` descarga la rama actualizada de GitHub (autenticada con tu
 token) y escribe los archivos en la **raíz del proyecto local**: añade los
 nuevos, actualiza los modificados y, si se pide, elimina los retirados. No usa
-dependencias externas y funciona en Windows, Linux y macOS con Python 3.9+.
+dependencias externas y funciona en Windows, Linux y macOS con Python 3.9+
+(tkinter viene incluido con el instalador oficial de Python).
+
+## Dos modos en un solo archivo
+
+| Cómo lo lanzas | Qué hace |
+|---|---|
+| doble clic / `python sync_nexus.py` | abre la **ventana gráfica**: barra de progreso real, registro, comprobación de cambios y actualización automática |
+| `python sync_nexus.py --dry-run`, `--prune`, `--watch`… | modo consola con el mismo motor |
+
+La ventana tiene: carpeta destino (con selector), repositorio, rama, token
+(oculto y opcional de recordar en el equipo), opciones de respaldo, limpieza de
+retirados y assets pesados, botones *Comprobar actualización* / *Sincronizar
+ahora* / *Ver plan* / *Cancelar* / *Abrir carpeta*, barra de progreso con el paso
+en curso (descarga con porcentaje, extracción, comparación y copia), registro con
+colores y estado de la rama (`Al día`, `Actualización disponible`, `Sincronizado`).
+
+Auto-actualización: con **“comprobar cambios cada 30 s”** consulta el último
+commit de la rama y avisa; si además marcas **“aplicar automáticamente al
+detectarlos”**, sincroniza sola en cuanto aparece un commit nuevo. En consola el
+equivalente es `--watch 120 --auto-sync`.
+
+Evidencia: `reports/sync-gui-running.png` (descarga/extracción al 57 %) y
+`reports/sync-gui-done.png` (sincronización terminada, rama al día).
 
 ## Uso habitual
 
@@ -66,7 +89,14 @@ plan (nuevos `+`, actualizados `~`, eliminados `-`).
 - Se ignoran `.git/`, `.godot/`, `__pycache__/`, basura del sistema y, salvo
   `--full`, los GLB fuente pesados.
 
-## Windows rápido
+## Windows rápido con la ventana
+
+```bat
+:: doble clic en SINCRONIZAR.bat  (pide el token si no está en el entorno)
+python sync_nexus.py            :: si el archivo está en la raíz del proyecto
+```
+
+## Consola rápida
 
 ```bat
 D:\proyectos\proyecto game\nexus-native> python sync_nexus.py
