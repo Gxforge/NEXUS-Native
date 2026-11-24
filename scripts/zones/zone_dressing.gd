@@ -459,7 +459,8 @@ func _build_d02() -> void:
 # C–04 · malla de contención y rótulos de la nave
 # --------------------------------------------------------------------------- #
 func _build_c04() -> void:
-	var metal := BuildKit.material(BuildKit.STEEL, 0.5, 0.4)
+	var steel := BuildKit.material(BuildKit.STEEL, 0.5, 0.4)
+	var metal := steel
 	var graphite := BuildKit.material(BuildKit.GRAPHITE, 0.5, 0.45)
 	var bronze := BuildKit.material(BuildKit.BRONZE)
 	var hazard := BuildKit.emissive(BuildKit.AMBER, 0.95)
@@ -543,14 +544,23 @@ func _build_c04() -> void:
 		0.06, 0.05, 15.0)
 	for index in 3:
 		var screen := WallScreen.new()
-		screen.kind = "phosphor"
+		# La primera muestra telemetría viva (red y sujeto); las otras dos, estado.
+		screen.kind = "telemetry" if index == 0 else "phosphor"
 		screen.screen_size = Vector2(2.2, 1.24)
 		screen.position = Vector3(-25.1, 5.4, 20.0 + float(index) * 6.2)
 		screen.rotation.y = PI * 0.5
 		add_child(screen)
 		screens.append(screen)
-		screen.push_phosphor("CONTENCIÓN C–04", "MALLA ACTIVA",
-			"anillo %d · tensión nominal" % (index + 1), 0.5 + float(index) * 0.07)
+		if screen.kind == "phosphor":
+			screen.push_phosphor("CONTENCIÓN C–04", "MALLA ACTIVA",
+				"anillo %d · tensión nominal" % (index + 1), 0.5 + float(index) * 0.07)
+		else:
+			# El feed vive con el mobiliario: toma muestras de GameState cada frame.
+			var feed := TelemetryFeed.new()
+			feed.name = "C04Feed"
+			add_child(feed)
+			feed.screen = screen
+			feed.set_process(true)
 	# Cajas de utillaje junto al acceso norte.
 	for index in 3:
 		BuildKit.block(self, graphite, -20.0 + float(index) * 1.5, 0.42, 6.4, 1.2, 0.84, 1.2)
@@ -560,10 +570,59 @@ func _build_c04() -> void:
 		44.6, 7.2, 26.0, -PI * 0.5)
 	BuildKit.plaque(self, "GALERÍA", "V–03   /   EJE NORTE", 7.0, 1.4,
 		-26.6, 7.2, 12.0, PI * 0.5)
+	# Mobiliario de escala humana: carretilla, escalera de pasarela, conos y palés.
+	var forklift := Node3D.new()
+	forklift.name = "C04Forklift"
+	forklift.position = Vector3(37.5, 0.0, 14.0)
+	forklift.rotation.y = -2.3
+	add_child(forklift)
+	BuildKit.block(forklift, steel, 0.0, 0.72, 0.0, 1.5, 1.0, 2.3)
+	BuildKit.block(forklift, graphite, 0.0, 0.3, 0.0, 1.56, 0.36, 2.4)
+	BuildKit.block(forklift, steel, 0.0, 1.34, 0.2, 1.3, 0.24, 1.5)
+	BuildKit.block(forklift, BuildKit.emissive(BuildKit.AMBER, 0.9), 0.0, 1.4, -0.62,
+		0.9, 0.08, 0.12)
+	BuildKit.bar(forklift, metal, Vector3(0.0, 1.3, 1.1), Vector3(0.0, 2.5, 0.85), 0.1)
+	BuildKit.block(forklift, graphite, 0.0, 2.56, 0.82, 0.9, 0.14, 0.8)
+	for wheel in 4:
+		var wx: float = -0.74 + float(wheel % 2) * 1.48
+		var wz: float = -0.72 + float(wheel / 2) * 1.44
+		BuildKit.drum(forklift, graphite, wx, 0.3, wz, 0.3, 0.22, true, 14)
+	for side in [-1, 1]:
+		BuildKit.block(forklift, metal, float(side) * 0.42, 0.14, -2.1, 0.14, 0.08, 1.2)
+		BuildKit.block(forklift, metal, float(side) * 0.42, 0.5, -1.5, 0.14, 0.7, 0.12)
+	BuildKit.bead(forklift, BuildKit.emissive(BuildKit.GLOW, 1.2), 0.0, 2.66, 0.82, 0.1, 8)
+	# Escalera de la pasarela.
+	var stair := Node3D.new()
+	stair.name = "C04Stair"
+	stair.position = Vector3(19.4, 0.0, 43.0)
+	add_child(stair)
+	for step in 9:
+		BuildKit.block(stair, steel, 0.0, 0.2 + float(step) * 0.32,
+			-float(step) * 0.34, 1.3, 0.08, 0.32)
+	for side in [-1, 1]:
+		BuildKit.bar(stair, metal, Vector3(float(side) * 0.68, 0.0, 0.0),
+			Vector3(float(side) * 0.68, 3.0, -3.0), 0.1)
+		BuildKit.bar(stair, metal, Vector3(float(side) * 0.68, 1.2, 0.0),
+			Vector3(float(side) * 0.68, 4.1, -3.0), 0.06)
+	BuildKit.block(stair, BuildKit.emissive(BuildKit.AMBER, 0.8), 0.0, 3.1, -3.05,
+		1.4, 0.06, 0.1)
+	# Conos de balizamiento y palés junto a la puerta.
+	for index in 5:
+		var angle: float = 0.6 + float(index) * 1.1
+		var cone := Node3D.new()
+		cone.name = "C04Cone%d" % index
+		cone.position = Vector3(2.0 + cos(angle) * 15.6, 0.0, 26.0 + sin(angle) * 15.6)
+		add_child(cone)
+		BuildKit.drum(cone, graphite, 0.0, 0.03, 0.0, 0.24, 0.06, false, 10)
+		BuildKit.drum(cone, BuildKit.emissive(BuildKit.AMBER, 0.9), 0.0, 0.34, 0.0,
+			0.14, 0.62, false, 10)
+	for index in 3:
+		BuildKit.block(self, bronze, -18.0 + float(index) * 1.6, 0.09, 12.0, 1.4, 0.18, 1.2)
+		BuildKit.block(self, graphite, -18.0 + float(index) * 1.6, 0.42, 12.0, 1.2, 0.5, 1.0)
 	# Dos hileras más de luminarias sobre la cuba: la sala es muy ancha y la fila
 	# central de `_ceiling_lights` dejaba el anillo a oscuras.
-	for row in 2:
-		var light_z: float = 14.0 + float(row) * 48.0
+	for row in 3:
+		var light_z: float = 6.0 + float(row) * 28.0
 		var light_x: float = -22.0
 		while light_x <= 42.0:
 			BuildKit.luminaire(self, light_x, ceiling() - 1.1, light_z, 3.2,

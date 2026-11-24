@@ -97,6 +97,11 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - A–01: dos estanterías de carga, muelle con franja y topes, bancada de carga de tres alojamientos, carro, bidones, pasillo marcado, tuberías, baliza y rótulo «MUELLE». Vista propia en `qa/capture_zones.tscn` (nueve zonas).
 - «GALERÍA AXIAL» reducido y desplazado al extremo de V–03 para que no se coma los planos rasantes. Hoja `reports/phase26-ingame.png`. QA total sin cambios: **2008 checks**. Detalle en `PHASE_26_ROOM_DENSITY.md`.
 
+## Fase 27 · C–04 a escala humana y telemetría viva
+- Carretilla, escalera de pasarela, conos, palés y cuatro filas de luminarias en la nave de contención (72 × 84 m): el anillo, el banco de instrumentación y el suelo dejan de estar a oscuras.
+- La primera pantalla del banco de C–04 pasa a `kind = "telemetry"` con un `TelemetryFeed` (`C04Feed`) creado con el mobiliario: carga/temperatura de red, sujeto, integridad, distancia e intención en vivo.
+- `validate_dressing` 110 → **116 checks** (pasarela, pórtico, carretilla, conos, pantallas y feed enlazado). Total: **2014 checks**, 0 fallos. Hoja `reports/phase27-ingame.png`. Detalle en `PHASE_27_CONTAINMENT_SCALE.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.

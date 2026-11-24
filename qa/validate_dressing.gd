@@ -212,6 +212,14 @@ func _check_zone_props(id: String, dressing: Node3D) -> void:
 			_check(_count_prefixed(dressing, "Cabinet") >= 8, "Electricidad: armarios del cuadro")
 		"c04":
 			_check(dressing.get_node_or_null("ContainmentMesh") != null, "C–04: malla de contención")
+			_check(dressing.get_node_or_null("C04Catwalk") != null, "C–04: pasarela perimetral")
+			_check(dressing.get_node_or_null("C04Gantry") != null, "C–04: pórtico de mantenimiento")
+			_check(dressing.get_node_or_null("C04Forklift") != null, "C–04: carretilla de escala humana")
+			_check(_count_prefixed(dressing, "C04Cone") == 5, "C–04: cinco conos de balizamiento")
+			_check(screens.size() >= 3, "C–04: banco de tres pantallas")
+			var feed := dressing.get_node_or_null("C04Feed") as TelemetryFeed
+			_check(feed != null and feed.screen != null,
+				"C–04: la primera pantalla muestra telemetría viva")
 
 
 func _has_child(root: Node, path: String) -> bool:
