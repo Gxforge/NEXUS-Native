@@ -150,8 +150,8 @@ func _build_interface() -> void:
 	_power_label.anchor_right = 1.0
 	_power_label.offset_left = -380
 	_power_label.offset_right = -24
-	_power_label.offset_top = 76
-	_power_label.offset_bottom = 100
+	_power_label.offset_top = 128
+	_power_label.offset_bottom = 152
 	_power_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 
 	var stamina_title := _make_label("StaminaTitle", "O₂ / RESISTENCIA", 12, Color(0.45, 0.61, 0.65))
