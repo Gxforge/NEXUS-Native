@@ -211,8 +211,13 @@ def token_from_file(path: str | Path) -> str | None:
 # --------------------------------------------------------------------------- #
 # GitHub
 # --------------------------------------------------------------------------- #
+REMOTE_PROBLEM: str | None = None
+
+
 def remote_commit(repo: str, branch: str, token: str | None, timeout: float = 20.0) -> str | None:
     """SHA del último commit de la rama (None si no hay red o no hay permisos)."""
+    global REMOTE_PROBLEM
+    REMOTE_PROBLEM = None
     url = "%s/repos/%s/commits/%s" % (API_ROOT, repo, branch)
     request = urllib.request.Request(url, headers={
         "User-Agent": USER_AGENT,
@@ -224,7 +229,19 @@ def remote_commit(repo: str, branch: str, token: str | None, timeout: float = 20
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
             payload = json.loads(response.read().decode("utf-8"))
-    except (urllib.error.URLError, urllib.error.HTTPError, ValueError, OSError):
+    except urllib.error.HTTPError as error:
+        if error.code in (403, 429):
+            REMOTE_PROBLEM = ("límite de consultas de GitHub alcanzado (%d). Añade el token en la "
+                              "ventana o espera unos minutos." % error.code)
+        elif error.code == 401:
+            REMOTE_PROBLEM = "el token fue rechazado (401): revísalo o desmárcalo"
+        elif error.code == 404:
+            REMOTE_PROBLEM = "repositorio o rama no encontrados (404)"
+        else:
+            REMOTE_PROBLEM = "GitHub respondió %d" % error.code
+        return None
+    except (urllib.error.URLError, ValueError, OSError) as error:
+        REMOTE_PROBLEM = "sin conexión (%s)" % (getattr(error, "reason", None) or error)
         return None
     sha = payload.get("sha") if isinstance(payload, dict) else None
     return sha if isinstance(sha, str) else None
@@ -691,7 +708,8 @@ def run_cli(args: argparse.Namespace) -> int:
             remote, local = SyncEngine(args, token=token, target=target).check_only()
             stamp = time.strftime("%H:%M:%S")
             if remote is None:
-                print("[%s] No se pudo consultar la rama (¿sin red o sin token?)" % stamp)
+                print("[%s] No se pudo consultar la rama: %s"
+                      % (stamp, REMOTE_PROBLEM or "sin red o sin token"))
             elif local is None:
                 print("[%s] Remoto en %s · todavía sin sincronizar" % (stamp, remote[:7]))
             elif remote == local:
@@ -780,6 +798,8 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
             self.target = tk.StringVar(value=cli_target or self.settings.get("target") or str(default_target()))
             self.repo = tk.StringVar(value=cli_repo or self.settings.get("repo", DEFAULT_REPO))
             self.branch = tk.StringVar(value=cli_branch or self.settings.get("branch", DEFAULT_BRANCH))
+            cli_token_file = getattr(default_options, "token_file", None) if default_options else None
+            self.cli_token_file = cli_token_file if cli_token_file and Path(cli_token_file).is_file() else None
             self.token = tk.StringVar(value="")
             self.prune = tk.BooleanVar(value=bool(self.settings.get("prune", False)))
             self.full = tk.BooleanVar(value=False)
@@ -863,20 +883,21 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
             options.pack(fill="x", pady=(0, 8))
             for column in range(3):
                 options.columnconfigure(column, weight=1)
-            ttk.Checkbutton(options, text="eliminar archivos retirados del repositorio",
+            ttk.Checkbutton(options, text="eliminar retirados",
                             variable=self.prune).grid(row=0, column=0, sticky="w")
             ttk.Checkbutton(options, text="respaldo antes de sobrescribir",
                             variable=self.backup).grid(row=0, column=1, sticky="w", padx=16)
-            ttk.Checkbutton(options, text="assets fuente (+174 MB)",
+            ttk.Checkbutton(options, text="assets fuente (174 MB)",
                             variable=self.full).grid(row=0, column=2, sticky="w", padx=16)
-            ttk.Checkbutton(options, text="comprobar cambios cada 30 s",
+            ttk.Checkbutton(options, text="comprobar cada 30 s",
                             variable=self.auto_check).grid(row=1, column=0, sticky="w", pady=(6, 0))
-            ttk.Checkbutton(options, text="aplicar automáticamente al detectarlos",
+            ttk.Checkbutton(options, text="aplicar automático",
                             variable=self.auto_apply).grid(row=1, column=1, sticky="w", padx=16, pady=(6, 0))
-            ttk.Checkbutton(options, text="forzar descarga y comparación",
+            ttk.Checkbutton(options, text="forzar descarga",
                             variable=self.force_download).grid(row=1, column=2, sticky="w", padx=16, pady=(6, 0))
-            ttk.Checkbutton(options, text="borrar caché .godot al actualizar (recomendado)",
-                            variable=self.clean_cache).grid(row=2, column=0, sticky="w", pady=(6, 0))
+            ttk.Checkbutton(options, text="borrar .godot al actualizar (recomendado)",
+                            variable=self.clean_cache).grid(row=2, column=0, columnspan=2,
+                                                            sticky="w", pady=(6, 0))
 
             actions = ttk.Frame(outer)
             actions.pack(fill="x", pady=(0, 10))
@@ -992,6 +1013,8 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
             entered = self.token.get().strip()
             if entered:
                 return entered
+            if self.cli_token_file:
+                return token_from_file(self.cli_token_file)
             remembered = self.settings.get("token")
             return remembered if isinstance(remembered, str) and remembered else token_from_environment()
 
@@ -1161,7 +1184,8 @@ def launch_gui(default_options: argparse.Namespace | None = None) -> int:
                 self.remote_label.set("Rama remota: sin conexión")
                 self.status.set("No se pudo consultar la rama")
                 self.progress.configure(value=0)
-                self._append("warn", "No se pudo consultar la rama remota (red, token o nombre del repositorio).")
+                self._append("warn", "No se pudo consultar la rama remota: %s"
+                             % (REMOTE_PROBLEM or "red, token o nombre del repositorio"))
                 return
             self.remote_label.set("Rama remota: %s" % remote[:7])
             if local is None:

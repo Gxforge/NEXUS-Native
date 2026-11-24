@@ -124,6 +124,8 @@ que no deberían volver a aparecer.
 - Se ignoran `.git/`, `.godot/`, `__pycache__/`, basura del sistema y, salvo
   `--full`, los GLB fuente pesados.
 
+![Ventana del sincronizador](reports/sync-gui-ready.png)
+
 ## Windows rápido con la ventana
 
 ```bat
