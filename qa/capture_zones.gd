@@ -111,16 +111,6 @@ func _place() -> void:
 			target = car.global_position + Vector3(0.0, 0.7, 0.0)
 			spot = car.global_position + Vector3(5.2, 0.0, 0.2)
 			print("CAPTURE coche en ", car.global_position, " con ", car.wheel_count(), " ruedas")
-			spot = car.global_position + Vector3(5.2, 0.0, 0.2)
-			print("CAPTURE coche en ", car.global_position, " con ", car.wheel_count(), " ruedas")
-			var shown := 0
-			for mesh_node in car.find_children("*", "MeshInstance3D", true, false):
-				var mi := mesh_node as MeshInstance3D
-				if mi != null and mi.is_visible_in_tree():
-					shown += 1
-			var sample := car.find_children("*", "MeshInstance3D", true, false).slice(0, 3)
-			print("CAPTURE mallas visibles=", shown, " muestra=",
-				sample.map(func(m): return [m.name, str(m.global_position.snapped(Vector3(0.01,0.01,0.01))), str(m.get_aabb().size.snapped(Vector3(0.01,0.01,0.01)))]))
 	_player.global_position = spot
 	_player.velocity = Vector3.ZERO
 	var eye := spot + Vector3(0.0, 1.72, 0.0)
