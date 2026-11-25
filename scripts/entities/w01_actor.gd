@@ -27,6 +27,8 @@ var _head: MeshInstance3D
 var _gum: MeshInstance3D
 var _throat: MeshInstance3D
 var _eye_roots: Array[Node3D] = []
+## Ojos animados (parpadeo, pupila y seguimiento) sobre el `.glb` original.
+var eyes: W01Eyes
 var _arms: Array[Node3D] = []
 var _effect_light: OmniLight3D
 var _game_state: GameState
@@ -47,6 +49,13 @@ func _ready() -> void:
 	for child: Node in eyes_root.get_children():
 		if child is Node3D:
 			_eye_roots.append(child as Node3D)
+	eyes = W01Eyes.new()
+	eyes.name = "EyeSystem"
+	add_child(eyes)
+	eyes.attach(eyes_root)
+	# Los `.glb` traen `metallic = 1.0` en tentáculos y párpados: sin mapa de
+	# entorno (la web sí lo tenía) se veían negros.
+	W01Materials.soften(self)
 	var arms_root := get_node("Tentacles/W01_20_Tentacles")
 	for child: Node in arms_root.get_children():
 		if child is Node3D and child.name.begins_with("arm-"):
@@ -125,6 +134,8 @@ func _sync_from_ai() -> void:
 
 func apply_uv() -> void:
 	_uv_flash = 1.1
+	if eyes != null:
+		eyes.flash()
 	_cold_remaining = 0.0
 	ai.recover()
 	_sync_from_ai()
@@ -190,13 +201,11 @@ func _set_mouth(value: float) -> void:
 		if mesh != null and mesh.mesh.get_blend_shape_count() > 0:
 			mesh.set_blend_shape_value(0, clampf(value, 0.025, 1.0))
 
+## Ojos: parpadeo, pupila y seguimiento (`EyeSystem.ts`).
 func _update_eyes(delta: float) -> void:
+	if eyes == null:
+		return
 	var target := get_node_or_null(look_target_path) as Node3D
 	if target == null:
 		return
-	for eye: Node3D in _eye_roots:
-		var local_direction := eye.global_transform.basis.inverse() * (target.global_position - eye.global_position).normalized()
-		var yaw := clampf(atan2(local_direction.x, local_direction.z), -0.16, 0.16)
-		var pitch := clampf(-asin(local_direction.y), -0.12, 0.12)
-		eye.rotation.y = lerpf(eye.rotation.y, yaw, minf(1.0, delta * 5.0))
-		eye.rotation.x = lerpf(eye.rotation.x, pitch, minf(1.0, delta * 5.0))
+	eyes.update(_time, delta, target.global_position, aggression)

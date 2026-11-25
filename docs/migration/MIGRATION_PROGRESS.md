@@ -129,6 +129,11 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `WallScreen` monta el plano original (`display.glb` 1,00 × 0,50 y `telemetry_screen.glb` 2,36 × 1,33).
 - Arreglado el consumo de memoria del lote grande (mataba el proceso en la octava zona) y las referencias a nodos liberados en `PropLibrary`. `validate_original_models` 19 → 42 checks. Total **2096 checks**, 0 fallos. Detalle en `PHASE_32_CEILING_AND_SCREENS.md`.
 
+## Fase 33 · Ojos de W–01 y entorno metálico
+- `scripts/entities/w01_eyes.gd`: port de `EyeSystem.ts` + `OcularSurface.ts` sobre `w01_eyes.glb` (siete ojos, catorce párpados parametrizados con la rejilla 33 × 8, seguimiento, pupila reactiva, parpadeo y cierre por pulso UV).
+- `scripts/entities/w01_materials.gd`: suavizado de los `metallic = 1,0` del exportador; `main.tscn` gana cielo procedural con `reflected_light_source = SKY` para que el metal tenga qué reflejar.
+- `qa/validate_w01_eyes.gd` (18 checks) + bloque en `run_suite` (7). Total **343 checks**, 0 fallos. Capturas `reports/eyes-*.png`, hoja `phase33-eyes.png`, `w01-c04-first-look.png` y las diez zonas. Detalle en `PHASE_33_EYES_AND_METALS.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.

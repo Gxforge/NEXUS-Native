@@ -432,6 +432,46 @@ func _validate_w01_perception() -> void:
 	_check(restored_field.from_dict(field.to_dict()) and is_equal_approx(restored_field.sector_risk(5), 0.1),
 		"field memory survives serialisation")
 
+func _validate_w01_eyes() -> void:
+	var packed_eyes := load("res://assets/generated/w01_eyes.glb") as PackedScene
+	_check(packed_eyes != null, "w01_eyes.glb loads")
+	if packed_eyes == null:
+		return
+	var eyes_root: Node = packed_eyes.instantiate()
+	root.add_child(eyes_root)
+	var system := W01Eyes.new()
+	eyes_root.add_child(system)
+	system.attach(eyes_root.get_child(0))
+	_check(system.count() == 7 and system.lid_count() == 14, "W-01 mounts seven eyes with fourteen lids")
+	system.update(0.0, 0.0, Vector3(5.0, 3.2, 4.0), 0.0)
+	_check(system.iris_yaw(0) > 0.05 and absf(system.iris_yaw(0)) <= 0.29,
+		"iris tracks the player inside the web clamp")
+	system.update(0.0, 0.0, Vector3(0.0, 3.2, 6.0), 0.0)
+	var calm := system.pupil_scale(0)
+	system.update(0.0, 0.0, Vector3(0.0, 3.2, 6.0), 1.0)
+	_check(system.pupil_scale(0) < calm, "pupil narrows when W-01 turns aggressive")
+	system.update(0.0, 0.0, Vector3(0.0, 3.2, 6.0), 0.0)
+	var open_edge := system.lid_position(0, true)
+	system.blink_timer = 0.0
+	system.update(0.1, 0.1, Vector3(0.0, 3.2, 6.0), 0.0)
+	system.update(0.2, 0.05, Vector3(0.0, 3.2, 6.0), 0.0)
+	_check(system.lid_position(0, true) < open_edge, "lids close during the blink")
+	system.flash()
+	system.update(0.3, 0.0, Vector3(0.0, 3.2, 6.0), 0.0)
+	var shut := 0
+	for index in 7:
+		if system.shut_of(index) > 0.5:
+			shut += 1
+	_check(shut == 7, "UV pulse shuts the seven eyes")
+	system.update(0.4, 1.2, Vector3(0.0, 3.2, 6.0), 0.0)
+	_check(system.shut_of(0) == 0.0, "eyes reopen after the UV pulse")
+	var packed_actor := load("res://assets/generated/w01_tentacles.glb") as PackedScene
+	var core: Node = packed_actor.instantiate()
+	root.add_child(core)
+	_check(W01Materials.soften(core) >= 100, "exported metals are softened for the native renderer")
+	eyes_root.queue_free()
+	core.queue_free()
+
 func _validate_transit() -> void:
 	var transit: CapsuleTransit = CapsuleTransit.new()
 	transit.simulation = false
@@ -715,6 +755,7 @@ func _run() -> void:
 	_validate_operations_panel()
 	_validate_bench_cycle()
 	_validate_w01_perception()
+	_validate_w01_eyes()
 	_validate_transit()
 	_validate_camera()
 	_validate_displays()
