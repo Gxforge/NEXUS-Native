@@ -52,11 +52,21 @@ func _build() -> void:
 		material.emission_enabled = true
 		material.emission_texture = viewport.get_texture()
 		material.emission_energy_multiplier = 1.25
-	var quad := QuadMesh.new()
-	quad.size = screen_size
+	# El plano es el original de la web (`display.glb` 1,0 × 0,5 para fósforo y
+	# `telemetry_screen.glb` 2,36 × 1,33 para la telemetría); se escala hasta el
+	# tamaño pedido para conservar UV y proporción.
+	var original := PropLibrary.screen("display" if kind == "phosphor" else "telemetry_screen")
 	mesh = MeshInstance3D.new()
 	mesh.name = "Face"
-	mesh.mesh = quad
+	if original.is_empty():
+		var quad := QuadMesh.new()
+		quad.size = screen_size
+		mesh.mesh = quad
+	else:
+		mesh.mesh = original["mesh"] as Mesh
+		var native: Vector2 = original["size"]
+		mesh.scale = Vector3(screen_size.x / maxf(native.x, 0.001),
+			screen_size.y / maxf(native.y, 0.001), 1.0)
 	mesh.material_override = material
 	mesh.extra_cull_margin = 1.0
 	add_child(mesh)

@@ -568,8 +568,11 @@ func _validate_displays() -> void:
 	screen.kind = "telemetry"
 	root.add_child(screen)
 	screen._ready()
+	var face: AABB = screen.mesh.mesh.get_aabb()
+	var face_size := Vector2(face.size.x * absf(screen.mesh.scale.x),
+		face.size.y * absf(screen.mesh.scale.y))
 	_check(screen.viewport.size == Vector2i(1024, 576)
-		and (screen.mesh.mesh as QuadMesh).size == Vector2(2.36, 1.328),
+		and face_size.is_equal_approx(Vector2(2.36, 1.328)),
 		"CAM 04 renders 1024x576 onto a 2,36 x 1,328 m quad")
 	_check(screen.push_telemetry(0.0, bus, 90.0, 5.0, "AGGRESSIVE", Vector3.ZERO, "Carga", 1, 0.6),
 		"CAM 04 accepts a live sample")

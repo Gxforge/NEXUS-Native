@@ -18,6 +18,10 @@ func _init() -> void:
 	await _check_cryo()
 	await _check_hub()
 	await _check_road()
+	await _check_ceiling()
+	await _check_lockers()
+	await _check_panels()
+	_check_screens()
 	var passed := failures.is_empty()
 	print(JSON.stringify({"checks": checks, "failures": failures, "passed": passed}))
 	quit(0 if passed else 1)
@@ -132,3 +136,100 @@ func _check_road() -> void:
 			_meshes(vehicle) >= 30)
 	zone.queue_free()
 	await process_frame
+
+
+## Luminarias originales: la web repite 38 veces la misma pieza de techo.
+func _check_ceiling() -> void:
+	var family := PropLibrary.family("laboratory_all_sectors", 4, Vector3(3.2, 0.3, 0.35))
+	_check("Luminaria: pieza original del laboratorio", family != null)
+	if family != null:
+		_check("Luminaria: carcasa, difusor y dos tiras (%d mallas)" % PropLibrary.mesh_count(family),
+			PropLibrary.mesh_count(family) == 4)
+		_check("Luminaria: difusor localizado", PropLibrary.luminaire_diffuser(family) != null)
+	var bank := PropLibrary.luminaires(4)
+	_check("Luminaria: se clona sin compartir nodos", bank.size() == 4 and bank[0] != bank[1])
+	var zones := {
+		"c04": "res://zones/zone_c04_shell.tscn",
+		"a01": "res://zones/zone_a01_shell.tscn",
+		"h01": "res://zones/zone_h01_hydraulics.tscn",
+	}
+	for id in zones:
+		var zone := _load(zones[id])
+		root.add_child(zone)
+		await process_frame
+		var dressing := zone.get_node_or_null("Dressing")
+		var lamps: Array[Node] = []
+		if dressing != null:
+			for child in dressing.get_children():
+				if String(child.name).begins_with("Luminaire"):
+					lamps.append(child)
+		_check("%s: luminarias originales colocadas (%d)" % [id, lamps.size()], lamps.size() >= 2)
+		var with_light := 0
+		var with_meshes := 0
+		for lamp in lamps:
+			if lamp.get_node_or_null("Light") != null:
+				with_light += 1
+			if _meshes(lamp) >= 4:
+				with_meshes += 1
+		_check("%s: cada luminaria lleva su luz (%d/%d)" % [id, with_light, lamps.size()],
+			with_light == lamps.size())
+		_check("%s: cada luminaria mantiene sus cuatro mallas (%d/%d)" % [id, with_meshes, lamps.size()],
+			with_meshes == lamps.size())
+		zone.queue_free()
+		await process_frame
+
+
+## Taquillas originales (nueve puertas por banco) en C–04 y A–01.
+func _check_lockers() -> void:
+	var locker_zones := {"c04": "res://zones/zone_c04_shell.tscn", "a01": "res://zones/zone_a01_shell.tscn"}
+	for id in locker_zones:
+		var zone := _load(String(locker_zones[id]))
+		root.add_child(zone)
+		await process_frame
+		var body := zone.get_node_or_null("Dressing/Lockers")
+		_check("%s: bancos de taquillas originales" % id, body != null)
+		if body != null:
+			_check("%s: dos bancos de nueve puertas" % id, body.get_child_count() == 2)
+			var bank := body.get_child(0)
+			_check("%s: banco con trece mallas (%d)" % [id, _meshes(bank)], _meshes(bank) == 13)
+		zone.queue_free()
+		await process_frame
+
+
+## Panel mural original en electricidad y vigilancia.
+func _check_panels() -> void:
+	var panel_zones := {"electrical": "res://zones/zone_electrical.tscn",
+		"surveillance": "res://zones/zone_surveillance.tscn"}
+	for id in panel_zones:
+		var zone := _load(String(panel_zones[id]))
+		root.add_child(zone)
+		await process_frame
+		var panel := zone.get_node_or_null("Dressing/WallPanel")
+		_check("%s: panel mural original" % id, panel != null and _meshes(panel) == 5)
+		zone.queue_free()
+		await process_frame
+
+
+## Las pantallas usan el plano exportado, no un cuadrilátero generado.
+func _check_screens() -> void:
+	for pair in [["display", "phosphor"], ["telemetry_screen", "telemetry"]]:
+		var original := PropLibrary.screen(String(pair[0]))
+		_check("Pantalla %s: plano original" % String(pair[0]), not original.is_empty())
+		if not original.is_empty():
+			var expected: Vector2 = Vector2(1.0, 0.5) if String(pair[0]) == "display" else Vector2(2.36, 1.33)
+			var size: Vector2 = original["size"]
+			_check("Pantalla %s: %.2f × %.2f m" % [String(pair[0]), size.x, size.y],
+				absf(size.x - expected.x) < 0.02 and absf(size.y - expected.y) < 0.02)
+		var screen := WallScreen.new()
+		screen.kind = String(pair[1])
+		root.add_child(screen)
+		await process_frame
+		var face := screen.get_node_or_null("Face") as MeshInstance3D
+		_check("Pantalla %s: cara con el plano original" % String(pair[1]),
+			face != null and face.mesh != null and face.mesh.get_surface_count() > 0)
+		if face != null and face.mesh != null:
+			var vertices: PackedVector3Array = face.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+			_check("Pantalla %s: plano de cuatro vértices (%d)" % [String(pair[1]), vertices.size()],
+				vertices.size() == 4)
+		screen.queue_free()
+		await process_frame

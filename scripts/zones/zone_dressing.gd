@@ -14,6 +14,9 @@ extends Node3D
 ## las paredes ni atravesando el techo.
 
 @export var zone_id: StringName = &"c04"
+## Materiales de difusor por tinta y contador de luminarias (ver `_luminaire()`).
+var _lum_index := 0
+var _lum_panels := {}
 
 var built_meshes := 0
 var pods: Array[Node3D] = []
@@ -202,23 +205,90 @@ func _ceiling_lights(tint: Color, spacing := 9.0, inset := 1.1) -> void:
 	var r := room()
 	var y: float = ceiling() - inset
 	var along_x: bool = (r[1] - r[0]) >= (r[3] - r[2])
-	var index := 0
 	if along_x:
 		var z: float = (r[2] + r[3]) * 0.5
 		var x: float = r[0] + 5.0
 		while x <= r[1] - 4.0:
-			var lamp := BuildKit.luminaire(self, x, y, z, 3.2, tint)
-			lamp.name = "Luminaire%d" % index
-			index += 1
+			_luminaire(Vector3(x, y, z), false, tint)
 			x += spacing
 	else:
 		var x: float = (r[0] + r[1]) * 0.5
 		var z: float = r[2] + 5.0
 		while z <= r[3] - 4.0:
-			var lamp := BuildKit.luminaire(self, x, y, z, 3.2, tint)
-			lamp.name = "Luminaire%d" % index
-			index += 1
+			_luminaire(Vector3(x, y, z), true, tint)
 			z += spacing
+
+
+## Coloca la siguiente luminaria original de `laboratory_all_sectors.glb`.
+## La web repite 38 veces la misma pieza (carcasa, difusor y dos tiras); aquí se
+## clonan las que hagan falta y se tinta el difusor por zona.
+func _luminaire(spot: Vector3, along_z: bool, tint: Color) -> Node3D:
+	var lamp: Node3D = PropLibrary.luminaire()
+	if lamp != null:
+		lamp.position = spot
+		lamp.rotation.y = PI * 0.5 if along_z else 0.0
+		var diffuser := PropLibrary.luminaire_diffuser(lamp)
+		if diffuser != null:
+			diffuser.material_override = _panel_material(tint)
+		add_child(lamp)
+	else:
+		lamp = BuildKit.luminaire(self, spot.x, spot.y, spot.z, 3.2, tint, false)
+	lamp.name = "Luminaire%d" % _lum_index
+	var light := OmniLight3D.new()
+	light.name = "Light"
+	light.light_color = tint
+	light.light_energy = 3.6
+	light.omni_range = 9.0
+	light.position = Vector3(0.0, -0.5, 0.0)
+	light.shadow_enabled = false
+	lamp.add_child(light)
+	_lum_index += 1
+	return lamp
+
+
+## Material del difusor por tinta (compartido entre las luminarias de la zona).
+func _panel_material(tint: Color) -> StandardMaterial3D:
+	var key := tint.to_html(false)
+	if _lum_panels.has(key):
+		return _lum_panels[key] as StandardMaterial3D
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color("9dd4dd")
+	material.emission_enabled = true
+	material.emission = tint
+	material.emission_energy_multiplier = 1.35
+	material.roughness = 0.45
+	_lum_panels[key] = material
+	return material
+
+
+## Taquillas originales del laboratorio (nueve puertas por banco).
+## `count` es cuántos bancos se colocan a lo largo del muro.
+func _lockers(count: int, origin: Vector3, along_x := true, yaw := 0.0) -> void:
+	var body := Node3D.new()
+	body.name = "Lockers"
+	add_child(body)
+	for index in count:
+		var bank: Node3D = PropLibrary.locker()
+		if bank == null:
+			break
+		var offset: float = float(index) * 3.4
+		bank.position = origin + (Vector3(offset, 0.0, 0.0) if along_x else Vector3(0.0, 0.0, offset))
+		bank.position.y = 1.61
+		bank.rotation.y = yaw
+		bank.name = "Lockers%d" % (index + 1)
+		body.add_child(bank)
+
+
+## Panel mural original (2,88 × 3,84 m) contra un muro.
+func _wall_panel(spot: Vector3, yaw := 0.0) -> Node3D:
+	var panel: Node3D = PropLibrary.wall_panel_node()
+	if panel == null:
+		return null
+	panel.position = spot
+	panel.rotation.y = yaw
+	panel.name = "WallPanel"
+	add_child(panel)
+	return panel
 
 
 # --------------------------------------------------------------------------- #
@@ -434,6 +504,8 @@ func _build_electrical() -> void:
 	BuildKit.cabinet(self, 40.0, 82.4, PI, 3.0, 2.6, 1.1, 3, "Switchboard")
 	BuildKit.plaque(self, "ELECTRICIDAD", "BARRA PRINCIPAL   /   BALANCE", 9.0, 1.5,
 		35.5, 7.4, 58.7, 0.0)
+	# Panel mural original (2,88 × 3,84 m) a la entrada del cuadro.
+	_wall_panel(Vector3(30.0, 0.0, 59.6))
 	_ceiling_lights(BuildKit.WARM)
 
 
@@ -487,6 +559,8 @@ func _build_surveillance() -> void:
 			0.0, 0.62, -0.34, 0.5, 0.04, 0.02)
 	BuildKit.plaque(self, "VIGILANCIA", "CCTV   /   LAB 09", 6.6, 1.4,
 		-17.6, 7.2, 83.2, PI)
+	# Panel mural original en el muro de la sala de vigilancia.
+	_wall_panel(Vector3(-24.0, 0.0, 67.4))
 	_ceiling_lights(Color("#bfe0e6"), 8.0)
 
 
@@ -695,8 +769,7 @@ func _build_c04() -> void:
 		var light_z: float = 6.0 + float(row) * 28.0
 		var light_x: float = -22.0
 		while light_x <= 42.0:
-			BuildKit.luminaire(self, light_x, ceiling() - 1.1, light_z, 3.2,
-				Color("#cfe9f2"))
+			_luminaire(Vector3(light_x, ceiling() - 1.1, light_z), false, Color("#cfe9f2"))
 			light_x += 12.0
 	# Utillaje y bidones arrimados a los muros para romper el vacío del suelo.
 	for index in 6:
@@ -711,6 +784,8 @@ func _build_c04() -> void:
 			46.0 + float(index) * 2.4, 1.4, 1.0, 1.4)
 		BuildKit.block(self, BuildKit.emissive(BuildKit.AMBER, 0.7), 2.0 + side * 24.0,
 			1.02, 46.0 + float(index) * 2.4, 1.2, 0.04, 0.06)
+	# Taquillas originales del laboratorio (nueve puertas por banco).
+	_lockers(2, Vector3(-19.0, 0.0, 2.4))
 	_ceiling_lights(Color("#cfe9f2"), 12.0)
 
 
@@ -897,6 +972,8 @@ func _build_a01() -> void:
 		2.0, 5.6, -23.0, 0.0)
 	BuildKit.plaque(self, "MUELLE", "A–01   /   CARGA DE EQUIPO", 6.4, 1.3,
 		-26.6, 4.6, -12.0, PI * 0.5)
+	# Taquillas del vestuario original junto al muro norte.
+	_lockers(2, Vector3(-22.0, 0.0, -22.4))
 	_ceiling_lights(BuildKit.WARM)
 
 

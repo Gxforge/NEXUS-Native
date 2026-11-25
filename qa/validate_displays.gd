@@ -16,6 +16,15 @@ func _init() -> void:
 	quit(1 if failures > 0 else 0)
 
 
+## Tamaño real de la cara de la pantalla: el plano es el original exportado
+## (`telemetry_screen.glb` 2,36 × 1,33 y `display.glb` 1,0 × 0,5) escalado.
+func _face_size(screen: WallScreen) -> Vector2:
+	if screen.mesh == null or screen.mesh.mesh == null:
+		return Vector2.ZERO
+	var box: AABB = screen.mesh.mesh.get_aabb()
+	return Vector2(box.size.x * absf(screen.mesh.scale.x), box.size.y * absf(screen.mesh.scale.y))
+
+
 func check(label: String, condition: bool, extra := "") -> void:
 	checks += 1
 	if not condition:
@@ -170,7 +179,7 @@ func _screen_nodes() -> void:
 		str(screen.viewport.size))
 	check("la superficie está dentro de la ventana", screen.surface.get_parent() == screen.viewport)
 	check("plano de 2,36 × 1,328 m",
-		(screen.mesh.mesh as QuadMesh).size == Vector2(2.36, 1.328))
+		_face_size(screen).is_equal_approx(Vector2(2.36, 1.328)))
 	check("material sin sombreado",
 		screen.material.shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED)
 	check("textura de la ventana", screen.material.albedo_texture != null)
@@ -192,7 +201,7 @@ func _screen_nodes() -> void:
 		phosphor.viewport.size == Vector2i(PhosphorDisplay.WIDTH, PhosphorDisplay.HEIGHT),
 		str(phosphor.viewport.size))
 	check("plano pequeño de 0,9 × 0,45 m",
-		(phosphor.mesh.mesh as QuadMesh).size == Vector2(0.9, 0.45))
+		_face_size(phosphor).is_equal_approx(Vector2(0.9, 0.45)))
 	check("pinta el panel", phosphor.push_phosphor("RED · E-07", "68 kW", "este", 0.61))
 	check("la telemetría no pinta en el panel",
 		not phosphor.push_telemetry(0.0, grid(), 1.0, 1.0, "", Vector3.ZERO, "", 0, 0.0))

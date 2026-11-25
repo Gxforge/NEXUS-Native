@@ -55,8 +55,9 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 
 - **Portado con pruebas:** IA y percepción de W-01, red eléctrica, cuadro eléctrico + CCTV, bóveda V-03 (lógica), archivo D-02, bancos de carga y analizador, encuesta/raycast, contactos, caché de zonas, compuertas, streaming y persistencia de partida.
 - **Parcial:** W-01 (dinámica de tentáculos y agarre), sectores/mobiliario, HUD, mapa, materiales.
+- Desde la fase 32 el techo de las doce zonas, las taquillas, los paneles murales y las pantallas son piezas originales de `laboratory_all_sectors.glb`, `display.glb` y `telemetry_screen.glb`.
 - **Sin empezar:** modelo/cabina/audio del coche, `Visibility.ts`, `Touch.ts` en dispositivo real, audio y distribución.
-- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **67 %**; el resto son sistemas por migrar.
+- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **69 %**; el resto son sistemas por migrar.
 
 ## 3. Hoja de ruta propuesta
 

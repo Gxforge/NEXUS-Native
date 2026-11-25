@@ -124,6 +124,11 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `scripts/world/first_person_rig.gd` (nuevo) + `_reach()` en `player.gd` (interactuar, escanear, disparar y señuelo).
 - `qa/validate_first_person.gd` (36 checks) y `qa/capture_first_person.tscn` con tres tomas en C–04. Total **2073 checks**, 0 fallos. Detalle en `PHASE_31_FIRST_PERSON_KIT.md`.
 
+## Fase 32 · Luminarias, taquillas, paneles y pantallas originales
+- `laboratory_all_sectors.glb` se usa por familia (forma + número de mallas, porque todos los grupos se llaman `Node`): la luminaria de techo de 38 piezas sustituye la barra procedural en las doce zonas, más taquillas de nueve puertas en C–04 y A–01 y panel mural en electricidad y vigilancia.
+- `WallScreen` monta el plano original (`display.glb` 1,00 × 0,50 y `telemetry_screen.glb` 2,36 × 1,33).
+- Arreglado el consumo de memoria del lote grande (mataba el proceso en la octava zona) y las referencias a nodos liberados en `PropLibrary`. `validate_original_models` 19 → 42 checks. Total **2096 checks**, 0 fallos. Detalle en `PHASE_32_CEILING_AND_SCREENS.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.
