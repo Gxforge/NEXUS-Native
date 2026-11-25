@@ -499,6 +499,39 @@ func _validate_w01_jaw() -> void:
 	jaw.pin(-1.0)
 	core.queue_free()
 
+func _validate_breath_audio() -> void:
+	var noise := W01Breath.noise_stream()
+	_check(noise.data.size() / 2 == int(W01Breath.NOISE_SECONDS * W01Breath.NOISE_RATE),
+		"breath noise is two seconds at the web rate")
+	var rotor := W01Breath.rotor_stream()
+	_check(rotor.data.size() / 2 == 100 * (W01Breath.ROTOR_RATE / 88),
+		"rotor loop holds 100 whole cycles of the 88 Hz triangle")
+	var breath := W01Breath.new()
+	root.add_child(breath)
+	_check(AudioServer.get_bus_index(W01Breath.AIR_BUS) != -1 and breath.bus_filter() != null,
+		"breath air bus carries its band-pass filter")
+	breath.active = true
+	breath.phase = 0.0
+	breath.update(0.1, 1.0)
+	_check(is_equal_approx(breath.phase, 0.455), "fatigue drives the 1,65 + 2,9 rad/s rhythm")
+	breath.phase = PI * 1.5
+	breath.update(0.0, 1.0)
+	_check(absf(breath.air_gain - 0.70) < 0.01 and breath.air_cutoff < 620.0,
+		"exhaling peaks the 0,70 gain on the 540 Hz band")
+	breath.phase = PI * 0.5
+	breath.update(0.0, 1.0)
+	_check(breath.air_cutoff > 900.0, "inhaling opens the band-pass to 920 Hz")
+	for _step in 140:
+		breath.machine(1.0, 1.0)
+	_check(absf(breath.hum_gain - 0.105) < 0.006 and absf(breath.hum_hz - 120.0) < 1.0,
+		"a loaded, nearby feed hums at 0,105 and 120 Hz")
+	_check(W01Breath.feeds_near(Vector3(22.7, 1.7, 67.4)) > 0.99
+		and W01Breath.feeds_near(Vector3(22.7, 1.7, 160.0)) < 0.01,
+		"feed proximity follows the Power.ts falloff")
+	breath.quiet()
+	_check(breath.air_gain == 0.0 and breath.hum_gain == 0.0, "menu silence mutes both voices")
+	breath.queue_free()
+
 func _validate_transit() -> void:
 	var transit: CapsuleTransit = CapsuleTransit.new()
 	transit.simulation = false
@@ -784,6 +817,7 @@ func _run() -> void:
 	_validate_w01_perception()
 	_validate_w01_eyes()
 	_validate_w01_jaw()
+	_validate_breath_audio()
 	_validate_transit()
 	_validate_camera()
 	_validate_displays()

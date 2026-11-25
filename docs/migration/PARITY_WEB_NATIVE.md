@@ -31,7 +31,7 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 | `vehicle/VehiclePhysics.ts` | 263 | `scripts/systems/vehicle_physics.gd` | ✅ | Mismo contrato numérico (masa 1260, 4100 N de motor, punta 49, turbo −24/s, integridad por impacto, marchas 1–6, paso fijo 1/120 s) con integrador propio en vez de cannon-es; incluido en los 154 checks. |
 | `vehicle/*` (otros 4 archivos, 659 líneas) | 659 | — | ❌ | Modelo del coche, audio, cabina y perspectivas. |
 | `Monster.ts` + `MonsterAI.ts` + `Attention.ts` + `FieldSense.ts` | 438 | `monster_ai.gd` + `monster_attention.gd` + `field_memory.gd` + `w01_actor.gd` | ✅ | Estados, agresividad, ataque y recarga, cono de visión, audición por pasos, memoria de 5,4 s, intenciones, patrulla, señuelo, repliegue y malla de contención con memoria por sector; 66 checks. Faltan agarre/daño y la colisión física de la malla. |
-| `Tentacles.ts` + `Breath.ts` + `Larva.ts` | 704 | GLB de tentáculos | 🟡 | Los 20 tentáculos se ven, pero no hay dinámica por segmentos, agarre ni larvas con comportamiento. |
+| `Tentacles.ts` + `Breath.ts` + `Larva.ts` | 704 | `scripts/systems/breath_audio.gd` + GLB de tentáculos | 🟡 | `Breath` completo: aire sintetizado (ruido `0,76/0,24` con filtro de un polo) por un paso banda que salta entre 540 y 920 Hz con `Q` 0,64, ganancia `(0,14 + 0,56·max(0,−sin))·fatiga·|sin|` a 1,65 + 2,9·fatiga rad/s, y zumbido triangular de 88 + 32·carga Hz con la caída `1/(1 + 0,17·d²)` de las cuatro acometidas. Falta el resto: dinámica por segmentos y agarre de los 20 tentáculos, y las larvas con comportamiento. |
 | `EyeSystem.ts` + `OcularSurface.ts` + `Head.ts` | 449 | `scripts/entities/w01_eyes.gd`, `scripts/entities/w01_jaw.gd` | 🟢 | `EyeSystem`: siete ojos con seguimiento (yaw 0,29 / 0,16 · pitch 0,18 / 0,12), pupila `0,88 + 0,17·sin(t·0,77 + fase) − agresión·0,12` acotada a 0,64–1,08, escala de reposo y cierre por pulso UV (1,1 s). `OcularSurface`: los catorce párpados se reconstruyen con la rejilla 33 × 8 (reposo 0,94 / −1,1; cierre −0,19 ∓ 0,02) y parpadeo de 0,2 s cada 2,2–5,6 s. `Head`: cáscara, encía y garganta del `.glb` con su *blend shape* de apertura amortiguada a 16 s⁻¹ y los 26 dientes desplazados entre el ancla de reposo y la abierta (`0,34·sin a`). Falta la ondulación de la cáscara ligada al grito y el peso de grito que la mueve (`Breath.ts`). |
 | `Survey.ts` | 168 | `scripts/interaction/survey_system.gd` + `survey_highlight.gd` | ✅ | Raycast, resaltado, registro y bitácora persistente. Falta el contenido de expedientes completo (depende de `Files.ts`). |
 | `Contacts.ts` | 176 | `contact_query_3d.gd` + `contact_fx_3d.gd` | ✅ | Consultas y VFX de contacto con el sujeto. |
@@ -57,7 +57,7 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 - **Parcial:** W-01 (dinámica de tentáculos y agarre), sectores/mobiliario, HUD, mapa, materiales.
 - Desde la fase 32 el techo de las doce zonas, las taquillas, los paneles murales y las pantallas son piezas originales de `laboratory_all_sectors.glb`, `display.glb` y `telemetry_screen.glb`.
 - **Sin empezar:** modelo/cabina/audio del coche, `Visibility.ts`, `Touch.ts` en dispositivo real, audio y distribución.
-- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **73 %**; el resto son sistemas por migrar.
+- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **75 %**; el resto son sistemas por migrar.
 
 ## 3. Hoja de ruta propuesta
 
