@@ -134,6 +134,10 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `scripts/entities/w01_materials.gd`: suavizado de los `metallic = 1,0` del exportador; `main.tscn` gana cielo procedural con `reflected_light_source = SKY` para que el metal tenga qué reflejar.
 - `qa/validate_w01_eyes.gd` (18 checks) + bloque en `run_suite` (7). Total **343 checks**, 0 fallos. Capturas `reports/eyes-*.png`, hoja `phase33-eyes.png`, `w01-c04-first-look.png` y las diez zonas. Detalle en `PHASE_33_EYES_AND_METALS.md`.
 
+## Fase 34 · Mandíbula y dentadura de W–01
+- `scripts/entities/w01_jaw.gd`: port de `Head.ts` sobre `w01_core.glb`; los 26 dientes se mueven entre el ancla de reposo y la abierta (`0,34·sin a`) y la apertura se amortigua a 16 s⁻¹ antes de entrar en el *blend shape* de `Head`/`Gum`/`Throat`.
+- `w01_actor.gd`: `jaw` en `_ready` y `_set_mouth(jaw.update(...))`. `qa/validate_w01_jaw.gd` (9 checks) y bloque de 6 en `run_suite`. Total **349 checks**, 0 fallos. Captura `reports/w01-maw.png`. Detalle en `PHASE_34_JAW.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.

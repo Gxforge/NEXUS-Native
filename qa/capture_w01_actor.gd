@@ -47,7 +47,20 @@ func _process(_delta: float) -> void:
 			var image := get_viewport().get_texture().get_image()
 			var error := image.save_png("res://reports/w01-c04-first-look.png")
 			print("CAPTURE res://reports/w01-c04-first-look.png -> %s" % ("ok" if error == OK else str(error)))
+			# Segunda toma: el morro abierto del todo (`Head.ts`), con la
+			# dentadura bajada al ancla abierta.
+			var w01 := get_tree().get_first_node_in_group(&"w01_actor")
+			if w01 != null and w01.get("jaw") != null:
+				(w01.get("jaw") as W01Jaw).pin(1.0)
 			phase = 3
+			frames = 0
+		3:
+			if frames < 20:
+				return
+			var mouth := get_viewport().get_texture().get_image()
+			var mouth_error := mouth.save_png("res://reports/w01-maw.png")
+			print("CAPTURE res://reports/w01-maw.png -> %s" % ("ok" if mouth_error == OK else str(mouth_error)))
+			phase = 4
 			frames = 0
 		_:
 			if frames > 4:

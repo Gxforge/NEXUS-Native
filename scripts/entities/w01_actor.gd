@@ -29,6 +29,8 @@ var _throat: MeshInstance3D
 var _eye_roots: Array[Node3D] = []
 ## Ojos animados (parpadeo, pupila y seguimiento) sobre el `.glb` original.
 var eyes: W01Eyes
+## Mandíbula y dentadura (`Head.ts`).
+var jaw: W01Jaw
 var _arms: Array[Node3D] = []
 var _effect_light: OmniLight3D
 var _game_state: GameState
@@ -53,6 +55,10 @@ func _ready() -> void:
 	eyes.name = "EyeSystem"
 	add_child(eyes)
 	eyes.attach(eyes_root)
+	jaw = W01Jaw.new()
+	jaw.name = "Jaw"
+	add_child(jaw)
+	jaw.attach(get_node("Core/W01_Core"))
 	# Los `.glb` traen `metallic = 1.0` en tentáculos y párpados: sin mapa de
 	# entorno (la web sí lo tenía) se veían negros.
 	W01Materials.soften(self)
@@ -104,6 +110,8 @@ func _process(delta: float) -> void:
 		opening = 0.08 + _attack_drive() * 0.42
 	if _uv_flash > 0.0:
 		opening = minf(opening, 0.12)
+	if jaw != null:
+		opening = jaw.update(delta, opening)
 	_set_mouth(opening)
 	_update_eyes(delta)
 	for index: int in _arms.size():

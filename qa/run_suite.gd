@@ -472,6 +472,33 @@ func _validate_w01_eyes() -> void:
 	eyes_root.queue_free()
 	core.queue_free()
 
+func _validate_w01_jaw() -> void:
+	var packed_core := load("res://assets/generated/w01_core.glb") as PackedScene
+	_check(packed_core != null, "w01_core.glb loads")
+	if packed_core == null:
+		return
+	var core: Node3D = packed_core.instantiate()
+	root.add_child(core)
+	var jaw := W01Jaw.new()
+	core.add_child(jaw)
+	jaw.attach(core)
+	_check(jaw.tooth_count() == 26, "W-01 mounts the 26 exported teeth")
+	var arcs := 0
+	for index in jaw.tooth_count():
+		if absf(jaw.travel(index)) > 0.05:
+			arcs += 1
+	_check(arcs >= 18, "the two dental arcs get an open anchor")
+	jaw.update(0.016, 1.0)
+	_check(jaw.drive > 0.0 and jaw.drive < 0.4, "the maw dampens its opening at 16 per second")
+	for _frame in 40:
+		jaw.update(0.016, 1.0)
+	_check(jaw.drive > 0.98, "the maw reaches the requested opening")
+	jaw.pin(1.0)
+	jaw.update(0.0, 0.0)
+	_check(is_equal_approx(jaw.drive, 1.0), "QA can pin the maw for captures")
+	jaw.pin(-1.0)
+	core.queue_free()
+
 func _validate_transit() -> void:
 	var transit: CapsuleTransit = CapsuleTransit.new()
 	transit.simulation = false
@@ -756,6 +783,7 @@ func _run() -> void:
 	_validate_bench_cycle()
 	_validate_w01_perception()
 	_validate_w01_eyes()
+	_validate_w01_jaw()
 	_validate_transit()
 	_validate_camera()
 	_validate_displays()
