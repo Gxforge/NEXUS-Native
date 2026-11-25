@@ -143,6 +143,10 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - Enganchado en `SceneExperienceController._process`: fatiga `1 − stamina/100` en primera persona y cercanía a las cuatro acometidas del pasillo eléctrico, con las acometidas caídas en silencio.
 - `qa/validate_breath_audio.gd` (21 checks) + bloque de 9 en `run_suite`. Total **358 checks**, 0 fallos. Curvas en `reports/phase35-breath.png` (+ CSV). Detalle en `PHASE_35_BREATH_AUDIO.md`.
 
+## Fase 36 · Veinte brazos (`Tentacles.ts`)
+- `scripts/entities/w01_arms.gd`: contrato de movimiento de `Tentacles.ts` sobre los veinte brazos y las 87 ventosas del exportador — fases, estiramiento, giro al operador, alcance de los brazos 2 y 3, `scout`, latigazo del pulso UV y recorte contra suelo y malla de contención.
+- `w01_actor.gd`: `arms` en `_ready`, `_update_arms()` en `_process`, `_lash_arms()` en `apply_uv()` y `arms_pin` para capturas. `qa/validate_w01_arms.gd` (19 checks) + bloque de 8 en `run_suite`. Total **366 checks**, 0 fallos. Captura `reports/w01-arms.png`. Detalle en `PHASE_36_ARMS.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.

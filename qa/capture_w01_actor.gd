@@ -7,6 +7,7 @@ var frames := 0
 var phase := 0
 var manager: ZoneManager
 var player: NexusPlayer
+var w01: Node
 
 
 func _ready() -> void:
@@ -27,6 +28,7 @@ func _process(_delta: float) -> void:
 			manager = main.get_node("ZoneManager") as ZoneManager
 			player = main.get_node("PersistentWorld/Player") as NexusPlayer
 			player.set_controls_enabled(false)
+			print("CAPTURE phase 0 -> start_game done")
 			phase = 1
 			frames = 0
 		1:
@@ -39,6 +41,7 @@ func _process(_delta: float) -> void:
 			camera.rotation = Vector3.ZERO
 			camera.global_position = Vector3(0.0, 2.4, 31.0)
 			camera.look_at(Vector3(0.0, 2.8, 22.0), Vector3.UP)
+			print("CAPTURE zone idle, camera placed")
 			phase = 2
 			frames = 0
 		2:
@@ -49,7 +52,7 @@ func _process(_delta: float) -> void:
 			print("CAPTURE res://reports/w01-c04-first-look.png -> %s" % ("ok" if error == OK else str(error)))
 			# Segunda toma: el morro abierto del todo (`Head.ts`), con la
 			# dentadura bajada al ancla abierta.
-			var w01 := get_tree().get_first_node_in_group(&"w01_actor")
+			w01 = get_tree().get_first_node_in_group(&"w01_actor")
 			if w01 != null and w01.get("jaw") != null:
 				(w01.get("jaw") as W01Jaw).pin(1.0)
 			phase = 3
@@ -60,7 +63,27 @@ func _process(_delta: float) -> void:
 			var mouth := get_viewport().get_texture().get_image()
 			var mouth_error := mouth.save_png("res://reports/w01-maw.png")
 			print("CAPTURE res://reports/w01-maw.png -> %s" % ("ok" if mouth_error == OK else str(mouth_error)))
+			if w01 != null:
+				w01.set("arms_pin", "strike")
+			# Vista de tres cuartos para que se vea el alcance de los brazos. La
+			# orientación va por el jugador: la cámara la reescribe cada frame.
+			var spot := Vector3(6.6, 1.28, 27.6)
+			player.global_position = spot
+			player.velocity = Vector3.ZERO
+			var direction := Vector3(0.0, 2.9, 22.0) - (spot + Vector3(0.0, 1.72, 0.0))
+			var flat := Vector2(direction.x, direction.z).length()
+			player.rotation.y = atan2(-direction.x, -direction.z)
+			player.set("_pitch", atan2(direction.y, flat))
+			(player.get_node("Camera3D") as Camera3D).rotation.x = float(player.get("_pitch"))
 			phase = 4
+			frames = 0
+		4:
+			if frames < 24:
+				return
+			var arms_image := get_viewport().get_texture().get_image()
+			var arms_error := arms_image.save_png("res://reports/w01-arms.png")
+			print("CAPTURE res://reports/w01-arms.png -> %s" % ("ok" if arms_error == OK else str(arms_error)))
+			phase = 5
 			frames = 0
 		_:
 			if frames > 4:

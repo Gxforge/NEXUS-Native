@@ -31,6 +31,10 @@ var _eye_roots: Array[Node3D] = []
 var eyes: W01Eyes
 ## Mandíbula y dentadura (`Head.ts`).
 var jaw: W01Jaw
+## Veinte brazos animados (`Tentacles.ts`).
+var arms: W01Arms
+## Fija la pose de los brazos para capturas (`""`, `"strike"`, `"probe"`).
+var arms_pin := ""
 var _arms: Array[Node3D] = []
 var _effect_light: OmniLight3D
 var _game_state: GameState
@@ -66,6 +70,10 @@ func _ready() -> void:
 	for child: Node in arms_root.get_children():
 		if child is Node3D and child.name.begins_with("arm-"):
 			_arms.append(child as Node3D)
+	arms = W01Arms.new()
+	arms.name = "Arms"
+	add_child(arms)
+	arms.attach(arms_root as Node3D)
 	_game_state = get_tree().get_first_node_in_group(&"game_state") as GameState
 	if _game_state != null and str(_game_state.watcher_state.get("zone", "c04")) == "c04":
 		state = str(_game_state.watcher_state.get("state", state))
@@ -114,11 +122,7 @@ func _process(delta: float) -> void:
 		opening = jaw.update(delta, opening)
 	_set_mouth(opening)
 	_update_eyes(delta)
-	for index: int in _arms.size():
-		var arm := _arms[index]
-		var strike := _attack_drive() if state == "ATTACK" else 0.0
-		arm.rotation.z = sin(_time * (0.56 + float(index % 4) * 0.11) + index * 1.23) * (0.045 + aggression * 0.035) + (0.18 * strike if index % 2 == 0 else -0.18 * strike)
-		arm.rotation.y = cos(_time * 0.41 + index * 0.73) * 0.035
+	_update_arms(delta)
 	if _effect_light != null:
 		_effect_light.visible = _uv_flash > 0.0 or _cold_remaining > 0.0
 		_effect_light.light_color = Color(0.78, 0.58, 1.0) if _uv_flash > 0.0 else Color(0.38, 0.9, 1.0)
@@ -144,6 +148,7 @@ func apply_uv() -> void:
 	_uv_flash = 1.1
 	if eyes != null:
 		eyes.flash()
+	_lash_arms()
 	_cold_remaining = 0.0
 	ai.recover()
 	_sync_from_ai()
@@ -200,6 +205,30 @@ func _update_behavior(delta: float) -> void:
 
 	if old_state != state or old_intent != intent:
 		behavior_changed.emit(state, aggression, intent)
+
+## Brazos: `Tentacles.ts` con los pesos de la web.
+func _update_arms(delta: float) -> void:
+	if arms == null:
+		return
+	var target := get_node_or_null(look_target_path) as Node3D
+	if target == null:
+		return
+	var player_position := target.global_position
+	var drive := _attack_drive() if state == "ATTACK" else 0.0
+	if arms_pin == "strike":
+		drive = 1.0
+	if arms_pin == "probe":
+		arms.probing = true
+	arms.strike = minf(1.0, drive * 1.45) if (state == "ATTACK" or arms_pin == "strike") and grabbing == false else 0.0
+	arms.grab = 1.0 if grabbing else 0.0
+	arms.lure = _lure_remaining > 0.0
+	arms.probing = intent.contains("malla") or intent.contains("Investiga")
+	arms.update(_time, delta, player_position, aggression, drive)
+
+## El pulso UV sacude también los brazos.
+func _lash_arms() -> void:
+	if arms != null:
+		arms.lash_all(1.0)
 
 func _attack_drive() -> float:
 	return ai.attack_drive()

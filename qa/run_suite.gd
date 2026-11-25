@@ -499,6 +499,48 @@ func _validate_w01_jaw() -> void:
 	jaw.pin(-1.0)
 	core.queue_free()
 
+func _validate_w01_arms() -> void:
+	var packed_arms := load("res://assets/generated/w01_tentacles.glb") as PackedScene
+	_check(packed_arms != null, "w01_tentacles.glb loads")
+	if packed_arms == null:
+		return
+	var scene: Node3D = packed_arms.instantiate()
+	root.add_child(scene)
+	scene.position = Vector3(0.0, 0.0, 22.0)
+	var arms := W01Arms.new()
+	root.add_child(arms)
+	arms.attach(scene.get_child(0))
+	_check(arms.arm_count() == 20 and arms.sucker_count() == 87,
+		"W-01 mounts twenty arms with eighty-seven suckers")
+	var player := Vector3(0.0, 1.7, 28.0)
+	arms.update(0.0, 0.0, player, 0.0, 0.0)
+	var calm: Vector3 = (arms.arms[0]["node"] as Node3D).scale
+	arms.update(0.0, 0.0, player, 1.0, 1.0)
+	var stretched: Vector3 = (arms.arms[0]["node"] as Node3D).scale
+	var axis := int(arms.arms[0]["axis"])
+	_check(is_equal_approx(stretched[axis] / calm[axis], 1.0 + W01Arms.EXTENSION_AGGRESSION + W01Arms.EXTENSION_ATTACK),
+		"aggression and attack stretch the arm on its own axis")
+	arms.update(0.0, 0.0, player, 0.3, 0.0)
+	var idle_tip := arms.tip_of(2)
+	arms.strike = 1.0
+	arms.update(0.0, 0.0, player, 0.3, 1.0)
+	_check(arms.tip_of(2).distance_to(player) < idle_tip.distance_to(player) - 0.5,
+		"arm two lunges at the operator when striking")
+	_check(arms.touches(arms.tip_of(2)), "the strike arm reports a touch on its tip")
+	arms.strike = 0.0
+	var lowest := INF
+	for index in arms.arm_count():
+		lowest = minf(lowest, arms.tip_of(index).y)
+	_check(lowest >= W01Arms.FLOOR_MARGIN - 0.01, "no arm tip goes through the floor")
+	arms.lash_all(1.0)
+	var shudder := (arms.arms[10]["node"] as Node3D).transform.basis.get_euler()
+	arms.update(0.05, 0.05, player, 0.0, 0.0)
+	_check((((arms.arms[10]["node"] as Node3D).transform.basis.get_euler()) - shudder).length() > 0.02,
+		"the UV pulse lashes the arms")
+	_check(arms.outer_reach(0.0, 22.0) > 2.1, "outer reach reports the arm span")
+	scene.queue_free()
+	arms.queue_free()
+
 func _validate_breath_audio() -> void:
 	var noise := W01Breath.noise_stream()
 	_check(noise.data.size() / 2 == int(W01Breath.NOISE_SECONDS * W01Breath.NOISE_RATE),
@@ -817,6 +859,7 @@ func _run() -> void:
 	_validate_w01_perception()
 	_validate_w01_eyes()
 	_validate_w01_jaw()
+	_validate_w01_arms()
 	_validate_breath_audio()
 	_validate_transit()
 	_validate_camera()

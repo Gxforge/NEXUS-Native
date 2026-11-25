@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bd64udjssgyqf"
+
+[deps]
+
+files=["res://reports/phase35-breath.fatiga.translation", "res://reports/phase35-breath.ganancia.translation", "res://reports/phase35-breath.corte.translation", "res://reports/phase35-breath.ganancia.translation", "res://reports/phase35-breath.hz.translation"]
+
+source_file="res://reports/phase35-breath.csv"
+dest_files=["res://reports/phase35-breath.fatiga.translation", "res://reports/phase35-breath.ganancia.translation", "res://reports/phase35-breath.corte.translation", "res://reports/phase35-breath.ganancia.translation", "res://reports/phase35-breath.hz.translation"]
+
+[params]
+
+compress=true
+delimiter=0
