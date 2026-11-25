@@ -253,3 +253,15 @@ static func locker() -> Node3D:
 static func wall_panel_node() -> Node3D:
 	var template := family("laboratory_all_sectors", 5, Vector3(2.9, 3.8, 0.2))
 	return template.duplicate() as Node3D if template != null else null
+
+
+## Coche de vía (`vehicle.glb`): cuerpo y cuatro ruedas en orden de exportación.
+##
+## El lote exporta cinco grupos sueltos (el cuerpo `Node2` y las ruedas `Node5` a
+## `Node8`); se devuelven dentro de un contenedor para poder montarlos de una vez.
+static func vehicle() -> Node3D:
+	var container := Node3D.new()
+	container.name = "Vehicle"
+	for node in children_of("vehicle"):
+		container.add_child(node)
+	return container if container.get_child_count() > 0 else null

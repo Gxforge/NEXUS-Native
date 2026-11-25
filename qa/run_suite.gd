@@ -499,6 +499,47 @@ func _validate_w01_jaw() -> void:
 	jaw.pin(-1.0)
 	core.queue_free()
 
+func _validate_vehicle_rig() -> void:
+	var physics := VehiclePhysics.new()
+	physics.reset(-12.0, 109.0, 0.0, true)
+	for i in 600:
+		physics.step(1.0 / 120.0, 0.0, 0.0, false, false)
+	_check(physics.contacts == 4, "el coche se apoya en las cuatro ruedas")
+	_check(absf(float(physics.wheel_state(0)["position"].y) - VehiclePhysics.WHEEL_RADIUS) < 0.02,
+		"la rueda se asienta en el radio")
+	var fast := VehiclePhysics.new()
+	fast.reset(-12.0, 109.0, 0.0, true)
+	for i in 240:
+		fast.step(1.0 / 120.0, 1.0, 0.0, false, false)
+	_check(fast.pitch < -0.005, "al acelerar el morro sube")
+	_check(fast.wheel_suspension[0] > fast.wheel_suspension[2],
+		"las delanteras extienden y las traseras comprimen")
+	var turning := VehiclePhysics.new()
+	turning.reset(-12.0, 109.0, 0.0, true)
+	for i in 300:
+		turning.step(1.0 / 120.0, 1.0, 1.0, false, false)
+	_check(absf(turning.roll) > 0.01, "la carrocería balancea al girar")
+	_check(absf(turning.wheel_steering[0]) > 0.01 and absf(turning.wheel_steering[3]) < 0.0001,
+		"sólo las ruedas delanteras giran")
+	var model := PropLibrary.vehicle()
+	var rig := VehicleRig.new()
+	root.add_child(rig)
+	_check(model != null and rig.attach(model), "el coche de vía se monta de vehicle.glb")
+	_check(rig.wheel_count() == 4 and rig.body != null, "cuerpo y cuatro ruedas")
+	_check(rig.find_children("*", "MeshInstance3D", true, false).size() >= 30,
+		"las mallas del coche entran en el árbol")
+	rig.sync(fast)
+	_check(absf(rig.wheel_y(0) - (VehiclePhysics.COM_Y + VehiclePhysics.WHEEL_OFFSETS[0].y
+		- fast.wheel_suspension[0])) < 0.001, "la suspensión mueve la rueda")
+	_check(absf(rig.rotation.x - fast.pitch) < 0.001 and absf(rig.rotation.y - fast.yaw) < 0.001,
+		"la actitud y el rumbo llegan a la malla")
+	rig.place(Vector3(3.0, 0.0, 20.0), 1.2)
+	_check(absf(rig.position.y - VehiclePhysics.COM_Y) < 0.001
+		and absf(rig.wheel_y(0) - VehicleRig.WHEEL_REST_Y) < 0.001,
+		"aparcado, el coche vuelve a su altura de diseño")
+	rig.queue_free()
+	await process_frame
+
 func _validate_larva() -> void:
 	var packed := load("res://zones/zone_h01_hydraulics.tscn") as PackedScene
 	if packed == null:
@@ -934,6 +975,7 @@ func _run() -> void:
 	_validate_w01_jaw()
 	_validate_loading_progress()
 	await _validate_larva()
+	await _validate_vehicle_rig()
 	_validate_w01_arms()
 	_validate_breath_audio()
 	_validate_transit()

@@ -158,12 +158,18 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `scripts/world/larva_rig.gd` (`LarvaRig`): gesto de los 8/9/10 tentáculos (`0,17·sin(t·1,35 + j·0,83)` y `0,18·cos(t·1,26 + j·1,26)`) y del ojo (`0,11·sin(t·0,8 + vaso)`, `0,055·cos(t·1,07)`), con reset limpio. El pivote del corazón pasa a escala 1,0 y conserva latido, vaivén y giro de `Workshop.Pods`.
 - `qa/validate_larva.gd` (44 checks) y bloque de 8 en `run_suite`. Total **383 checks**, 0 fallos. Captura `reports/ingame-h01.png`. Detalle en `PHASE_38_LARVA.md`.
 
+## Fase 39 · Coche de vía: suspensión y mallas originales
+- `scripts/world/vehicle_rig.gd` (`VehicleRig`): cuerpo y cuatro ruedas de `vehicle.glb` colocados en `(±0,87, 0,355, ±1,38)` y sincronizados con la física (`rotation = (pitch, yaw, roll)`, rueda `y = comY + 0,14 − suspensión`). `PropLibrary.vehicle()` devuelve los cinco grupos en orden de exportación.
+- `VehiclePhysics`: solver de cuatro apoyos con las constantes de `tune` (recorrido 0,19 m, rigidez 41, amortiguación 3,4/4,5, tope 18 kN), actitud de la carrocería por aceleración y guiñada, y `wheel_state(i)` con suspensión, dirección, rodadura, contacto y posición. `contacts` es el recuento real.
+- `CapsuleTransit._build_car()`: el coche se monta al arrancar y se sincroniza en cada paso (conduciendo o aparcado).
+- `qa/validate_vehicle_rig.gd` (51 checks) y bloque de 12 en `run_suite`. Total **395 checks**, 0 fallos. Captura `reports/ingame-transit_car.png`. Detalle en `PHASE_39_VEHICLE.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.
 2. ~~Migrar la bóveda V-03~~ hecho en las fases 15 y 37 (lógica y geometría animada); faltan su audio y la apertura desde el panel de la galería.
 3. ~~Sistemas eléctricos/CCTV/archivos~~ hechos en las fases 16 y 17; quedan la geometría, las pantallas y el vídeo de las cámaras.
-4. Migrar Transit/cápsula/vehículo con el solver de cuatro apoyos en `transit_hub`, `transit_road` y `transit_rail`.
+4. ~~Migrar Transit/cápsula/vehículo con el solver de cuatro apoyos~~ hecho en la fase 39; faltan cabina, audio y perspectivas del coche.
 5. Particionar el GLB combinado por zona para el pase de alta fidelidad y cerrar IA, deformación, audio y VFX con pruebas A/B.
 
 Ver `PHASE_13_ZONE_MODULES.md` para el detalle de la iteración.

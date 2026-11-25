@@ -27,6 +27,24 @@ const BOOST_RECOVERY := 9.0
 const BOOST_COOLDOWN := 3.5
 const STEP := 1.0 / 120.0
 const IMPACT_THRESHOLD := 2.7
+## Suspensión de los cuatro apoyos (`tune.spring`/`compression`/`rebound` de la web).
+const SUSPENSION_REST := 0.32
+const SUSPENSION_TRAVEL := 0.19
+const SUSPENSION_STIFFNESS := 41.0
+const SUSPENSION_COMPRESSION := 3.4
+const SUSPENSION_REBOUND := 4.5
+const MAX_SUSPENSION_FORCE := 18000.0
+const ROLL_INFLUENCE := 0.12
+## Frecuencia y amortiguación del cabeceo y el balanceo de la carrocería.
+const BODY_FREQUENCY := 9.0
+const BODY_DAMPING := 0.75
+## Puntos de anclaje de las ruedas, en el orden de la web: delanteras primero.
+const WHEEL_OFFSETS := [
+	Vector3(-0.87, 0.14, 1.38),
+	Vector3(0.87, 0.14, 1.38),
+	Vector3(-0.87, 0.14, -1.38),
+	Vector3(0.87, 0.14, -1.38),
+]
 
 var position := Vector3(-12.0, COM_Y + 0.045, 109.0)
 var yaw := 0.0
@@ -45,9 +63,25 @@ var braking := false
 var pressure := 0.0
 var contacts := 4
 var train_z := 0.0
+## Altura del suelo bajo las ruedas (0 en la vía; el tren la sube cuando lo lleva).
+var ground := 0.0
+## Cabeceo (eje X) y balanceo (eje Z) de la carrocería, en radianes.
+var pitch := 0.0
+var roll := 0.0
+var pitch_rate := 0.0
+var roll_rate := 0.0
+## Estado de cada apoyo: longitud de suspensión, ángulo de giro y de rodadura.
+var wheel_suspension: Array[float] = [SUSPENSION_REST, SUSPENSION_REST, SUSPENSION_REST, SUSPENSION_REST]
+var wheel_speed: Array[float] = [0.0, 0.0, 0.0, 0.0]
+var wheel_steering: Array[float] = [0.0, 0.0, 0.0, 0.0]
+var wheel_rotation: Array[float] = [0.0, 0.0, 0.0, 0.0]
+var wheel_contact: Array[bool] = [true, true, true, true]
+var wheel_world: Array[Vector3] = [Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO]
 
 var _accumulator := 0.0
 var _reverse_delay := 0.0
+var _last_speed := 0.0
+var _last_yaw := 0.0
 
 
 func reset(x: float, z: float, new_yaw := 0.0, repair := false) -> void:
@@ -61,6 +95,19 @@ func reset(x: float, z: float, new_yaw := 0.0, repair := false) -> void:
 	boost = false
 	braking = false
 	pressure = 0.0
+	pitch = 0.0
+	roll = 0.0
+	pitch_rate = 0.0
+	roll_rate = 0.0
+	for index in 4:
+		wheel_suspension[index] = SUSPENSION_REST
+		wheel_speed[index] = 0.0
+		wheel_steering[index] = 0.0
+		wheel_rotation[index] = 0.0
+		wheel_contact[index] = true
+	contacts = 4
+	_last_speed = 0.0
+	_last_yaw = new_yaw
 	if repair:
 		integrity = 100.0
 		energy = 100.0
@@ -123,8 +170,87 @@ func _tick(h: float, pedal_in: float, turn: float, hand: bool, turbo: bool) -> v
 	var nose := Vector3(sin(yaw), 0.0, cos(yaw))
 	position += nose * travel
 
+	_solve_suspension(h)
 	gear = "N" if absolute < 0.45 else ("R" if speed < 0.0 else str(mini(6, 1 + int(floor(absolute / 8.0)))))
 	rpm = round(850.0 + minf(1.0, fmod(absolute, 8.0) / 8.0) * 4100.0 + absf(throttle) * 750.0)
+
+
+## Suspensión y actitud de la carrocería sobre los cuatro apoyos.
+##
+## La web lo resuelve con `cannon-es`: cuatro muelles de 41 N/mm con 0,19 m de
+## recorrido y 18 kN de tope, y una carrocería de 1 260 kg que cabecea y balancea
+## sola. Aquí el muelle de cada rueda se integra con su rigidez y su
+## amortiguación (más compresión que extensión, como `dampingCompression` y
+## `dampingRelaxation`), y la actitud se obtiene de la aceleración longitudinal y
+## del par de guiñada, que es lo que la carrocería siente en la web.
+func _solve_suspension(h: float) -> void:
+	if h <= 0.0:
+		return
+	var acceleration := (speed - _last_speed) / h
+	var yaw_rate := (yaw - _last_yaw) / h
+	_last_speed = speed
+	_last_yaw = yaw
+	# Morro arriba al acelerar y hundido al frenar; vuelco hacia fuera del giro.
+	var pitch_target := clampf(-acceleration * 0.010, -0.11, 0.11)
+	var roll_target := clampf(-yaw_rate * speed * 0.0075, -0.10, 0.10)
+	var w := BODY_FREQUENCY
+	pitch_rate += (pitch_target - pitch) * w * w * h
+	pitch_rate *= exp(-h * 2.0 * BODY_DAMPING * w)
+	pitch += pitch_rate * h
+	roll_rate += (roll_target - roll) * w * w * h
+	roll_rate *= exp(-h * 2.0 * BODY_DAMPING * w)
+	roll += roll_rate * h
+	# Anclajes en el mundo: la carrocería está girada por el rumbo y la actitud.
+	var base := position.y + WHEEL_OFFSETS[0].y
+	var nose := Vector3(sin(yaw), 0.0, cos(yaw))
+	var side := Vector3(cos(yaw), 0.0, -sin(yaw))
+	var contact_count := 0
+	for index in 4:
+		var offset: Vector3 = WHEEL_OFFSETS[index]
+		# Altura del anclaje con la actitud de la carrocería: `rotation.x = pitch`
+		# hunde el morro y `rotation.z = roll` sube el costado derecho.
+		var along := -offset.z * pitch + offset.x * roll
+		var anchor_y := base + along
+		var target := clampf(anchor_y - ground - WHEEL_RADIUS,
+			SUSPENSION_REST - SUSPENSION_TRAVEL, SUSPENSION_REST + SUSPENSION_TRAVEL)
+		# Muelle de la rueda: la frecuencia sale de la rigidez real y el
+		# amortiguamiento es mayor al comprimir que al extender, como la web.
+		var omega := sqrt(SUSPENSION_STIFFNESS)
+		var zeta := 0.62 * (SUSPENSION_COMPRESSION if target < wheel_suspension[index]
+			else SUSPENSION_REBOUND) / 4.0
+		wheel_speed[index] += ((target - wheel_suspension[index]) * omega * omega
+			- wheel_speed[index] * 2.0 * zeta * omega) * h
+		var length := clampf(wheel_suspension[index] + wheel_speed[index] * h,
+			SUSPENSION_REST - SUSPENSION_TRAVEL, SUSPENSION_REST + SUSPENSION_TRAVEL)
+		wheel_suspension[index] = length
+		wheel_contact[index] = absf(anchor_y - ground - WHEEL_RADIUS - length) < 0.06
+		if wheel_contact[index]:
+			contact_count += 1
+		wheel_steering[index] = steer if index < 2 else 0.0
+		wheel_rotation[index] = fposmod(wheel_rotation[index] + speed / WHEEL_RADIUS * h, TAU)
+		var wheel_position := position + nose * offset.z + side * offset.x \
+			+ Vector3(0.0, offset.y + along - length, 0.0)
+		wheel_world[index] = wheel_position
+	contacts = contact_count
+
+
+## Estado de un apoyo para la malla del vehículo (`VehicleRig`).
+func wheel_state(index: int) -> Dictionary:
+	var i := clampi(index, 0, 3)
+	return {
+		"index": i,
+		"offset": WHEEL_OFFSETS[i],
+		"suspension": wheel_suspension[i],
+		"steering": wheel_steering[i],
+		"rotation": wheel_rotation[i],
+		"contact": wheel_contact[i],
+		"position": wheel_world[i],
+	}
+
+
+## Cabeceo y balanceo en grados, para la telemetría.
+func attitude_degrees() -> Vector2:
+	return Vector2(rad_to_deg(pitch), rad_to_deg(roll))
 
 
 ## Registra un choque con la velocidad normal de impacto (m/s).
@@ -152,6 +278,10 @@ func telemetry() -> Dictionary:
 		"impact": impact,
 		"contacts": contacts,
 		"pressure": pressure,
+		"pitch": pitch,
+		"roll": roll,
+		"suspension": wheel_suspension.duplicate(),
+		"wheel_speed": wheel_speed.duplicate(),
 	}
 
 

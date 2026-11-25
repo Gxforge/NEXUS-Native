@@ -27,6 +27,8 @@ const SEAT_OFFSETS := [
 ]
 
 var physics: VehiclePhysics = VehiclePhysics.new()
+## Carrocería y ruedas de `vehicle.glb` (fase 39).
+var car: VehicleRig = null
 
 var at := STATION_B
 var target := STATION_B
@@ -55,6 +57,7 @@ var _sz := 0.0
 
 func _ready() -> void:
 	add_to_group(&"capsule_transit")
+	_build_car()
 	_board = get_node_or_null("Board") as Label3D
 	reset()
 	var state := get_tree().get_first_node_in_group(&"game_state") as GameState
@@ -62,6 +65,23 @@ func _ready() -> void:
 		state.register_transit(self)
 	if _board != null:
 		_board.text = status
+
+
+## Monta el coche de vía sobre el modelo original y lo deja aparcado.
+func _build_car() -> void:
+	if car != null:
+		return
+	var model := PropLibrary.vehicle()
+	if model == null:
+		return
+	car = VehicleRig.new()
+	car.name = "RailCar"
+	add_child(car)
+	if not car.attach(model):
+		car.queue_free()
+		car = null
+		return
+	car.place(_car_offset, 0.0)
 
 
 func reset() -> void:
@@ -290,6 +310,12 @@ func step(delta: float, player_position: Vector3, first_person: bool,
 
 	if aboard and result != player_position:
 		player_carried.emit(result)
+
+	if car != null:
+		if driving:
+			car.sync(physics)
+		else:
+			car.place(_car_offset, 0.0)
 
 	if hold and time >= 0.0:
 		_set_status("RETENIDA")
