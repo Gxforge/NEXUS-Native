@@ -499,6 +499,58 @@ func _validate_w01_jaw() -> void:
 	jaw.pin(-1.0)
 	core.queue_free()
 
+func _validate_larva() -> void:
+	var packed := load("res://zones/zone_h01_hydraulics.tscn") as PackedScene
+	if packed == null:
+		_check(false, "falta la zona H-01")
+		return
+	var zone: Node3D = packed.instantiate()
+	root.add_child(zone)
+	var dressing: Node = zone.get_node_or_null("Dressing")
+	if dressing == null:
+		_check(false, "falta el atrezzo de H-01")
+		zone.queue_free()
+		return
+	dressing.set_process(false)
+	var rigs: Array = dressing.larva_rigs
+	_check(rigs.size() == 3, "tres larvas con rig en H-01")
+	var counts: Array[int] = []
+	var eyes := 0
+	for index in mini(rigs.size(), 3):
+		var rig = rigs[index]
+		counts.append(rig.feeler_count())
+		if rig.has_eye():
+			eyes += 1
+	_check(counts.size() == 3 and counts[0] == 8 and counts[1] == 9 and counts[2] == 10,
+		"los tentáculos crecen con el vaso (8, 9 y 10)")
+	_check(eyes == 3, "las tres larvas conservan el ojo")
+	if rigs.is_empty():
+		zone.queue_free()
+		return
+	var rig = rigs[0]
+	var t := 7.3
+	rig.sync(t)
+	_check(absf(rig.feelers[0].rotation.x - LarvaRig.FEELER_SWAY * sin(t * LarvaRig.FEELER_RATE)) < 0.001,
+		"el tentáculo 0 sigue la fórmula de Larva.ts")
+	_check(absf(rig.eye.rotation.y - LarvaRig.EYE_YAW * sin(t * LarvaRig.EYE_YAW_RATE)) < 0.001,
+		"el ojo gira con la fase de su vaso")
+	rig.reset()
+	_check(absf(rig.feelers[0].rotation.x) < 0.0001 and absf(rig.eye.rotation.y) < 0.0001,
+		"el reset devuelve los tentáculos y el ojo al reposo")
+	var specimen := dressing.pods[0].get_node_or_null("Specimen") as Node3D
+	dressing.animate(5.0)
+	var pulse: float = pow(maxf(0.0, sin(5.0 * 3.1)), 5.0)
+	_check(specimen != null and absf(specimen.scale.x - (1.0 + pulse * 0.12)) < 0.002,
+		"el corazón de la larva late a escala real")
+	var group: Array = dressing.bubbles[0]
+	dressing.animate(0.0)
+	var low: float = (group[0] as Node3D).position.y
+	dressing.animate(1.0)
+	_check(group.size() == 48 and (group[0] as Node3D).position.y > low,
+		"las cuarenta y ocho burbujas del vaso ascienden")
+	zone.queue_free()
+	await process_frame
+
 func _validate_loading_progress() -> void:
 	_check(LoadingProgress.value(0.0, ResourceLoader.THREAD_LOAD_IN_PROGRESS, ZoneManager.State.IDLE, 0.5) > 0.0,
 		"loading bar moves even when the loader reports nothing")
@@ -881,6 +933,7 @@ func _run() -> void:
 	_validate_w01_eyes()
 	_validate_w01_jaw()
 	_validate_loading_progress()
+	await _validate_larva()
 	_validate_w01_arms()
 	_validate_breath_audio()
 	_validate_transit()

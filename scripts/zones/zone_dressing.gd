@@ -24,6 +24,7 @@ var fans: Array[Node3D] = []
 var screens: Array[Node3D] = []
 var specimens: Array[Node3D] = []
 var bubbles: Array = []
+var larva_rigs: Array[LarvaRig] = []
 var rings: Array[MeshInstance3D] = []
 var indicators: Array[MeshInstance3D] = []
 
@@ -123,15 +124,20 @@ func _build_floor() -> void:
 
 ## Saca del grupo exportado la malla de la criatura (la única del vaso cuyo
 ## volumen ronda 2,3 × 2,7 × 2,2 m; el cristal mide 3,1 × 3,2 × 3,1).
-func _take_larva(pod: Node3D) -> MeshInstance3D:
+## Grupo de la larva dentro de un vaso: el hijo que cuelga tentáculos (hijos
+## `Node3D` por debajo del eje del cuerpo). Antes se tomaba la nube de burbujas
+## del exportador (una sola malla de 48 vértices) y el vaso se quedaba sin
+## criatura.
+func _take_larva(pod: Node3D) -> Node3D:
 	for child in pod.get_children():
-		var mesh := child as MeshInstance3D
-		if mesh == null or mesh.mesh == null:
+		var node := child as Node3D
+		if node == null or node is MeshInstance3D:
 			continue
-		var box := mesh.get_aabb()
-		if box.size.x > 2.0 and box.size.x < 2.6 and box.size.y > 2.0:
-			pod.remove_child(mesh)
-			return mesh
+		for grandchild in node.get_children():
+			var feeler := grandchild as Node3D
+			if feeler != null and not (feeler is MeshInstance3D) and feeler.position.y < -0.2:
+				pod.remove_child(node)
+				return node
 	return null
 
 
@@ -151,15 +157,17 @@ func animate(t: float) -> void:
 			var bubble: Node3D = group[j]
 			var speed: float = 0.1 + float(j % 3) * 0.023
 			bubble.position.y = 0.92 + fmod(t * speed + float(j) * 0.149 + float(index) * 0.69, 2.75)
-	# Latido de la larva en suspensión.
+	# Latido de la larva en suspensión y gesto de sus tentáculos y su ojo.
 	for index in specimens.size():
 		var specimen: Node3D = specimens[index]
 		var a: float = t * 3.1 + float(index) * 1.62
 		var pulse: float = pow(maxf(0.0, sin(a)), 5.0)
-		specimen.scale = Vector3(0.42 * (1.0 + pulse * 0.12),
-			0.42 * (1.0 - pulse * 0.065), 0.42 * (1.0 + pulse * 0.1))
+		specimen.scale = Vector3(1.0 + pulse * 0.12,
+			1.0 - pulse * 0.065, 1.0 + pulse * 0.1)
 		specimen.position.y = 2.25 + sin(a * 0.4) * 0.07
 		specimen.rotation.y = 1.27 + sin(a * 0.23) * 0.23
+		if index < larva_rigs.size() and larva_rigs[index] != null:
+			larva_rigs[index].sync(t)
 	# Aspas de las turbinas; giran más despacio cuanto menor es el índice.
 	for index in fans.size():
 		var fan: Node3D = fans[index]
@@ -312,19 +320,18 @@ func _build_h01() -> void:
 		pod.set_meta("survey_id", "pod_%d" % index)
 		body.add_child(pod)
 		pods.append(pod)
-		# La larva exportada pasa a un pivote propio para poder latir: el pivote se
-		# queda en el centro de la criatura y `animate()` lo escala a 0.42.
+		# La larva exportada pasa a un pivote propio para poder latir y girar
+		# (`Workshop.ts` coloca el corazón en `(0, 2,25, 0)` y lo escala).
 		var specimen := Node3D.new()
 		specimen.name = "Specimen"
 		specimen.position = Vector3(0.0, 2.25, 0.0)
 		specimen.rotation.y = 1.27
-		specimen.scale = Vector3(0.42, 0.42, 0.42)
 		pod.add_child(specimen)
 		var larva := _take_larva(pod)
 		if larva != null:
-			larva.scale = Vector3(2.381, 2.381, 2.381)
-			larva.position = Vector3(0.0, -5.38, 0.0)
+			larva.position = Vector3.ZERO
 			specimen.add_child(larva)
+			larva_rigs.append(LarvaRig.attach(larva, index))
 		else:
 			var core := (load(W01_CORE) as PackedScene).instantiate()
 			core.name = "Core"

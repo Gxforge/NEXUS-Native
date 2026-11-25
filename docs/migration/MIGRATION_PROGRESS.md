@@ -153,6 +153,11 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `assets/ui/menu_background.png`: ilustración propia para el fondo del menú (velo 0,45) y de la carga (velo 0,62).
 - `qa/validate_vault_door.gd` (24 checks) y bloque de 9 en `run_suite`. Total **375 checks**, 0 fallos. Capturas `reports/ui-main-menu.png`, `ui-loading.png`, `vault-opening.png` y `vault-open.png`. Detalle en `PHASE_37_VAULT_UI.md`.
 
+## Fase 38 · Larvas de H–01 (`Larva.ts`)
+- Arreglado `_take_larva()`: tomaba la nube de burbujas del exportador (48 vértices) en vez de la criatura y dejaba los vasos sin larva. Ahora identifica el grupo que cuelga tentáculos (`position.y < −0,2`), que es el criterio de la web.
+- `scripts/world/larva_rig.gd` (`LarvaRig`): gesto de los 8/9/10 tentáculos (`0,17·sin(t·1,35 + j·0,83)` y `0,18·cos(t·1,26 + j·1,26)`) y del ojo (`0,11·sin(t·0,8 + vaso)`, `0,055·cos(t·1,07)`), con reset limpio. El pivote del corazón pasa a escala 1,0 y conserva latido, vaivén y giro de `Workshop.Pods`.
+- `qa/validate_larva.gd` (44 checks) y bloque de 8 en `run_suite`. Total **383 checks**, 0 fallos. Captura `reports/ingame-h01.png`. Detalle en `PHASE_38_LARVA.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.
