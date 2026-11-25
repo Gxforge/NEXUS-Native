@@ -182,9 +182,15 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `SceneExperienceController`: `zones_path`, reconstrucción al cambiar de zona (`zone_ready`/`zone_unloaded`), aplicación por fotograma con la cámara y restauración sin control. En C-04 oculta 8 de 454 props con los muros de electricidad y vigilancia; A-01, hub y crioteca quedan a cero.
 - `qa/validate_visibility.gd` (41 checks) + bloque de 10 en `run_suite`. Total **424 checks**, 0 fallos. Detalle en `PHASE_42_VISIBILITY.md`.
 
+## Fase 43 · Distribución: presets y construcción reproducible
+- `export_presets.cfg`: tres destinos — `Linux` (x86_64), `Windows Desktop` (x86_64) y `Android` (arm64-v8a, inmersivo, minSdk 21 / targetSdk 34, `com.gxforge.nexusnative`, versión 43 / 0.43.0) — con PCK incrustado y `qa/`, `reports/`, `docs/` y `tools/` fuera del paquete.
+- `tools/build.sh`: importación, puerta de calidad (`run_suite` a cero fallos), exportación de cada destino, firma y verificación del APK con `apksigner`, prueba de humo del binario de Linux y `SHA256SUMS` + `BUILD_REPORT.json`. Reconstrucción de la fase: 149,47 MB (Linux), 177,31 MB (Windows) y 105,38 MB (APK firmado, `arm64-v8a`, firma v1/v2 verificada).
+- Ajustes que exigió: `config/version = "0.43.0"` y `import_etc2_astc = true` (sin él el export de Android falla con un mensaje **vacío**), `.gdignore` en `reports/` y `tools/`, y `/build/` fuera de git.
+- `qa/validate_distribution.gd` (38 checks) + bloque de 11 en `run_suite`. Total **435 checks**, 0 fallos. Detalle en `PHASE_43_DISTRIBUTION.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
-1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.
+1. Verificar y ajustar el HUD/touch y el mapa con el APK en un dispositivo real (checklist en `PHASE_43_DISTRIBUTION.md`).
 2. ~~Migrar la bóveda V-03~~ hecho en las fases 15 y 37 (lógica y geometría animada); faltan su audio y la apertura desde el panel de la galería.
 3. ~~Sistemas eléctricos/CCTV/archivos~~ hechos en las fases 16 y 17; quedan la geometría, las pantallas y el vídeo de las cámaras.
 4. ~~Migrar Transit/cápsula/vehículo con el solver de cuatro apoyos y las perspectivas~~ hecho en las fases 39, 40 y 41; falta el mapa de reflejos de las tiras de luz y el audio de puertas.

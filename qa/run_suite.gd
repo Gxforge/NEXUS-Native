@@ -601,6 +601,43 @@ func _validate_visibility() -> void:
 	world.queue_free()
 	await process_frame
 
+func _validate_distribution() -> void:
+	var presets := ConfigFile.new()
+	_check(presets.load("res://export_presets.cfg") == OK, "la configuración de distribución se lee")
+	var names: Array[String] = []
+	for index in 3:
+		names.append(str(presets.get_value("preset.%d" % index, "name", "")))
+	_check(names == ["Linux", "Windows Desktop", "Android"],
+		"hay presets de Linux, Windows y Android (%s)" % str(names))
+	var project := ConfigFile.new()
+	project.load("res://project.godot")
+	var version := str(project.get_value("application", "config/version", ""))
+	_check(version == "0.43.0" and str(presets.get_value("preset.2.options", "version/name", "")) == version,
+		"el APK repite la versión del proyecto (%s)" % version)
+	_check(bool(project.get_value("rendering", "textures/vram_compression/import_etc2_astc", false)),
+		"el proyecto importa ETC2/ASTC, que Android necesita")
+	_check(bool(presets.get_value("preset.2.options", "architectures/arm64-v8a", false))
+		and not bool(presets.get_value("preset.2.options", "architectures/armeabi-v7a", true)),
+		"sólo se compila arm64-v8a")
+	_check(FileAccess.file_exists("res://tools/build.sh"), "el script de construcción está en el repositorio")
+	for index in 3:
+		_check(str(presets.get_value("preset.%d" % index, "exclude_filter", "")).contains("reports/*"),
+			"el preset %d no empaqueta las capturas" % index)
+	var report_path := "res://build/BUILD_REPORT.json"
+	if FileAccess.file_exists(report_path):
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(report_path))
+		var data: Dictionary = parsed as Dictionary if parsed is Dictionary else {}
+		_check(str(data.get("version", "")) == version and (data.get("suite_failures", []) as Array).is_empty(),
+			"el informe de construcción está al día y sin fallos")
+		var artifacts: Array = data.get("artifacts", [])
+		var big := true
+		for artifact: Dictionary in artifacts:
+			if int(artifact.get("bytes", 0)) < 1048576:
+				big = false
+		_check(artifacts.size() >= 2 and big, "el informe lista los binarios exportados (%d)" % artifacts.size())
+	else:
+		_check(true, "sin artefactos locales (se generan con tools/build.sh)")
+
 func _validate_vehicle_ui() -> void:
 	var dash := CockpitDisplay.new()
 	root.add_child(dash)
@@ -1126,6 +1163,7 @@ func _run() -> void:
 	await _validate_vehicle_ui()
 	await _validate_perspectives()
 	await _validate_visibility()
+	_validate_distribution()
 	_validate_w01_arms()
 	_validate_breath_audio()
 	_validate_transit()

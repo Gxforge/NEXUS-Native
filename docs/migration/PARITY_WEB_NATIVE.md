@@ -56,8 +56,8 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 - **Portado con pruebas:** IA y percepción de W-01, red eléctrica, cuadro eléctrico + CCTV, bóveda V-03 (lógica), archivo D-02, bancos de carga y analizador, encuesta/raycast, contactos, caché de zonas, compuertas, streaming y persistencia de partida.
 - **Parcial:** W-01 (dinámica de tentáculos y agarre), sectores/mobiliario, HUD, mapa, materiales.
 - Desde la fase 32 el techo de las doce zonas, las taquillas, los paneles murales y las pantallas son piezas originales de `laboratory_all_sectors.glb`, `display.glb` y `telemetry_screen.glb`.
-- **Sin empezar:** `Touch.ts` en dispositivo real, audio ambiental y distribución.
-- Desde la fase 37 la bóveda V–03 tiene su geometría animada y el arranque (menú + carga) muestra arte e información propios; desde la 38 la anatomía de W–01 (`EyeSystem`, `OcularSurface`, `Head`, `Tentacles`, `Breath`, `Larva`) está completa, desde la 39 el coche de vía se ve y se apoya en sus cuatro ruedas, desde la 40 lleva instrumentos y motor sonoro y desde la 41 las cuatro cámaras de `Perspectives.ts` y desde la 42 el recorte por portales de `Visibility.ts`.
+- **Sin empezar:** `Touch.ts` en dispositivo real y audio ambiental.
+- Desde la fase 37 la bóveda V–03 tiene su geometría animada y el arranque (menú + carga) muestra arte e información propios; desde la 38 la anatomía de W–01 (`EyeSystem`, `OcularSurface`, `Head`, `Tentacles`, `Breath`, `Larva`) está completa, desde la 39 el coche de vía se ve y se apoya en sus cuatro ruedas, desde la 40 lleva instrumentos y motor sonoro y desde la 41 las cuatro cámaras de `Perspectives.ts` y desde la 42 el recorte por portales de `Visibility.ts` y desde la 43 hay presets y construcción reproducible para Linux, Windows y Android.
 - Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **88 %**; el resto son sistemas por migrar.
 
 ## 3. Hoja de ruta propuesta
@@ -75,7 +75,7 @@ Cada fase termina con validador headless propio y una entrada en
 | **P-6** ✅ | IA de W-01 (`MonsterAI`, `Attention`, `FieldSense`) | — | `validate_w01_ai.gd` 66/66 + 10 checks en la suite · hecho (falta agarre/daño y tentáculos dinámicos) |
 | **P-7** ✅ | Tránsito y vehículo (`Transit.ts`, `vehicle/*`) | — | `validate_transit.gd` 154/154, geometría 51, cabina/audio 38 y cámaras 39 + 21 checks en la suite · hecho (falta el audio de puertas y el mapa de reflejos) |
 | **P-8** 🟡 | UI y orquestación (`App.tsx`, `SceneExperience.ts`, `CameraController`, `DisplayQuality`, `Visibility`) | — | Vista (113), pantallas (89), estado/perfiles (139), ajustes/paneles/bitácora (95) y recorte por portales (41 checks, fase 42) hechos · faltan los controles táctiles en dispositivo real |
-| **P-9** | Distribución | P-8 | Presets Windows/Android, builds reproducibles y QA en dispositivo real |
+| **P-9** 🟡 | Distribución | P-8 | Presets Linux/Windows/Android, `tools/build.sh` reproducible con informe y sumas, y binarios verificados · falta el QA en dispositivo real |
 
 ## 4. Orden recomendado y por qué
 
