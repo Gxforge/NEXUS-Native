@@ -20,6 +20,8 @@ const LURE_COST := 12.0
 @export var mouse_sensitivity: float = 0.0022
 @export var interaction_range: float = 3.2
 @onready var camera: Camera3D = $Camera3D
+## Manos y equipo en primera persona (modelos originales de `touch_rig_assets.glb`).
+@onready var rig: FirstPersonRig = $Camera3D/FirstPerson
 
 var _pitch: float = 0.0
 var controls_enabled: bool = false
@@ -366,7 +368,14 @@ func _set_prompt(text: String) -> void:
 	_last_prompt = text
 	prompt_changed.emit(text)
 
+## Gesto de la mano derecha al usar el equipo.
+func _reach(style: StringName) -> void:
+	if rig != null:
+		rig.play_reach(style)
+
+
 func interact() -> void:
+	_reach(&"press")
 	var hit := _first_hit(interaction_range)
 	if hit.is_empty():
 		show_message("No hay nada utilizable al alcance")
@@ -382,6 +391,7 @@ func interact() -> void:
 	show_message("Sin respuesta · apunta a un equipo interactivo")
 
 func scan() -> void:
+	_reach(&"round")
 	if scene_experience == null:
 		show_message("Escáner no disponible")
 		return
@@ -480,6 +490,9 @@ func fire_tool(gas: bool) -> void:
 		return
 	energy -= cost
 	tool_cooldowns[key] = 12.0 if gas else 8.0
+	_reach(&"grip")
+	if rig != null:
+		rig.kick(1.0)
 	var range_m := 12.0 if gas else SCAN_RANGE
 	var hit := _first_hit(range_m)
 	if not hit.is_empty():
@@ -515,6 +528,7 @@ func deploy_lure() -> void:
 		return
 	energy -= LURE_COST
 	tool_cooldowns["lure"] = 5.0
+	_reach(&"flat")
 	scene_experience.emit_contact(hit, false)
 	var collider: Object = hit.get("collider")
 	if collider is Node:

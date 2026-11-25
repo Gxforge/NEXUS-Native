@@ -119,6 +119,11 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - Crioteca con `CryoConsole` (`Node98`) y `CryoReader` (`Node99`) de `vault.glb`.
 - Validador nuevo `qa/validate_original_models.gd` (19 checks) que comprueba mallas de vasos, larva, puerta, puesto, consolas, tornos y vehículo. Total **2037 checks**, 0 fallos. Detalle en `PHASE_30_VEHICLE_AND_CRYO.md`.
 
+## Fase 31 · Guante, instrumentos y mangas en primera persona
+- `touch_rig_assets.glb` montado bajo la cámara: seis poses de guante, los tres instrumentos de `Instruments.ts`, el guante de linterna, cuatro mangas y dos codos, con el balanceo, el gesto de alcance y el retroceso de `Touch.ts`.
+- `scripts/world/first_person_rig.gd` (nuevo) + `_reach()` en `player.gd` (interactuar, escanear, disparar y señuelo).
+- `qa/validate_first_person.gd` (36 checks) y `qa/capture_first_person.tscn` con tres tomas en C–04. Total **2073 checks**, 0 fallos. Detalle en `PHASE_31_FIRST_PERSON_KIT.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.

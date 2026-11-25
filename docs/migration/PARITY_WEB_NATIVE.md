@@ -35,7 +35,7 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 | `EyeSystem.ts` + `OcularSurface.ts` + `Head.ts` | 449 | GLB de ojos | 🟡 | Seguimiento ocular limitado. Faltan parpadeo, iris reactivo y orientación de cabeza acoplada a la IA. |
 | `Survey.ts` | 168 | `scripts/interaction/survey_system.gd` + `survey_highlight.gd` | ✅ | Raycast, resaltado, registro y bitácora persistente. Falta el contenido de expedientes completo (depende de `Files.ts`). |
 | `Contacts.ts` | 176 | `contact_query_3d.gd` + `contact_fx_3d.gd` | ✅ | Consultas y VFX de contacto con el sujeto. |
-| `Glove.ts` + `Loadout.ts` + `Instruments.ts` | 590 | `scripts/world/player.gd` | 🟡 | Linterna, energía y ranuras existen. Faltan guante con animación, instrumentos de mano y carga de herramientas como en la web. |
+| `Glove.ts` + `Loadout.ts` + `Instruments.ts` | 590 | `scripts/world/first_person_rig.gd` + `player.gd` | ✅ | Rig original de `touch_rig_assets.glb` colgado de la cámara: seis poses de guante (`press`/`drawer`/`grip`/`flat`/`round`/`box`), los tres instrumentos ópticos, el guante de linterna de la mano izquierda, cuatro mangas y dos codos, con balanceo, alcance de 1,06 s, retroceso y encendido por protocolo; 36 checks en `qa/validate_first_person.gd`. Falta el agarre de objetos reales (depende de `Touch.ts`). |
 | `Displays.ts` + `TelemetryScreen.ts` + `SceneExperience`-feed | 228 | `phosphor_display.gd` + `telemetry_model.gd` + `screen_surface.gd` + `wall_screen.gd` + `telemetry_feed.gd` | ✅ | Panel de fósforo 640×320 con traza de 72 muestras y `CAM 04` 1024×576 con búfer de 75 filas, tres páginas, series y pies de estado; montadas en `zone_electrical` con datos vivos de `PowerGrid` y W–01; 89 checks. Falta el vídeo real de CCTV. |
 | `Environment.ts` + `PortalLight.ts` + `materials.ts` + `protocols.ts` | 646 | `OperationsPanel` (iluminación) | 🟡 | Iluminación por zona y protocolos básicos. Faltan materiales dinámicos. |
 | `Effects.ts` | 80 | `scripts/effects/contact_fx_3d.gd` | 🟡 | Sólo el efecto de contacto. |
@@ -54,9 +54,9 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 ## 2. Resumen cuantitativo
 
 - **Portado con pruebas:** IA y percepción de W-01, red eléctrica, cuadro eléctrico + CCTV, bóveda V-03 (lógica), archivo D-02, bancos de carga y analizador, encuesta/raycast, contactos, caché de zonas, compuertas, streaming y persistencia de partida.
-- **Parcial:** W-01 (dinámica de tentáculos y agarre), jugador y carga, sectores/mobiliario, HUD, mapa, materiales.
+- **Parcial:** W-01 (dinámica de tentáculos y agarre), sectores/mobiliario, HUD, mapa, materiales.
 - **Sin empezar:** modelo/cabina/audio del coche, `Visibility.ts`, `Touch.ts` en dispositivo real, audio y distribución.
-- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **63 %**; el resto son sistemas por migrar.
+- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **67 %**; el resto son sistemas por migrar.
 
 ## 3. Hoja de ruta propuesta
 

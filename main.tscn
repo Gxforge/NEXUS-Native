@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/core/main.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/core/zone_catalog.gd" id="2"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://scripts/core/scene_experience_controller.gd" id="6"]
 [ext_resource type="Script" path="res://scripts/ui/nexus_hud.gd" id="7"]
 [ext_resource type="Script" path="res://scripts/world/biological_dust.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/world/first_person_rig.gd" id="9"]
 [sub_resource type="CapsuleShape3D" id="PlayerShape"]
 radius = 0.34
 height = 1.82
@@ -45,6 +46,9 @@ shape = SubResource("PlayerShape")
 [node name="Camera3D" type="Camera3D" parent="PersistentWorld/Player"]
 position = Vector3(0, 1.72, 0)
 current = true
+
+[node name="FirstPerson" type="Node3D" parent="PersistentWorld/Player/Camera3D"]
+script = ExtResource("9")
 
 [node name="BiologicalDust" type="GPUParticles3D" parent="PersistentWorld/Player"]
 position = Vector3(0, 1.4, -1)
