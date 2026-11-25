@@ -52,6 +52,8 @@ var items: Dictionary = {}
 
 var _player_position := Vector3.ZERO
 var _has_player := false
+## Puerta animada de la galería (`VaultDoorRig`), si la zona la ha montado.
+var door: VaultDoorRig = null
 
 
 func _ready() -> void:
@@ -117,6 +119,8 @@ func _set_phase(next: String) -> void:
 ## `Vector3.INF` para ignorar la proximidad.
 func update(delta: float, player_position: Vector3 = Vector3.INF) -> void:
 	delta = maxf(delta, 0.0)
+	if door != null:
+		door.sync(timer)
 	if timer >= 0.0 and not opened_once:
 		timer = minf(SEQUENCE_SECONDS, timer + delta)
 		_set_phase(_phase_for(timer))
@@ -126,7 +130,16 @@ func update(delta: float, player_position: Vector3 = Vector3.INF) -> void:
 	_step_drawers(delta, player_position)
 
 
+## Engancha la puerta animada (la monta el atrezzo de la galería).
+func attach_door(rig: VaultDoorRig) -> void:
+	door = rig
+	if door != null:
+		door.sync(timer)
+
+
 func reset() -> void:
+	if door != null:
+		door.reset()
 	timer = -1.0
 	opened_once = false
 	_set_phase("Sellada")

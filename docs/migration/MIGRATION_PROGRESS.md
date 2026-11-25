@@ -147,10 +147,16 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `scripts/entities/w01_arms.gd`: contrato de movimiento de `Tentacles.ts` sobre los veinte brazos y las 87 ventosas del exportador — fases, estiramiento, giro al operador, alcance de los brazos 2 y 3, `scout`, latigazo del pulso UV y recorte contra suelo y malla de contención.
 - `w01_actor.gd`: `arms` en `_ready`, `_update_arms()` en `_process`, `_lash_arms()` en `apply_uv()` y `arms_pin` para capturas. `qa/validate_w01_arms.gd` (19 checks) + bloque de 8 en `run_suite`. Total **366 checks**, 0 fallos. Captura `reports/w01-arms.png`. Detalle en `PHASE_36_ARMS.md`.
 
+## Fase 37 · Puerta de la bóveda, pantalla de carga y arte del menú
+- `scripts/world/vault_door_rig.gd`: el grupo `Node2` de `vault.glb` montado en V–03 con la secuencia de `Vault.ts` (pistones 0,8 + i·0,71, cerrojos 4,3 + i·0,58, corona 8,8→13,9, disco 13,6→22) y las piezas localizadas por geometría (disco, corona, 8 cerrojos, 4 pistones, brazos). La puerta pasa de B–02 al fondo de la galería, donde vive `VaultModule`, y esconde el portal de la crioteca.
+- `scripts/ui/loading_progress.gd`: barra compuesta (informe · 70, suelo exponencial al 52 %, estados de `ZoneManager` para el último 30 %) y línea de datos reales (módulo, `.tscn`, KB, dependencias, segundos, informe y estado). El título de la carga y el botón del menú salen de `zone_graph.json`.
+- `assets/ui/menu_background.png`: ilustración propia para el fondo del menú (velo 0,45) y de la carga (velo 0,62).
+- `qa/validate_vault_door.gd` (24 checks) y bloque de 9 en `run_suite`. Total **375 checks**, 0 fallos. Capturas `reports/ui-main-menu.png`, `ui-loading.png`, `vault-opening.png` y `vault-open.png`. Detalle en `PHASE_37_VAULT_UI.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.
-2. ~~Migrar la bóveda V-03~~ hecho en la fase 15; sigue su geometría animada en el pase de alta fidelidad.
+2. ~~Migrar la bóveda V-03~~ hecho en las fases 15 y 37 (lógica y geometría animada); faltan su audio y la apertura desde el panel de la galería.
 3. ~~Sistemas eléctricos/CCTV/archivos~~ hechos en las fases 16 y 17; quedan la geometría, las pantallas y el vídeo de las cámaras.
 4. Migrar Transit/cápsula/vehículo con el solver de cuatro apoyos en `transit_hub`, `transit_road` y `transit_rail`.
 5. Particionar el GLB combinado por zona para el pase de alta fidelidad y cerrar IA, deformación, audio y VFX con pruebas A/B.

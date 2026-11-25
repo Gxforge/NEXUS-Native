@@ -401,10 +401,6 @@ func _build_b02() -> void:
 	for index in 3:
 		BuildKit.cabinet(self, 42.6, -18.0 + float(index) * 2.4, -PI * 0.5, 1.6, 2.4, 0.8, 1,
 			"Cabinet%d" % (index + 1))
-	# Puerta circular de la bóveda en el muro sur, junto al vano de paso.
-	_vault_door(Vector3(38.0, 2.4, -23.4), 2.2)
-	BuildKit.plaque(self, "BÓVEDA", "V–03   /   ACCESO RESTRINGIDO", 5.4, 1.4,
-		38.0, 7.0, -23.2, 0.0)
 	BuildKit.plaque(self, "TURBINAS", "B–02   /   PLANTA DE TURBINAS", 8.0, 1.6,
 		40.0, 7.2, -12.0, -PI * 0.5)
 	_ceiling_lights(BuildKit.WARM)
@@ -430,6 +426,20 @@ func _vault_door(center: Vector3, radius: float) -> Node3D:
 	original.scale = Vector3(factor, factor, factor)
 	var disc := _disc_aabb(original)
 	original.position = -disc.get_center() + Vector3(0.0, 0.0, disc.size.z * 0.32)
+	# Apertura real: el rig busca disco, corona, pestillos y pistones en el
+	# propio modelo y sigue el tiempo que le manda `VaultModule`.
+	var rig := VaultDoorRig.new()
+	rig.name = "Rig"
+	door.add_child(rig)
+	if rig.attach(original):
+		door.set_meta("vault_rig", rig)
+		var module := get_parent().get_node_or_null("VaultModule") as VaultModule
+		if module != null:
+			module.attach_door(rig)
+		elif get_tree() != null:
+			var state := get_tree().get_first_node_in_group(&"game_state") as GameState
+			if state != null and state.vault != null:
+				state.vault.attach_door(rig)
 	return door
 
 
@@ -824,7 +834,11 @@ func _build_gallery() -> void:
 		terminal.scale = Vector3(0.62, 0.62, 0.62)
 		add_child(terminal)
 	BuildKit.plaque(self, "GALERÍA AXIAL", "V–03   /   EJE DE COMUNICACIÓN", 5.2, 0.95,
-		30.6, 3.9, -76.0, -PI * 0.5)
+		30.6, 3.9, -44.0, -PI * 0.5)
+	# Puerta de la bóveda al fondo del eje, con su secuencia de apertura. El
+	# centro va desplazado a +x porque los brazos hidráulicos del modelo salen
+	# 4,8 m hacia −x y si no atravesarían el muro oeste.
+	_vault_door(Vector3(28.0, 2.6, -78.6), 1.8)
 
 
 func _build_cryo() -> void:

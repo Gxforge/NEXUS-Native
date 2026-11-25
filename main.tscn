@@ -1,6 +1,7 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/core/main.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cv1vgl7t8k88" path="res://assets/ui/menu_background.png" id="10_bg"]
 [ext_resource type="Script" path="res://scripts/core/zone_catalog.gd" id="2"]
 [ext_resource type="Script" path="res://scripts/core/game_state.gd" id="3"]
 [ext_resource type="Script" path="res://scripts/core/zone_manager.gd" id="4"]
@@ -104,6 +105,17 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="Art" type="TextureRect" parent="UI/MainMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("10_bg")
+expand_mode = 1
+stretch_mode = 6
+
 [node name="Background" type="ColorRect" parent="UI/MainMenu"]
 layout_mode = 1
 anchors_preset = 15
@@ -111,7 +123,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.006, 0.012, 0.016, 1)
+color = Color(0.004, 0.01, 0.014, 0.45)
 
 [node name="Panel" type="PanelContainer" parent="UI/MainMenu"]
 layout_mode = 1
@@ -175,6 +187,17 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="Art" type="TextureRect" parent="UI/LoadingScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("10_bg")
+expand_mode = 1
+stretch_mode = 6
+
 [node name="Background" type="ColorRect" parent="UI/LoadingScreen"]
 layout_mode = 1
 anchors_preset = 15
@@ -182,7 +205,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.004, 0.009, 0.012, 1)
+color = Color(0.004, 0.009, 0.012, 0.62)
 
 [node name="Panel" type="PanelContainer" parent="UI/LoadingScreen"]
 layout_mode = 1
@@ -214,3 +237,10 @@ text = "Esperando solicitud"
 custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 show_percentage = true
+
+[node name="Details" type="Label" parent="UI/LoadingScreen/Panel/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.6, 0.64, 1)
+theme_override_font_sizes/font_size = 15
+text = ""
+autowrap_mode = 2

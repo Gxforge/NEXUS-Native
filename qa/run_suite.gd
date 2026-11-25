@@ -499,6 +499,27 @@ func _validate_w01_jaw() -> void:
 	jaw.pin(-1.0)
 	core.queue_free()
 
+func _validate_loading_progress() -> void:
+	_check(LoadingProgress.value(0.0, ResourceLoader.THREAD_LOAD_IN_PROGRESS, ZoneManager.State.IDLE, 0.5) > 0.0,
+		"loading bar moves even when the loader reports nothing")
+	var early := LoadingProgress.value(0.0, ResourceLoader.THREAD_LOAD_IN_PROGRESS, ZoneManager.State.IDLE, 0.2)
+	var later := LoadingProgress.value(0.0, ResourceLoader.THREAD_LOAD_IN_PROGRESS, ZoneManager.State.IDLE, 3.0)
+	_check(later > early and later <= LoadingProgress.PRELOAD_CEILING,
+		"the preload floor eases towards 60 without passing it")
+	_check(is_equal_approx(LoadingProgress.value(1.0, ResourceLoader.THREAD_LOAD_LOADED, ZoneManager.State.IDLE, 1.0), 100.0),
+		"a mounted zone reads 100 %")
+	var staging := LoadingProgress.value(1.0, ResourceLoader.THREAD_LOAD_LOADED, ZoneManager.State.STAGING, 1.0)
+	_check(staging > 70.0 and staging < 99.0, "mounting stages fill the last thirty percent")
+	_check(LoadingProgress.stage_weight(ZoneManager.State.TRANSFERRING) > LoadingProgress.stage_weight(ZoneManager.State.LOADING),
+		"stage weights follow the zone manager order")
+	_check(LoadingProgress.step_name(ResourceLoader.THREAD_LOAD_IN_PROGRESS, ZoneManager.State.IDLE) == "Precargando geometría y recursos",
+		"the loading screen names the preload step")
+	var line := LoadingProgress.details(&"c04", "res://zones/zone_c04_shell.tscn", 12.5, 0.4, 0.5, 0)
+	_check(line.contains("C04") and line.contains("zone_c04_shell.tscn") and line.contains("dependencias"),
+		"the loading screen shows real file data")
+	_check(LoadingProgress.file_kb("res://zones/zone_c04_shell.tscn") > 0.0, "module size is read from disk")
+	_check(LoadingProgress.dependencies("res://zones/zone_c04_shell.tscn") > 0, "module dependencies are counted")
+
 func _validate_w01_arms() -> void:
 	var packed_arms := load("res://assets/generated/w01_tentacles.glb") as PackedScene
 	_check(packed_arms != null, "w01_tentacles.glb loads")
@@ -859,6 +880,7 @@ func _run() -> void:
 	_validate_w01_perception()
 	_validate_w01_eyes()
 	_validate_w01_jaw()
+	_validate_loading_progress()
 	_validate_w01_arms()
 	_validate_breath_audio()
 	_validate_transit()

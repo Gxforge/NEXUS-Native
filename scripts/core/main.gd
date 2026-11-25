@@ -10,6 +10,8 @@ extends Node
 @onready var hud: NexusHUD = $UI/HUD
 @onready var loading_progress: ProgressBar = $UI/LoadingScreen/Panel/Content/Progress
 @onready var loading_status: Label = $UI/LoadingScreen/Panel/Content/Status
+@onready var loading_details: Label = $UI/LoadingScreen/Panel/Content/Details
+@onready var loading_title: Label = $UI/LoadingScreen/Panel/Content/Title
 
 var _startup_requested: bool = false
 var _transition_requested: bool = false
@@ -20,6 +22,9 @@ const ZONE_GRAPH_PATH := "res://data/zone_graph.json"
 const SCENE_OFFSET_2D := Vector2(9.0, 14.0)
 var _startup_zone: StringName = &"c04"
 var _autosave_timer: float = 10.0
+## Segundos que lleva la pantalla de carga y tamaño del módulo en disco.
+var _load_elapsed: float = 0.0
+var _load_size_kb: float = 0.0
 
 func _ready() -> void:
 	_register_zones()
@@ -41,7 +46,8 @@ func _ready() -> void:
 	if hud != null:
 		hud.update_quality_label(game_state.quality())
 	var start_button := $UI/MainMenu/Panel/Content/Start as Button
-	start_button.text = "CONTINUAR EN " + str(game_state.current_zone).to_upper() if catalog.has_zone(game_state.current_zone) else "ENTRAR EN C–04"
+	start_button.text = "CONTINUAR EN " + _zone_label(game_state.current_zone).to_upper() \
+		if catalog.has_zone(game_state.current_zone) else "ENTRAR EN C–04 · CONTENCIÓN"
 	start_button.pressed.connect(start_game)
 	$UI/MainMenu/Panel/Content/Quit.pressed.connect(_quit_game)
 	apply_quality_category()
@@ -60,7 +66,13 @@ func start_game() -> bool:
 	main_menu.hide()
 	loading_screen.show()
 	loading_progress.value = 0.0
-	loading_status.text = "Solicitando " + str(_startup_zone).to_upper()
+	if loading_title != null:
+		loading_title.text = _zone_label(_startup_zone).to_upper()
+	loading_status.text = "Solicitando " + _zone_label(_startup_zone)
+	_load_elapsed = 0.0
+	_load_size_kb = LoadingProgress.file_kb(catalog.zone(_startup_zone).scene_path)
+	if loading_details != null:
+		loading_details.text = ""
 	if not zone_manager.preload_zone(_startup_zone):
 		loading_status.text = "Error al solicitar " + str(_startup_zone).to_upper()
 		_startup_requested = false
@@ -70,27 +82,37 @@ func start_game() -> bool:
 	set_process(true)
 	return true
 
+## Nombre legible de una zona, del catálogo (`C-04 · Contención`).
+func _zone_label(zone_id: StringName) -> String:
+	var definition := catalog.zone(zone_id) if catalog != null else null
+	if definition != null:
+		return str(definition.display_name)
+	return str(zone_id).to_upper().replace("_", " ")
+
+
 func _process(delta: float) -> void:
+	_load_elapsed += delta
 	if _game_started:
 		_tick_session_tips(delta)
 	if _startup_requested and not _game_started:
 		var progress: Array = []
 		var definition := catalog.zone(_startup_zone)
 		var status := ResourceLoader.load_threaded_get_status(definition.scene_path, progress)
-		if not progress.is_empty():
-			loading_progress.value = float(progress[0]) * 100.0
+		var reported := float(progress[0]) if not progress.is_empty() else 0.0
+		loading_progress.value = LoadingProgress.value(reported, status, zone_manager.state, _load_elapsed)
+		loading_status.text = LoadingProgress.step_name(status, zone_manager.state)
+		if loading_details != null:
+			loading_details.text = LoadingProgress.details(_startup_zone, definition.scene_path,
+				_load_size_kb, _load_elapsed, reported, zone_manager.state)
 		match status:
 			ResourceLoader.THREAD_LOAD_IN_PROGRESS:
-				loading_status.text = "Precargando geometría y recursos"
+				pass
 			ResourceLoader.THREAD_LOAD_LOADED:
-				loading_progress.value = 100.0
-				loading_status.text = "Inicializando " + str(_startup_zone).to_upper()
 				if zone_manager.state == ZoneManager.State.IDLE and not _transition_requested:
 					_transition_requested = zone_manager.transition_to(_startup_zone, &"entry")
 					if not _transition_requested:
 						_on_zone_transition_failed(_startup_zone, "No se pudo iniciar el tránsito")
 			ResourceLoader.THREAD_LOAD_FAILED, ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
-				loading_status.text = "No se pudo cargar " + str(_startup_zone).to_upper()
 				_startup_requested = false
 				loading_screen.hide()
 				main_menu.show()
