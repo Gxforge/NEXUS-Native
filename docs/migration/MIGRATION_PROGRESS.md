@@ -175,6 +175,13 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `capsule_transit.gd`: el asiento resta `CameraController.EYE_HEIGHT` — estaba anclado por el ojo y dejaba la cabina 1,72 m sobre el techo.
 - `qa/validate_perspectives.gd` (39 checks) + bloque de 8 en `run_suite`. Total **414 checks**, 0 fallos. Captura `reports/ingame-transit_chase.png`. Detalle en `PHASE_41_PERSPECTIVES.md`.
 
+## Fase 42 · Recorte por portales (`Visibility.ts`)
+- `scripts/world/visibility.gd` (`Visibility`): port de `Visibility.ts` (122 líneas) — cajas envolventes de los props con margen 0,15 m (1,4 m en bandejas), proyección de la silueta sobre el plano de la compuerta a través de la cámara y ocultación sólo cuando la caja queda entera detrás y fuera del vano (lo que cruza el plano se conserva).
+- Particiones sacadas de `data/zone_graph.json` con los afinados de la web en las seis paredes opacas (electricidad y vigilancia 2,28 × 4,55 con prueba lateral a |x| > 17,6; galería de B-02 3,35 × 6,1 con la bandera `gallery_open`; bóveda 1,7 × 3,4; H-01 y D-02 2,17 × 4,02 en corredor lateral). Abertura = media × apertura viva del `SectorDoor` emparejado por posición (0,9 m).
+- Dos añadidos nativos: `SCENE_OFFSET (9; 14)` para alinear con el montaje de las zonas (comprobado contra `Main.SCENE_OFFSET_2D`) y `probe(world)`, que descarta las particiones sin geometría de muro (dos lados × tres alturas, ≥ 2 impactos).
+- `SceneExperienceController`: `zones_path`, reconstrucción al cambiar de zona (`zone_ready`/`zone_unloaded`), aplicación por fotograma con la cámara y restauración sin control. En C-04 oculta 8 de 454 props con los muros de electricidad y vigilancia; A-01, hub y crioteca quedan a cero.
+- `qa/validate_visibility.gd` (41 checks) + bloque de 10 en `run_suite`. Total **424 checks**, 0 fallos. Detalle en `PHASE_42_VISIBILITY.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.

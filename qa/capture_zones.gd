@@ -71,6 +71,13 @@ func _process(_delta: float) -> void:
 			if _frames < 12:
 				return
 			var id: String = _order[_index]
+			var experience := main.get_node_or_null("PersistentWorld/SceneExperience")
+			if experience != null:
+				experience.call("_apply_visibility")
+				print("CAPTURE recorte: %d de %d props ocultos · muros %s" % [
+					experience.call("visibility_hidden"),
+					experience.visibility.candidate_count(),
+					str(experience.visibility.partition_ids())])
 			var image := get_viewport().get_texture().get_image()
 			var path := "res://reports/ingame-%s.png" % id
 			var error := image.save_png(path)

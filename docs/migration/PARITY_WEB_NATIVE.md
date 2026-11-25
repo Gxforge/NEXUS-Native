@@ -41,7 +41,7 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 | `Effects.ts` | 80 | `scripts/effects/contact_fx_3d.gd` | 🟡 | Sólo el efecto de contacto. |
 | `CameraController.ts` | 364 | `scripts/world/camera_controller.gd` + `player.gd` | ✅ | Órbita con amortiguación del 6 % por frame, límites 3,1–13 m y polar 0,38–π·0,49, primera persona con aguante (14/s, espera 1,05 s, rearme 26), cadencia, balanceo de cabeza, agachado de −0,44 m, corona de escape y entrada del vehículo; 113 checks. Faltan las sacudidas y las transiciones entre zonas. |
 | `DisplayQuality.ts` | 34 | `experience_state.gd` + `main.gd` | ✅ | Presets low/medium/high con densidad de render, sombras, glow y tamaño de vídeo; aplicados al viewport (F3). |
-| `Visibility.ts` | 57 | — | ❌ | Culling por mamparos; se portará con la geometría de alta fidelidad. |
+| `Visibility.ts` | 57 | `scripts/world/visibility.gd` | ✅ | Recorte por portales de la web: cajas envolventes con margen 0,15 m (1,4 m en bandejas), proyección de la silueta sobre el plano de la compuerta y ocultación sólo de lo que queda entero detrás y fuera del vano. Particiones del grafo con los seis muros afinados, abertura viva de cada `SectorDoor` y bandera de la galería; añade `SCENE_OFFSET` (9; 14) y una comprobación geométrica del muro antes de recortar; 41 checks en `qa/validate_visibility.gd` (fase 42). |
 | `ZoneCache.ts` | 98 | `zone_manager.gd` + `PHASE_10B` | ✅ | Streaming con precarga, descarga y política de propiedad. |
 | `ZoneGates.ts` | 93 | `sector_door.gd`, `streaming_sector_door.gd` | ✅ | Compuertas con umbral y bloqueo durante la transición. |
 | `Sectors.ts` | 608 | `zones/` (12 escenas) + `data/zone_graph.json` + `scripts/zones/zone_dressing.gd` | 🟡 | Las 12 zonas existen como módulo con colisión y portales y, desde la fase 24, con mobiliario y rótulos de sector dentro del volumen real de cada módulo (95 checks). Faltan la lógica interior de cada zona y el atrezzo GLB de alta fidelidad. |
@@ -56,9 +56,9 @@ de los dos repositorios, no en la documentación de fases (que va por detrás).
 - **Portado con pruebas:** IA y percepción de W-01, red eléctrica, cuadro eléctrico + CCTV, bóveda V-03 (lógica), archivo D-02, bancos de carga y analizador, encuesta/raycast, contactos, caché de zonas, compuertas, streaming y persistencia de partida.
 - **Parcial:** W-01 (dinámica de tentáculos y agarre), sectores/mobiliario, HUD, mapa, materiales.
 - Desde la fase 32 el techo de las doce zonas, las taquillas, los paneles murales y las pantallas son piezas originales de `laboratory_all_sectors.glb`, `display.glb` y `telemetry_screen.glb`.
-- **Sin empezar:** `Visibility.ts`, `Touch.ts` en dispositivo real, audio ambiental y distribución.
-- Desde la fase 37 la bóveda V–03 tiene su geometría animada y el arranque (menú + carga) muestra arte e información propios; desde la 38 la anatomía de W–01 (`EyeSystem`, `OcularSurface`, `Head`, `Tentacles`, `Breath`, `Larva`) está completa, desde la 39 el coche de vía se ve y se apoya en sus cuatro ruedas, desde la 40 lleva instrumentos y motor sonoro y desde la 41 las cuatro cámaras de `Perspectives.ts`.
-- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **86 %**; el resto son sistemas por migrar.
+- **Sin empezar:** `Touch.ts` en dispositivo real, audio ambiental y distribución.
+- Desde la fase 37 la bóveda V–03 tiene su geometría animada y el arranque (menú + carga) muestra arte e información propios; desde la 38 la anatomía de W–01 (`EyeSystem`, `OcularSurface`, `Head`, `Tentacles`, `Breath`, `Larva`) está completa, desde la 39 el coche de vía se ve y se apoya en sus cuatro ruedas, desde la 40 lleva instrumentos y motor sonoro y desde la 41 las cuatro cámaras de `Perspectives.ts` y desde la 42 el recorte por portales de `Visibility.ts`.
+- Del total de ~13.400 líneas web, la parte con equivalente nativo verificable ronda el **88 %**; el resto son sistemas por migrar.
 
 ## 3. Hoja de ruta propuesta
 
@@ -74,7 +74,7 @@ Cada fase termina con validador headless propio y una entrada en
 | **P-5** ✅ | Bancos de H-01 y B-02 (`BenchCycle.ts`, `Workshop.ts`) | P-1 | `validate_bench_cycle.gd` 51/51 + 11 checks en la suite · hecho (faltan los vasos, que son visuales) |
 | **P-6** ✅ | IA de W-01 (`MonsterAI`, `Attention`, `FieldSense`) | — | `validate_w01_ai.gd` 66/66 + 10 checks en la suite · hecho (falta agarre/daño y tentáculos dinámicos) |
 | **P-7** ✅ | Tránsito y vehículo (`Transit.ts`, `vehicle/*`) | — | `validate_transit.gd` 154/154, geometría 51, cabina/audio 38 y cámaras 39 + 21 checks en la suite · hecho (falta el audio de puertas y el mapa de reflejos) |
-| **P-8** 🟡 | UI y orquestación (`App.tsx`, `SceneExperience.ts`, `CameraController`, `DisplayQuality`, `Visibility`) | — | Vista (113), pantallas (89), estado/perfiles (139) y ajustes/paneles/bitácora (95) hechos · faltan los controles táctiles y `Visibility` |
+| **P-8** 🟡 | UI y orquestación (`App.tsx`, `SceneExperience.ts`, `CameraController`, `DisplayQuality`, `Visibility`) | — | Vista (113), pantallas (89), estado/perfiles (139), ajustes/paneles/bitácora (95) y recorte por portales (41 checks, fase 42) hechos · faltan los controles táctiles en dispositivo real |
 | **P-9** | Distribución | P-8 | Presets Windows/Android, builds reproducibles y QA en dispositivo real |
 
 ## 4. Orden recomendado y por qué

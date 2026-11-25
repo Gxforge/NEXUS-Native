@@ -69,6 +69,7 @@ script = ExtResource("6")
 camera_path = NodePath("../Player/Camera3D")
 game_state_path = NodePath("../../GameState")
 player_path = NodePath("../Player")
+zones_path = NodePath("../../ActiveZones")
 
 [node name="ActiveZones" type="Node3D" parent="."]
 

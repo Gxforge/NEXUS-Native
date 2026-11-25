@@ -544,6 +544,63 @@ func _validate_perspectives() -> void:
 	camera.queue_free()
 	await process_frame
 
+func _validate_visibility() -> void:
+	var world := Node3D.new()
+	world.name = "VisibilityWorld"
+	root.add_child(world)
+	var mesh := MeshInstance3D.new()
+	var shape := BoxMesh.new()
+	shape.size = Vector3.ONE
+	mesh.mesh = shape
+	world.add_child(mesh)
+	mesh.global_position = Vector3(20.0, 1.0, -5.0)
+	var graph := {"connections": [
+		{"id": "qa_bulkhead", "world_door": [0.0, 0.0], "width": 4.4, "portal_yaw_from": 180.0},
+	]}
+	var view := Visibility.new()
+	view.configure(world, graph, [], false, Vector2.ZERO)
+	_check(view.candidate_count() == 1, "el recorte por portales toma las mallas del mundo")
+	_check(is_equal_approx(view.entry_box(mesh).size.x, 1.3),
+		"la caja de cada prop crece 0,15 m por lado")
+	view.apply(Vector3(0.0, 1.7, 10.0))
+	_check(not mesh.visible, "lo que queda entero detrás de una compuerta se oculta")
+	view.restore()
+	_check(mesh.visible and view.hidden_count() == 0, "restaurar devuelve la visibilidad")
+	mesh.global_position = Vector3(0.0, 1.0, -5.0)
+	view.rebuild()
+	view.apply(Vector3(0.0, 1.7, 10.0))
+	_check(mesh.visible, "lo que se ve por el vano se conserva")
+	mesh.global_position = Vector3(20.0, 1.0, 0.0)
+	view.rebuild()
+	view.apply(Vector3(0.0, 1.7, 10.0))
+	_check(mesh.visible, "lo que cruza el plano de la compuerta se conserva")
+	var door := Node3D.new()
+	door.name = "QaDoor"
+	world.add_child(door)
+	door.set_script(load("res://qa/door_stub.gd"))
+	door.set("aperture", 0.0)
+	view.configure(world, graph, [door], false, Vector2.ZERO)
+	_check(is_equal_approx(view.factor(0), 0.0), "una compuerta cerrada deja la abertura a cero")
+	var file := FileAccess.open("res://data/zone_graph.json", FileAccess.READ)
+	var parsed: Variant = JSON.parse_string(file.get_as_text()) if file != null else null
+	if file != null:
+		file.close()
+	var real := Visibility.partitions_for(parsed as Dictionary if parsed is Dictionary else {})
+	_check(real.size() == 6, "sólo las seis paredes opacas del grafo son particiones")
+	var electrical := -1
+	for index in real.size():
+		if str(real[index]["id"]) == "c04_electrical":
+			electrical = index
+	_check(electrical >= 0 and is_equal_approx(float(real[electrical]["half"]), 2.28)
+		and is_equal_approx(float(real[electrical]["lateral"]), 17.6),
+		"electricidad usa el vano y el desplazamiento afinados en la web")
+	view.set_gallery_open(true)
+	_check(is_equal_approx(Visibility.DOOR_MATCH, 0.9) and is_equal_approx(Visibility.MARGIN, 0.15),
+		"los márgenes del recorte son los de la web")
+	view.restore()
+	world.queue_free()
+	await process_frame
+
 func _validate_vehicle_ui() -> void:
 	var dash := CockpitDisplay.new()
 	root.add_child(dash)
@@ -1068,6 +1125,7 @@ func _run() -> void:
 	await _validate_vehicle_rig()
 	await _validate_vehicle_ui()
 	await _validate_perspectives()
+	await _validate_visibility()
 	_validate_w01_arms()
 	_validate_breath_audio()
 	_validate_transit()
