@@ -307,7 +307,9 @@ func step(delta: float, player_position: Vector3, first_person: bool,
 		physics.set_train(at)
 		physics.step(delta, forward, steer_input, hold, false)
 		_car_offset = Vector3(physics.position.x, 0.0, physics.position.z)
-		result = physics.position + Vector3(0.38, 1.055, -0.24).rotated(Vector3.UP, physics.yaw)
+		# El jugador se ancla por los pies: el ojo queda en la cabina.
+		result = physics.position \
+			+ Vector3(0.38, 1.055 - CameraController.EYE_HEIGHT, -0.24).rotated(Vector3.UP, physics.yaw)
 
 	if seat >= 0:
 		var offset: Vector3 = SEAT_OFFSETS[seat]

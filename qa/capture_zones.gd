@@ -19,6 +19,7 @@ const VIEWS := {
 	"transit_hub": [Vector3(0.0, 0.0, 86.0), Vector3(16.0, 1.8, 104.0)],
 	"transit_car": [Vector3(-6.4, 0.0, 104.2), Vector3(-12.0, 0.7, 109.0)],
 	"transit_seat": [Vector3(-11.6, 0.0, 108.8), Vector3(-11.6, 0.8, 115.0)],
+	"transit_chase": [Vector3(-12.0, 0.0, 109.0), Vector3(-12.0, 0.8, 115.0)],
 	"v03_cryo": [Vector3(31.0, 0.0, -84.0), Vector3(26.0, 1.6, -94.0)],
 }
 
@@ -104,6 +105,16 @@ func _place() -> void:
 	var view: Array = VIEWS[id]
 	var spot: Vector3 = view[0]
 	var target: Vector3 = view[1]
+	if id == "transit_chase":
+		# Persecución del coche (modo 1 de `Perspectives`): el operador al volante.
+		var hub := get_tree().get_first_node_in_group(&"capsule_transit")
+		if hub != null:
+			hub.driving = true
+			hub.simulation = false
+			_player.view.set_mode("first-person")
+			_player.perspective.car_mode = 1
+			for i in 60:
+				_player.call("_update_perspective", 1.0 / 60.0)
 	if id == "transit_seat":
 		# Vista del conductor: el ojo va donde lo pone `Transit.step`.
 		var hub := get_tree().get_first_node_in_group(&"capsule_transit") as Node3D

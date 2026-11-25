@@ -499,6 +499,51 @@ func _validate_w01_jaw() -> void:
 	jaw.pin(-1.0)
 	core.queue_free()
 
+func _validate_perspectives() -> void:
+	var view := Perspectives.new()
+	_check(view.mode(false) == 0 and view.mode(true) == 0, "las cámaras arrancan en primera persona y cabina")
+	view.cycle_foot()
+	view.cycle_foot()
+	view.cycle_car()
+	_check(view.mode(false) == 2 and view.mode(true) == 1,
+		"V y C ciclan las vistas de a pie y del coche")
+	_check(is_equal_approx(view.zoom(100.0), Perspectives.ZOOM_MAX)
+		and is_equal_approx(view.zoom(-100.0), Perspectives.ZOOM_MIN),
+		"la rueda del ratón queda acotada entre 2,2 y 9 m")
+	var body := Vector3(3.0, 1.72, 20.0)
+	var car := Transform3D(Basis(Vector3.UP, 0.4), Vector3(-12.0, 0.045, 109.0))
+	view = Perspectives.new()
+	var idle := view.solve(body, car, true, 0.0, 0.0, 1.0 / 60.0)
+	_check(not bool(idle["enabled"])
+		and (idle["position"] as Vector3).distance_to(car * Perspectives.COCKPIT) < 0.001,
+		"la cabina se coloca en el puesto del conductor")
+	view.car_mode = 1
+	for i in 40:
+		view.solve(body, car, true, 0.0, 0.0, 1.0 / 60.0)
+	var chase := view.solve(body, car, true, 0.0, 0.0, 1.0 / 60.0)
+	var pivot := car * Perspectives.CAR_PIVOT
+	_check(bool(chase["enabled"]) and (chase["position"] as Vector3).z < pivot.z
+		and absf((chase["position"] as Vector3).y - (pivot.y + Perspectives.HEIGHT)) < 0.02,
+		"la persecución va detrás y a la altura pedida")
+	view.foot = 2
+	var orbit := view.solve(body, Transform3D.IDENTITY, false, 0.0, 0.0, 1.0 / 60.0)
+	_check((orbit["position"] as Vector3).z > body.z, "la órbita a pie se queda por detrás")
+	var camera := Camera3D.new()
+	root.add_child(camera)
+	view = Perspectives.new()
+	view.car_mode = 1
+	var wall := func(origin: Vector3, destination: Vector3) -> float:
+		return 1.0
+	for i in 30:
+		view.apply(camera, body, car, true, 0.0, 0.0, wall, 1.0 / 60.0)
+	var shortened := camera.global_position.distance_to(car * Perspectives.CAR_PIVOT)
+	_check(shortened <= 1.0 - Perspectives.COLLISION_MARGIN + 0.05,
+		"una pared acorta la toma de la cámara")
+	_check(not Perspectives.new().apply(camera, body, car, false, 0.0, 0.0, Callable(), 1.0 / 60.0),
+		"en primera persona no se toca la cámara")
+	camera.queue_free()
+	await process_frame
+
 func _validate_vehicle_ui() -> void:
 	var dash := CockpitDisplay.new()
 	root.add_child(dash)
@@ -1022,6 +1067,7 @@ func _run() -> void:
 	await _validate_larva()
 	await _validate_vehicle_rig()
 	await _validate_vehicle_ui()
+	await _validate_perspectives()
 	_validate_w01_arms()
 	_validate_breath_audio()
 	_validate_transit()

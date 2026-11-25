@@ -169,12 +169,18 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `scripts/systems/vehicle_audio.gd` (`VehicleAudio`): motor (sierra `30 + rpm/63`), rodadura (triángulo `240 + |v|·18`), turbo (seno `240 + energía·4`) y ruido con paso bajo `240 + |v|·20 + 2700·impacto`, con las ganancias y constantes de tiempo de `VehicleAudio.ts`; se apaga con el coche aparcado.
 - `qa/validate_vehicle_ui.gd` (38 checks) y bloque de 11 en `run_suite`. Total **406 checks**, 0 fallos. Captura `reports/ingame-transit_seat.png`. Detalle en `PHASE_40_COCKPIT_AUDIO.md`.
 
+## Fase 41 · Perspectivas del operador y del coche
+- `scripts/world/perspectives.gd` (`Perspectives`): port de `Perspectives.ts` (104 líneas), el último archivo de `vehicle/*` sin equivalente. Dos tablas de modo (`foot`/`car`, 0–2) con ciclo `1 → 2 → 0`; a pie el modo 1 es hombro (`aim.y − 0,32`, 2,9 m) y el 2 es órbita (`−distancia · 0,72`, `+0,55 − 0,8 · pitch`); en coche el 0 es cabina en `COCKPIT (0,38; 1,055; −0,24)` mirando a `COCKPIT_AIM` con `up = car.basis.y`, y el 1/2 giran alrededor de `CAR_PIVOT (0; 0,66; 0,23)` a `DISTANCE 4,8` con `y = pivot.y + max(0,35; height)`. Rueda de 0,4 m entre 2,2 y 9,0 m, amortiguado `e^(−12·Δt)` y mezcla `smoothstep` a 5,0.
+- `player.gd`: `perspective` + `_update_perspective()`, `V` cicla a pie y `C` en coche, rueda acerca/aleja, `_hit_distance()` con `intersect_ray` y `max(COLLISION_MIN 0,12, d − COLLISION_MARGIN 0,17)`; modo 0 a pie devuelve el control a `CameraController`.
+- `capsule_transit.gd`: el asiento resta `CameraController.EYE_HEIGHT` — estaba anclado por el ojo y dejaba la cabina 1,72 m sobre el techo.
+- `qa/validate_perspectives.gd` (39 checks) + bloque de 8 en `run_suite`. Total **414 checks**, 0 fallos. Captura `reports/ingame-transit_chase.png`. Detalle en `PHASE_41_PERSPECTIVES.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.
 2. ~~Migrar la bóveda V-03~~ hecho en las fases 15 y 37 (lógica y geometría animada); faltan su audio y la apertura desde el panel de la galería.
 3. ~~Sistemas eléctricos/CCTV/archivos~~ hechos en las fases 16 y 17; quedan la geometría, las pantallas y el vídeo de las cámaras.
-4. ~~Migrar Transit/cápsula/vehículo con el solver de cuatro apoyos~~ hecho en las fases 39 y 40; faltan las perspectivas de cámara del coche (`Perspectives.ts`).
+4. ~~Migrar Transit/cápsula/vehículo con el solver de cuatro apoyos y las perspectivas~~ hecho en las fases 39, 40 y 41; falta el mapa de reflejos de las tiras de luz y el audio de puertas.
 5. Particionar el GLB combinado por zona para el pase de alta fidelidad y cerrar IA, deformación, audio y VFX con pruebas A/B.
 
 Ver `PHASE_13_ZONE_MODULES.md` para el detalle de la iteración.

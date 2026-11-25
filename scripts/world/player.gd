@@ -19,6 +19,10 @@ const LURE_COST := 12.0
 
 @export var mouse_sensitivity: float = 0.0022
 @export var interaction_range: float = 3.2
+## Cámaras de hombro, órbita y del coche (`Perspectives.ts`, fase 41).
+var perspective := Perspectives.new()
+var _perspective_active := false
+
 @onready var camera: Camera3D = $Camera3D
 ## Manos y equipo en primera persona (modelos originales de `touch_rig_assets.glb`).
 @onready var rig: FirstPersonRig = $Camera3D/FirstPerson
@@ -133,6 +137,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		if not view.is_first_person() and orbit_drag:
 			view.orbit_rotate(motion.relative.x * 0.0042, motion.relative.y * 0.0042)
 			return
+	if event is InputEventMouseButton and perspective.enabled:
+		var zoom_button := event as InputEventMouseButton
+		if zoom_button.pressed and zoom_button.button_index == MOUSE_BUTTON_WHEEL_UP:
+			perspective.zoom(-1.0)
+			return
+		if zoom_button.pressed and zoom_button.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			perspective.zoom(1.0)
+			return
 	if event is InputEventMouseButton and not view.is_first_person():
 		var button := event as InputEventMouseButton
 		if button.button_index == MOUSE_BUTTON_LEFT:
@@ -143,6 +155,14 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 		if button.pressed and button.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			view.orbit_zoom(0.12)
+			return
+	if event is InputEventKey and (event as InputEventKey).pressed and not (event as InputEventKey).echo:
+		var key := (event as InputEventKey).keycode
+		if key == KEY_V:
+			_cycle_perspective(false)
+			return
+		if key == KEY_C:
+			_cycle_perspective(true)
 			return
 	if event.is_action_pressed(&"toggle_view"):
 		toggle_view()
@@ -244,6 +264,8 @@ func _process(delta: float) -> void:
 		return
 	if not view.is_first_person():
 		_update_orbit(delta)
+	else:
+		_update_perspective(delta)
 	_prompt_timer -= delta
 	if _prompt_timer <= 0.0:
 		_prompt_timer = 0.12
@@ -300,6 +322,53 @@ func _apply_eye_height() -> void:
 	camera.position = _eye_base + Vector3(0.0,
 		-CameraController.CROUCH_DROP if view.crouch else 0.0, 0.0)
 	camera.position.y += view.bob_offset()
+
+## Cámaras de la fase 41: hombro y órbita a pie, cabina y persecución al volante.
+func _update_perspective(delta: float) -> void:
+	if not view.is_first_person():
+		if _perspective_active:
+			_perspective_active = false
+		return
+	var transit := game_state.transit if game_state != null else null
+	var driving: bool = transit != null and transit.driving and transit.car != null
+	var car := Transform3D.IDENTITY
+	if driving:
+		car = (transit.car as Node3D).global_transform
+	var placed := perspective.apply(camera, global_position, car, driving, rotation.y, _pitch,
+		_hit_distance, delta)
+	if not placed and _perspective_active:
+		camera.top_level = false
+		camera.position = _eye_base
+		camera.rotation = Vector3(_pitch, 0.0, 0.0)
+	_perspective_active = placed
+
+
+## Distancia del primer obstáculo entre dos puntos (para el acortado de la toma).
+func _hit_distance(origin: Vector3, destination: Vector3) -> float:
+	var world := get_world_3d()
+	if world == null:
+		return -1.0
+	var query := PhysicsRayQueryParameters3D.create(origin, destination, 0xFFFFFFFF, [get_rid()])
+	query.collide_with_areas = true
+	query.collide_with_bodies = true
+	query.hit_from_inside = true
+	var found := world.direct_space_state.intersect_ray(query)
+	if found.is_empty():
+		return -1.0
+	return origin.distance_to(found.get("position", origin) as Vector3)
+
+
+## V cicla las vistas a pie y C las del coche.
+func _cycle_perspective(car: bool) -> void:
+	if car:
+		var mode := perspective.cycle_car()
+		show_message(["Cabina", "Persecución", "Órbita del coche"][mode])
+	else:
+		var mode := perspective.cycle_foot()
+		show_message(["Primera persona", "Al hombro", "Órbita trasera"][mode])
+	if game_state != null:
+		game_state.log_event("Cámara: " + ("coche " if car else "") + str(perspective.mode(car)))
+
 
 func _update_orbit(delta: float) -> void:
 	view.focal_point = global_position + Vector3(0.0, 1.6, 0.0)
