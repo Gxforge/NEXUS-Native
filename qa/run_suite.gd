@@ -499,6 +499,51 @@ func _validate_w01_jaw() -> void:
 	jaw.pin(-1.0)
 	core.queue_free()
 
+func _validate_vehicle_ui() -> void:
+	var dash := CockpitDisplay.new()
+	root.add_child(dash)
+	await process_frame
+	_check(dash.face != null, "el panel de instrumentos se monta")
+	dash.paint(0, "N", 100, 850)
+	_check(dash.text_of("Speed") == "000" and dash.text_of("Gear") == "GEAR N",
+		"el panel arranca en punto muerto")
+	_check(dash.text_of("Charge") == "E 100%" and dash.text_of("Title") == "GT / 14     AXIAL DRIVE",
+		"el panel enseña energía y cabecera")
+	var paints := dash.paints
+	dash.paint(0, "N", 100, 850)
+	_check(dash.paints == paints, "el panel no se repinta si nada cambia")
+	dash.paint(74, "3", 42, 3200)
+	_check(dash.text_of("Speed") == "074" and dash.text_of("Gear") == "GEAR 3"
+		and dash.text_of("Rpm") == "3200 RPM", "el panel se repinta al cambiar la telemetría")
+	_check(absf(dash.bar_width() - 42.0 * 3.55 * CockpitDisplay.PIXEL) < 0.0001,
+		"la barra de energía sigue a la carga")
+	var physics := VehiclePhysics.new()
+	physics.reset(-12.0, 109.0, 0.0, true)
+	physics.speed = 12.4
+	physics.energy = 63.4
+	physics.rpm = 2750.0
+	physics.gear = "2"
+	dash.sync(physics)
+	_check(dash.text_of("Speed") == "045" and dash.text_of("Rpm") == "2800 RPM",
+		"la telemetría llega redondeada como en la web")
+	var audio := VehicleAudio.new()
+	root.add_child(audio)
+	await process_frame
+	physics.throttle = 1.0
+	for i in 40:
+		audio._process(1.0 / 60.0)
+		audio.update(physics, true)
+	_check(absf(audio.engine_hz - (30.0 + 2750.0 / 63.0)) < 0.001
+		and absf(audio.roll_hz - (240.0 + 12.4 * 18.0)) < 0.001,
+		"las voces del motor siguen la fórmula de la web")
+	_check(absf(audio.engine_gain - 0.02) < 0.001, "la ganancia del motor responde al gas")
+	_check(audio.bus_filter() != null and audio.filter_hz > 240.0, "la rodadura pasa por el paso bajo")
+	audio.quiet()
+	_check(not audio.active and audio.engine_gain == 0.0, "quiet silencia el coche")
+	dash.queue_free()
+	audio.queue_free()
+	await process_frame
+
 func _validate_vehicle_rig() -> void:
 	var physics := VehiclePhysics.new()
 	physics.reset(-12.0, 109.0, 0.0, true)
@@ -976,6 +1021,7 @@ func _run() -> void:
 	_validate_loading_progress()
 	await _validate_larva()
 	await _validate_vehicle_rig()
+	await _validate_vehicle_ui()
 	_validate_w01_arms()
 	_validate_breath_audio()
 	_validate_transit()

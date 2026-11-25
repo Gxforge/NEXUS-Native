@@ -18,6 +18,7 @@ const VIEWS := {
 	"v03_gallery": [Vector3(27.2, 0.0, -36.0), Vector3(25.4, 1.4, -54.0)],
 	"transit_hub": [Vector3(0.0, 0.0, 86.0), Vector3(16.0, 1.8, 104.0)],
 	"transit_car": [Vector3(-6.4, 0.0, 104.2), Vector3(-12.0, 0.7, 109.0)],
+	"transit_seat": [Vector3(-11.6, 0.0, 108.8), Vector3(-11.6, 0.8, 115.0)],
 	"v03_cryo": [Vector3(31.0, 0.0, -84.0), Vector3(26.0, 1.6, -94.0)],
 }
 
@@ -85,7 +86,7 @@ func _process(_delta: float) -> void:
 ## Pide la transición a la zona de este paso (si no estamos ya en ella).
 ## Las vistas extra (`transit_car`) viven en la zona que indican, no en su nombre.
 func _zone_for(id: String) -> String:
-	return "transit_hub" if id == "transit_car" else id
+	return "transit_hub" if id.begins_with("transit_") else id
 
 
 func _start_zone() -> void:
@@ -103,6 +104,18 @@ func _place() -> void:
 	var view: Array = VIEWS[id]
 	var spot: Vector3 = view[0]
 	var target: Vector3 = view[1]
+	if id == "transit_seat":
+		# Vista del conductor: el ojo va donde lo pone `Transit.step`.
+		var hub := get_tree().get_first_node_in_group(&"capsule_transit") as Node3D
+		var rig := hub.get_node_or_null("RailCar") as Node3D if hub != null else null
+		if rig != null:
+			var seat := rig.global_transform * Vector3(0.38, 1.055, -0.24)
+			spot = Vector3(seat.x, seat.y - 1.72, seat.z)
+			target = rig.global_transform * Vector3(0.38, 0.62, 3.6)
+			var dash := rig.get_node_or_null("Cockpit")
+			if dash != null:
+				print("CAPTURE panel: ", dash.key, " · ", dash.text_of("Speed"), " km/h · ",
+					dash.text_of("Gear"), " · ", dash.text_of("Charge"))
 	if id == "transit_car":
 		# El coche se busca en el árbol: así la toma no depende de la colocación.
 		var transit := get_tree().get_first_node_in_group(&"capsule_transit") as Node3D
@@ -111,6 +124,14 @@ func _place() -> void:
 			target = car.global_position + Vector3(0.0, 0.7, 0.0)
 			spot = car.global_position + Vector3(5.2, 0.0, 0.2)
 			print("CAPTURE coche en ", car.global_position, " con ", car.wheel_count(), " ruedas")
+			var dash := car.get_node_or_null("Cockpit")
+			if dash != null:
+				var face := dash.get_node_or_null("CockpitFace") as MeshInstance3D
+				var mat := face.material_override as StandardMaterial3D if face != null else null
+				print("CAPTURE panel: en árbol=", dash.is_inside_tree(), " viewport=", dash.viewport != null,
+					" hijos=", dash.viewport.get_child_count() if dash.viewport != null else -1,
+					" tex=", mat.albedo_texture if mat != null else "sin material",
+					" clave=", dash.key)
 	_player.global_position = spot
 	_player.velocity = Vector3.ZERO
 	var eye := spot + Vector3(0.0, 1.72, 0.0)

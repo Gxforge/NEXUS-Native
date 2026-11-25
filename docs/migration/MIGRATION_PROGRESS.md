@@ -164,12 +164,17 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `CapsuleTransit._build_car()`: el coche se monta al arrancar y se sincroniza en cada paso (conduciendo o aparcado).
 - `qa/validate_vehicle_rig.gd` (51 checks) y bloque de 12 en `run_suite`. Total **395 checks**, 0 fallos. Captura `reports/ingame-transit_car.png`. Detalle en `PHASE_39_VEHICLE.md`.
 
+## Fase 40 · Panel de instrumentos y sonido del coche
+- `scripts/world/cockpit_display.gd` (`CockpitDisplay`): lienzo de 384 × 144 reproducido en el espacio (1 px = 1 mm) con `Label3D` y barra de carga, repintado sólo al cambiar la clave y telemetría redondeada como la web. Subido a 1,03 m y 0,47 m con 12° de inclinación porque el salpicadero exportado tapa la posición original.
+- `scripts/systems/vehicle_audio.gd` (`VehicleAudio`): motor (sierra `30 + rpm/63`), rodadura (triángulo `240 + |v|·18`), turbo (seno `240 + energía·4`) y ruido con paso bajo `240 + |v|·20 + 2700·impacto`, con las ganancias y constantes de tiempo de `VehicleAudio.ts`; se apaga con el coche aparcado.
+- `qa/validate_vehicle_ui.gd` (38 checks) y bloque de 11 en `run_suite`. Total **406 checks**, 0 fallos. Captura `reports/ingame-transit_seat.png`. Detalle en `PHASE_40_COCKPIT_AUDIO.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa en una build visible de Android.
 2. ~~Migrar la bóveda V-03~~ hecho en las fases 15 y 37 (lógica y geometría animada); faltan su audio y la apertura desde el panel de la galería.
 3. ~~Sistemas eléctricos/CCTV/archivos~~ hechos en las fases 16 y 17; quedan la geometría, las pantallas y el vídeo de las cámaras.
-4. ~~Migrar Transit/cápsula/vehículo con el solver de cuatro apoyos~~ hecho en la fase 39; faltan cabina, audio y perspectivas del coche.
+4. ~~Migrar Transit/cápsula/vehículo con el solver de cuatro apoyos~~ hecho en las fases 39 y 40; faltan las perspectivas de cámara del coche (`Perspectives.ts`).
 5. Particionar el GLB combinado por zona para el pase de alta fidelidad y cerrar IA, deformación, audio y VFX con pruebas A/B.
 
 Ver `PHASE_13_ZONE_MODULES.md` para el detalle de la iteración.

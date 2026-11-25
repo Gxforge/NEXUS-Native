@@ -30,6 +30,8 @@ const WHEEL_POSITIONS := [
 var body: Node3D
 var wheels: Array[Node3D] = []
 var model: Node3D
+## Panel de instrumentos del salpicadero (`Cockpit.ts`).
+var dash: CockpitDisplay = null
 
 
 ## Monta el modelo exportado y separa cuerpo y ruedas.
@@ -61,6 +63,10 @@ func attach(exported: Node3D) -> bool:
 		wheels[index].position = WHEEL_POSITIONS[index]
 	if body != null:
 		body.position = Vector3.ZERO
+	if dash == null:
+		dash = CockpitDisplay.new()
+		dash.name = "Cockpit"
+		add_child(dash)
 	place(Vector3.ZERO, 0.0)
 	return body != null and wheels.size() == 4
 
@@ -85,6 +91,8 @@ func sync(physics: VehiclePhysics) -> void:
 		var wheel := wheels[index]
 		wheel.position.y = COM_Y + WHEEL_ANCHOR_Y - float(state["suspension"])
 		wheel.rotation = Vector3(float(state["rotation"]), float(state["steering"]), 0.0)
+	if dash != null:
+		dash.sync(physics)
 
 
 ## Cuántas ruedas se han montado.

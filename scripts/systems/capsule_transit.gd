@@ -29,6 +29,8 @@ const SEAT_OFFSETS := [
 var physics: VehiclePhysics = VehiclePhysics.new()
 ## Carrocería y ruedas de `vehicle.glb` (fase 39).
 var car: VehicleRig = null
+## Motor, rodadura y turbo sintetizados (`VehicleAudio.ts`, fase 40).
+var audio: VehicleAudio = null
 
 var at := STATION_B
 var target := STATION_B
@@ -82,6 +84,9 @@ func _build_car() -> void:
 		car = null
 		return
 	car.place(_car_offset, 0.0)
+	audio = VehicleAudio.new()
+	audio.name = "EngineAudio"
+	add_child(audio)
 
 
 func reset() -> void:
@@ -316,6 +321,11 @@ func step(delta: float, player_position: Vector3, first_person: bool,
 			car.sync(physics)
 		else:
 			car.place(_car_offset, 0.0)
+	if audio != null:
+		audio.update(physics, driving)
+	audio = VehicleAudio.new()
+	audio.name = "EngineAudio"
+	add_child(audio)
 
 	if hold and time >= 0.0:
 		_set_status("RETENIDA")
