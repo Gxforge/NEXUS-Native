@@ -188,6 +188,13 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - Ajustes que exigió: `config/version = "0.43.0"` y `import_etc2_astc = true` (sin él el export de Android falla con un mensaje **vacío**), `.gdignore` en `reports/` y `tools/`, y `/build/` fuera de git.
 - `qa/validate_distribution.gd` (38 checks) + bloque de 11 en `run_suite`. Total **435 checks**, 0 fallos. Detalle en `PHASE_43_DISTRIBUTION.md`.
 
+## Fase 44 · Pantalla de carga con progreso real
+- Diagnosticado el 60 % eterno: `load_threaded_get_status` informa `0` durante toda la precarga y la fase 37 tapaba el hueco con un suelo exponencial que tiende a 60; la línea de datos mostraba el enum interno (`estado IDLE`). El juego entraba en 1,8 s, no había cuelgue.
+- `scripts/ui/loading_progress.gd` reescrito: plan por dependencias (`ext_resource` a dos niveles, módulo al final, un recurso en vuelo cada vez), arrastre máximo del 85 % dentro del recurso en curso, techo de precarga en 92 % con el montaje real en el último tramo, línea de datos de operador (`C04 · zone_c04_shell.tscn · 14 de 14 recursos · 3.2 MB · 0:02`), reloj de pared, aviso a los 15 s sin avance y botón **Volver al menú** a los 60 s.
+- `tools/gen_load_plan.gd` + `data/load_plan.json` (**12 zonas · 136 recursos · 4,0 MB**): el juego exportado lleva los `.tscn`/`.glb` remapeados a `.scn` y no puede leer dependencias, así que se calculan en la construcción y se versionan. `tools/build.sh` los regenera antes de exportar.
+- `main.tscn`: panel de carga más alto, `Content/Hint` y `Content/Cancel`; `main.gd`: `_begin_load_plan`, `_request_next_resource`, `_tick_loading`, `cancel_loading`, y dos fotogramas de pausa para que el 92 % se pinte antes del bloqueo del montaje.
+- `qa/run_suite.gd`: bloque de carga de 9 a 25 comprobaciones. Total **455 checks**, 0 fallos. Versión 0.44.0. Medición: 7 % en el primer fotograma, 14 de 14 a los 0,39 s, juego listo en 2,1 s. Detalle en `PHASE_44_LOADING.md`.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa con el APK en un dispositivo real (checklist en `PHASE_43_DISTRIBUTION.md`).

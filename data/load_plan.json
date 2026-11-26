@@ -1,0 +1,623 @@
+{
+  "engine": "4.4.1-stable (official)",
+  "generated": "2026-11-26T13:41:50",
+  "depth": 2,
+  "zones": {
+    "res://zones/zone_a01_shell.tscn": {
+      "files": [
+        {
+          "path": "res://scripts/zones/zone_root.gd",
+          "kb": 1.5
+        },
+        {
+          "path": "res://scripts/zones/structural_shell.gd",
+          "kb": 1.0
+        },
+        {
+          "path": "res://assets/generated/a01_structural_shell.glb",
+          "kb": 7.4
+        },
+        {
+          "path": "res://scenes/validation/a01_portal_assembly.tscn",
+          "kb": 2.2
+        },
+        {
+          "path": "res://scenes/entities/field_flashlight.tscn",
+          "kb": 1.2
+        },
+        {
+          "path": "res://scripts/zones/zone_dressing.gd",
+          "kb": 42.8
+        },
+        {
+          "path": "res://scripts/zones/streaming_sector_door.gd",
+          "kb": 3.5
+        },
+        {
+          "path": "res://assets/generated/a01_portal_frame.glb",
+          "kb": 8.0
+        },
+        {
+          "path": "res://assets/generated/a01_door_leaf.glb",
+          "kb": 5.2
+        },
+        {
+          "path": "res://scripts/interaction/field_pickup.gd",
+          "kb": 0.9
+        },
+        {
+          "path": "res://zones/zone_a01_shell.tscn",
+          "kb": 1.6
+        }
+      ],
+      "kb": 75.4,
+      "count": 11
+    },
+    "res://zones/zone_b02_turbines.tscn": {
+      "files": [
+        {
+          "path": "res://scripts/zones/zone_root.gd",
+          "kb": 1.5
+        },
+        {
+          "path": "res://scripts/zones/structural_shell.gd",
+          "kb": 1.0
+        },
+        {
+          "path": "res://assets/generated/b02_structural_shell.glb",
+          "kb": 8.8
+        },
+        {
+          "path": "res://scenes/validation/a01_portal_assembly.tscn",
+          "kb": 2.2
+        },
+        {
+          "path": "res://scenes/entities/field_flashlight.tscn",
+          "kb": 1.2
+        },
+        {
+          "path": "res://scripts/systems/bench_station.gd",
+          "kb": 2.4
+        },
+        {
+          "path": "res://scripts/zones/zone_dressing.gd",
+          "kb": 42.8
+        },
+        {
+          "path": "res://scripts/zones/streaming_sector_door.gd",
+          "kb": 3.5
+        },
+        {
+          "path": "res://assets/generated/a01_portal_frame.glb",
+          "kb": 8.0
+        },
+        {
+          "path": "res://assets/generated/a01_door_leaf.glb",
+          "kb": 5.2
+        },
+        {
+          "path": "res://scripts/interaction/field_pickup.gd",
+          "kb": 0.9
+        },
+        {
+          "path": "res://zones/zone_b02_turbines.tscn",
+          "kb": 2.7
+        }
+      ],
+      "kb": 80.3,
+      "count": 12
+    },
+    "res://zones/zone_c04_shell.tscn": {
+      "files": [
+        {
+          "path": "res://scripts/zones/zone_root.gd",
+          "kb": 1.5
+        },
+        {
+          "path": "res://scripts/zones/structural_shell.gd",
+          "kb": 1.0
+        },
+        {
+          "path": "res://assets/generated/c04_structural_shell.glb",
+          "kb": 14.5
+        },
+        {
+          "path": "res://scenes/validation/a01_portal_assembly.tscn",
+          "kb": 2.2
+        },
+        {
+          "path": "res://scenes/entities/w01_actor.tscn",
+          "kb": 0.9
+        },
+        {
+          "path": "res://scripts/zones/zone_dressing.gd",
+          "kb": 42.8
+        },
+        {
+          "path": "res://scripts/zones/streaming_sector_door.gd",
+          "kb": 3.5
+        },
+        {
+          "path": "res://assets/generated/a01_portal_frame.glb",
+          "kb": 8.0
+        },
+        {
+          "path": "res://assets/generated/a01_door_leaf.glb",
+          "kb": 5.2
+        },
+        {
+          "path": "res://scripts/entities/w01_actor.gd",
+          "kb": 8.6
+        },
+        {
+          "path": "res://assets/generated/w01_core.glb",
+          "kb": 1451.1
+        },
+        {
+          "path": "res://assets/generated/w01_eyes.glb",
+          "kb": 476.2
+        },
+        {
+          "path": "res://assets/generated/w01_tentacles.glb",
+          "kb": 1222.4
+        },
+        {
+          "path": "res://zones/zone_c04_shell.tscn",
+          "kb": 2.7
+        }
+      ],
+      "kb": 3240.8,
+      "count": 14
+    },
+    "res://zones/zone_d02_records.tscn": {
+      "files": [
+        {
+          "path": "res://scripts/zones/zone_root.gd",
+          "kb": 1.5
+        },
+        {
+          "path": "res://scripts/zones/structural_shell.gd",
+          "kb": 1.0
+        },
+        {
+          "path": "res://assets/generated/d02_structural_shell.glb",
+          "kb": 7.4
+        },
+        {
+          "path": "res://scenes/validation/a01_portal_assembly.tscn",
+          "kb": 2.2
+        },
+        {
+          "path": "res://scenes/entities/field_flashlight.tscn",
+          "kb": 1.2
+        },
+        {
+          "path": "res://scripts/zones/files_module.gd",
+          "kb": 9.0
+        },
+        {
+          "path": "res://scripts/zones/files_tray.gd",
+          "kb": 3.0
+        },
+        {
+          "path": "res://scripts/zones/zone_dressing.gd",
+          "kb": 42.8
+        },
+        {
+          "path": "res://scripts/zones/streaming_sector_door.gd",
+          "kb": 3.5
+        },
+        {
+          "path": "res://assets/generated/a01_portal_frame.glb",
+          "kb": 8.0
+        },
+        {
+          "path": "res://assets/generated/a01_door_leaf.glb",
+          "kb": 5.2
+        },
+        {
+          "path": "res://scripts/interaction/field_pickup.gd",
+          "kb": 0.9
+        },
+        {
+          "path": "res://zones/zone_d02_records.tscn",
+          "kb": 5.6
+        }
+      ],
+      "kb": 91.4,
+      "count": 13
+    },
+    "res://zones/zone_electrical.tscn": {
+      "files": [
+        {
+          "path": "res://scripts/zones/zone_root.gd",
+          "kb": 1.5
+        },
+        {
+          "path": "res://scripts/zones/structural_shell.gd",
+          "kb": 1.0
+        },
+        {
+          "path": "res://assets/generated/electrical_structural_shell.glb",
+          "kb": 7.5
+        },
+        {
+          "path": "res://scenes/validation/a01_portal_assembly.tscn",
+          "kb": 2.2
+        },
+        {
+          "path": "res://scenes/entities/field_flashlight.tscn",
+          "kb": 1.2
+        },
+        {
+          "path": "res://scripts/systems/operations_console.gd",
+          "kb": 3.6
+        },
+        {
+          "path": "res://scripts/ui/wall_screen.gd",
+          "kb": 3.9
+        },
+        {
+          "path": "res://scripts/ui/telemetry_feed.gd",
+          "kb": 3.2
+        },
+        {
+          "path": "res://scripts/zones/zone_dressing.gd",
+          "kb": 42.8
+        },
+        {
+          "path": "res://scripts/zones/streaming_sector_door.gd",
+          "kb": 3.5
+        },
+        {
+          "path": "res://assets/generated/a01_portal_frame.glb",
+          "kb": 8.0
+        },
+        {
+          "path": "res://assets/generated/a01_door_leaf.glb",
+          "kb": 5.2
+        },
+        {
+          "path": "res://scripts/interaction/field_pickup.gd",
+          "kb": 0.9
+        },
+        {
+          "path": "res://zones/zone_electrical.tscn",
+          "kb": 4.3
+        }
+      ],
+      "kb": 88.8,
+      "count": 14
+    },
+    "res://zones/zone_h01_hydraulics.tscn": {
+      "files": [
+        {
+          "path": "res://scripts/zones/zone_root.gd",
+          "kb": 1.5
+        },
+        {
+          "path": "res://scripts/zones/structural_shell.gd",
+          "kb": 1.0
+        },
+        {
+          "path": "res://assets/generated/h01_structural_shell.glb",
+          "kb": 7.4
+        },
+        {
+          "path": "res://scenes/validation/a01_portal_assembly.tscn",
+          "kb": 2.2
+        },
+        {
+          "path": "res://scripts/systems/bench_station.gd",
+          "kb": 2.4
+        },
+        {
+          "path": "res://scripts/zones/zone_dressing.gd",
+          "kb": 42.8
+        },
+        {
+          "path": "res://scripts/zones/streaming_sector_door.gd",
+          "kb": 3.5
+        },
+        {
+          "path": "res://assets/generated/a01_portal_frame.glb",
+          "kb": 8.0
+        },
+        {
+          "path": "res://assets/generated/a01_door_leaf.glb",
+          "kb": 5.2
+        },
+        {
+          "path": "res://zones/zone_h01_hydraulics.tscn",
+          "kb": 2.3
+        }
+      ],
+      "kb": 76.4,
+      "count": 10
+    },
+    "res://zones/zone_surveillance.tscn": {
+      "files": [
+        {
+          "path": "res://scripts/zones/zone_root.gd",
+          "kb": 1.5
+        },
+        {
+          "path": "res://scripts/zones/structural_shell.gd",
+          "kb": 1.0
+        },
+        {
+          "path": "res://assets/generated/surveillance_structural_shell.glb",
+          "kb": 7.5
+        },
+        {
+          "path": "res://scenes/validation/a01_portal_assembly.tscn",
+          "kb": 2.2
+        },
+        {
+          "path": "res://scripts/systems/operations_console.gd",
+          "kb": 3.6
+        },
+        {
+          "path": "res://scripts/zones/zone_dressing.gd",
+          "kb": 42.8
+        },
+        {
+          "path": "res://scripts/zones/streaming_sector_door.gd",
+          "kb": 3.5
+        },
+        {
+          "path": "res://assets/generated/a01_portal_frame.glb",
+          "kb": 8.0
+        },
+        {
+          "path": "res://assets/generated/a01_door_leaf.glb",
+          "kb": 5.2
+        },
+        {
+          "path": "res://zones/zone_surveillance.tscn",
+          "kb": 2.7
+        }
+      ],
+      "kb": 78.1,
+      "count": 10
+    },
+    "res://zones/zone_transit_hub.tscn": {
+      "files": [
+        {
+          "path": "res://scripts/zones/zone_root.gd",
+          "kb": 1.5
+        },
+        {
+          "path": "res://scripts/zones/structural_shell.gd",
+          "kb": 1.0
+        },
+        {
+          "path": "res://assets/generated/transit_hub_structural_shell.glb",
+          "kb": 10.2
+        },
+        {
+          "path": "res://scenes/validation/a01_portal_assembly.tscn",
+          "kb": 2.2
+        },
+        {
+          "path": "res://scripts/systems/capsule_transit.gd",
+          "kb": 11.9
+        },
+        {
+          "path": "res://scripts/systems/transit_console.gd",
+          "kb": 1.9
+        },
+        {
+          "path": "res://scripts/zones/zone_dressing.gd",
+          "kb": 42.8
+        },
+        {
+          "path": "res://scripts/zones/streaming_sector_door.gd",
+          "kb": 3.5
+        },
+        {
+          "path": "res://assets/generated/a01_portal_frame.glb",
+          "kb": 8.0
+        },
+        {
+          "path": "res://assets/generated/a01_door_leaf.glb",
+          "kb": 5.2
+        },
+        {
+          "path": "res://zones/zone_transit_hub.tscn",
+          "kb": 5.7
+        }
+      ],
+      "kb": 94.0,
+      "count": 11
+    },
+    "res://zones/zone_transit_rail.tscn": {
+      "files": [
+        {
+          "path": "res://scripts/zones/zone_root.gd",
+          "kb": 1.5
+        },
+        {
+          "path": "res://scripts/zones/structural_shell.gd",
+          "kb": 1.0
+        },
+        {
+          "path": "res://assets/generated/transit_rail_structural_shell.glb",
+          "kb": 7.4
+        },
+        {
+          "path": "res://scenes/validation/a01_portal_assembly.tscn",
+          "kb": 2.2
+        },
+        {
+          "path": "res://scripts/zones/streaming_sector_door.gd",
+          "kb": 3.5
+        },
+        {
+          "path": "res://assets/generated/a01_portal_frame.glb",
+          "kb": 8.0
+        },
+        {
+          "path": "res://assets/generated/a01_door_leaf.glb",
+          "kb": 5.2
+        },
+        {
+          "path": "res://zones/zone_transit_rail.tscn",
+          "kb": 3.9
+        }
+      ],
+      "kb": 32.9,
+      "count": 8
+    },
+    "res://zones/zone_transit_road.tscn": {
+      "files": [
+        {
+          "path": "res://scripts/zones/zone_root.gd",
+          "kb": 1.5
+        },
+        {
+          "path": "res://scripts/zones/structural_shell.gd",
+          "kb": 1.0
+        },
+        {
+          "path": "res://assets/generated/transit_road_structural_shell.glb",
+          "kb": 7.5
+        },
+        {
+          "path": "res://scenes/validation/a01_portal_assembly.tscn",
+          "kb": 2.2
+        },
+        {
+          "path": "res://scripts/zones/zone_dressing.gd",
+          "kb": 42.8
+        },
+        {
+          "path": "res://scripts/zones/streaming_sector_door.gd",
+          "kb": 3.5
+        },
+        {
+          "path": "res://assets/generated/a01_portal_frame.glb",
+          "kb": 8.0
+        },
+        {
+          "path": "res://assets/generated/a01_door_leaf.glb",
+          "kb": 5.2
+        },
+        {
+          "path": "res://zones/zone_transit_road.tscn",
+          "kb": 4.1
+        }
+      ],
+      "kb": 75.8,
+      "count": 9
+    },
+    "res://zones/zone_v03_cryotheque.tscn": {
+      "files": [
+        {
+          "path": "res://scripts/zones/zone_root.gd",
+          "kb": 1.5
+        },
+        {
+          "path": "res://scripts/zones/structural_shell.gd",
+          "kb": 1.0
+        },
+        {
+          "path": "res://assets/generated/v03_cryo_structural_shell.glb",
+          "kb": 7.4
+        },
+        {
+          "path": "res://scenes/validation/a01_portal_assembly.tscn",
+          "kb": 2.2
+        },
+        {
+          "path": "res://scenes/entities/field_flashlight.tscn",
+          "kb": 1.2
+        },
+        {
+          "path": "res://scripts/zones/zone_dressing.gd",
+          "kb": 42.8
+        },
+        {
+          "path": "res://scripts/zones/streaming_sector_door.gd",
+          "kb": 3.5
+        },
+        {
+          "path": "res://assets/generated/a01_portal_frame.glb",
+          "kb": 8.0
+        },
+        {
+          "path": "res://assets/generated/a01_door_leaf.glb",
+          "kb": 5.2
+        },
+        {
+          "path": "res://scripts/interaction/field_pickup.gd",
+          "kb": 0.9
+        },
+        {
+          "path": "res://zones/zone_v03_cryotheque.tscn",
+          "kb": 1.7
+        }
+      ],
+      "kb": 75.5,
+      "count": 11
+    },
+    "res://zones/zone_v03_gallery.tscn": {
+      "files": [
+        {
+          "path": "res://scripts/zones/zone_root.gd",
+          "kb": 1.5
+        },
+        {
+          "path": "res://scripts/zones/structural_shell.gd",
+          "kb": 1.0
+        },
+        {
+          "path": "res://assets/generated/v03_gallery_structural_shell.glb",
+          "kb": 11.6
+        },
+        {
+          "path": "res://scenes/validation/a01_portal_assembly.tscn",
+          "kb": 2.2
+        },
+        {
+          "path": "res://scenes/entities/field_flashlight.tscn",
+          "kb": 1.2
+        },
+        {
+          "path": "res://scripts/zones/vault_module.gd",
+          "kb": 12.6
+        },
+        {
+          "path": "res://scripts/zones/vault_station.gd",
+          "kb": 2.7
+        },
+        {
+          "path": "res://scripts/zones/zone_dressing.gd",
+          "kb": 42.8
+        },
+        {
+          "path": "res://scripts/zones/streaming_sector_door.gd",
+          "kb": 3.5
+        },
+        {
+          "path": "res://assets/generated/a01_portal_frame.glb",
+          "kb": 8.0
+        },
+        {
+          "path": "res://assets/generated/a01_door_leaf.glb",
+          "kb": 5.2
+        },
+        {
+          "path": "res://scripts/interaction/field_pickup.gd",
+          "kb": 0.9
+        },
+        {
+          "path": "res://zones/zone_v03_gallery.tscn",
+          "kb": 4.1
+        }
+      ],
+      "kb": 97.3,
+      "count": 13
+    }
+  }
+}

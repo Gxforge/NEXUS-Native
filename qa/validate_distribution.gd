@@ -53,7 +53,7 @@ func _run() -> void:
 
 	# 2. Versión: la del proyecto manda y los presets la repiten.
 	var version := str(project.get_value("application", "config/version", ""))
-	_check("el proyecto lleva versión (%s)" % version, version == "0.43.0")
+	_check("el proyecto lleva versión (%s)" % version, version == "0.44.0")
 	_check("el APK repite la versión del proyecto (%s)"
 		% str(presets.get_value("preset.2.options", "version/name", "")),
 		str(presets.get_value("preset.2.options", "version/name", "")) == version)

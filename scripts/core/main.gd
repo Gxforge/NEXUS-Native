@@ -12,6 +12,8 @@ extends Node
 @onready var loading_status: Label = $UI/LoadingScreen/Panel/Content/Status
 @onready var loading_details: Label = $UI/LoadingScreen/Panel/Content/Details
 @onready var loading_title: Label = $UI/LoadingScreen/Panel/Content/Title
+@onready var loading_hint: Label = $UI/LoadingScreen/Panel/Content/Hint
+@onready var loading_cancel: Button = $UI/LoadingScreen/Panel/Content/Cancel
 
 var _startup_requested: bool = false
 var _transition_requested: bool = false
@@ -22,9 +24,23 @@ const ZONE_GRAPH_PATH := "res://data/zone_graph.json"
 const SCENE_OFFSET_2D := Vector2(9.0, 14.0)
 var _startup_zone: StringName = &"c04"
 var _autosave_timer: float = 10.0
-## Segundos que lleva la pantalla de carga y tamaño del módulo en disco.
+## Estado real de la pantalla de carga: plan de recursos, cuántos van y cuánto
+## lleva el actual sin terminar.
 var _load_elapsed: float = 0.0
-var _load_size_kb: float = 0.0
+var _load_plan: PackedStringArray = PackedStringArray()
+var _load_total: int = 0
+var _load_done: int = 0
+var _load_index: int = 0
+var _load_requested: String = ""
+var _load_megabytes: float = 0.0
+var _load_slot_elapsed: float = 0.0
+var _load_started_ms: int = 0
+var _load_slot_started_ms: int = 0
+var _load_stalled: float = 0.0
+var _load_last_progress_ms: int = 0
+var _load_mounted: bool = false
+var _load_preloaded: bool = false
+var _load_hold_frames: int = 0
 
 func _ready() -> void:
 	_register_zones()
@@ -68,19 +84,148 @@ func start_game() -> bool:
 	loading_progress.value = 0.0
 	if loading_title != null:
 		loading_title.text = _zone_label(_startup_zone).to_upper()
-	loading_status.text = "Solicitando " + _zone_label(_startup_zone)
-	_load_elapsed = 0.0
-	_load_size_kb = LoadingProgress.file_kb(catalog.zone(_startup_zone).scene_path)
-	if loading_details != null:
-		loading_details.text = ""
-	if not zone_manager.preload_zone(_startup_zone):
-		loading_status.text = "Error al solicitar " + str(_startup_zone).to_upper()
-		_startup_requested = false
-		loading_screen.hide()
-		main_menu.show()
-		return false
+	if loading_hint != null:
+		loading_hint.text = ""
+	if loading_cancel != null:
+		loading_cancel.hide()
+	_begin_load_plan(_startup_zone)
 	set_process(true)
 	return true
+
+
+## Prepara el plan de recursos de la zona y pide el primero. Cada dependencia
+## se pide de una en una: así la barra avanza con hechos y la memoria no se
+## dispara en el móvil.
+func _begin_load_plan(zone_id: StringName) -> void:
+	var definition := catalog.zone(zone_id)
+	_load_plan = LoadingProgress.plan(definition.scene_path)
+	_load_total = _load_plan.size()
+	_load_done = 0
+	_load_index = 0
+	_load_requested = ""
+	_load_megabytes = LoadingProgress.plan_megabytes(_load_plan)
+	_load_elapsed = 0.0
+	_load_slot_elapsed = 0.0
+	_load_stalled = 0.0
+	_load_started_ms = Time.get_ticks_msec()
+	_load_slot_started_ms = _load_started_ms
+	_load_mounted = false
+	_load_preloaded = false
+	_load_hold_frames = 0
+	_load_last_progress_ms = Time.get_ticks_msec()
+	loading_progress.value = 0.0
+	loading_status.text = LoadingProgress.step_name(zone_manager.state, 0, _load_total, false)
+	if loading_details != null:
+		loading_details.text = LoadingProgress.details(zone_id, definition.scene_path, 0, _load_total,
+			_load_megabytes, 0.0, 0.0)
+
+
+## Pide el recurso en curso, si no hay ninguno pedido todavía.
+func _request_next_resource() -> void:
+	while _load_index < _load_total:
+		var path := _load_plan[_load_index]
+		if not LoadingProgress.has_resource(path):
+			_load_index += 1
+			_load_done = _load_index
+			continue
+		if ResourceLoader.load_threaded_request(path, "", true) != OK:
+			push_warning("No se pudo pedir %s; se sigue sin él" % path)
+			_load_index += 1
+			_load_done = _load_index
+			continue
+		_load_requested = path
+		_load_slot_started_ms = Time.get_ticks_msec()
+		_load_slot_elapsed = 0.0
+		return
+	_load_requested = ""
+
+
+## Un paso de la precarga: estado del recurso en curso y, al terminar todos, el
+## tránsito real a la zona.
+func _tick_loading(_delta: float) -> void:
+	## Reloj de pared, no suma de deltas: un fotograma bloqueado por el montaje
+	## no debe hacer que el cronometro de la pantalla se quede parado.
+	_load_elapsed = (Time.get_ticks_msec() - _load_started_ms) / 1000.0
+	_load_slot_elapsed = (Time.get_ticks_msec() - _load_slot_started_ms) / 1000.0
+	if _load_requested.is_empty() and _load_index < _load_total:
+		_request_next_resource()
+	if not _load_requested.is_empty():
+		var status := ResourceLoader.load_threaded_get_status(_load_requested)
+		match status:
+			ResourceLoader.THREAD_LOAD_LOADED:
+				_load_requested = ""
+				_load_index += 1
+				_load_done = _load_index
+				_load_slot_elapsed = 0.0
+				_load_slot_started_ms = Time.get_ticks_msec()
+				_load_last_progress_ms = Time.get_ticks_msec()
+				_load_stalled = 0.0
+			ResourceLoader.THREAD_LOAD_FAILED, ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
+				push_warning("Recurso no cargado en el plan: %s" % _load_requested)
+				_load_requested = ""
+				_load_index += 1
+				_load_done = _load_index
+				_load_last_progress_ms = Time.get_ticks_msec()
+				_load_stalled = 0.0
+			_:
+				_load_stalled = (Time.get_ticks_msec() - _load_last_progress_ms) / 1000.0
+	elif _load_index >= _load_total:
+		_load_stalled = 0.0
+		if not _load_preloaded:
+			# Un par de fotogramas con el 92 % ya pintado: el montaje de la zona
+			# ocupa un fotograma entero y, sin esto, la pantalla se quedaria
+			# diciendo "14 de 14" mientras el motor esta ocupado.
+			_load_preloaded = true
+			_load_hold_frames = 2
+		elif _load_hold_frames > 0:
+			_load_hold_frames -= 1
+		elif zone_manager.state == ZoneManager.State.IDLE and not _transition_requested:
+			_load_mounted = true
+			_transition_requested = zone_manager.transition_to(_startup_zone, &"entry")
+			if not _transition_requested:
+				_on_zone_transition_failed(_startup_zone, "No se pudo iniciar el tránsito")
+				return
+	var state := zone_manager.state
+	loading_progress.value = LoadingProgress.value(_load_done, _load_total, _load_slot_elapsed,
+		state, _load_mounted)
+	if _load_preloaded and not _load_mounted:
+		loading_status.text = "Montando la zona"
+	else:
+		loading_status.text = LoadingProgress.step_name(state, _load_done, _load_total, _load_mounted)
+	if loading_details != null:
+		var module_path := catalog.zone(_startup_zone).scene_path
+		if _load_total > 0:
+			module_path = _load_plan[_load_total - 1]
+		loading_details.text = LoadingProgress.details(_startup_zone, module_path, _load_done, _load_total,
+			_load_megabytes, _load_elapsed, _load_stalled)
+	if loading_hint != null:
+		if _load_preloaded and not _load_mounted:
+			loading_hint.text = "Un momento · montando la geometría de la zona"
+		else:
+			loading_hint.text = LoadingProgress.stall_hint(_load_stalled) if not _load_mounted else ""
+	if loading_cancel != null:
+		loading_cancel.visible = _load_stalled >= LoadingProgress.STALL_ABORT
+		if loading_cancel.visible and loading_cancel.pressed.get_connections().is_empty():
+			loading_cancel.pressed.connect(cancel_loading)
+
+## Vuelve al menú si la precarga no avanza y el operador decide salir.
+func cancel_loading() -> void:
+	if not _startup_requested:
+		return
+	print("NEXUS carga cancelada tras %.1f s sin avance" % _load_stalled)
+	_startup_requested = false
+	_transition_requested = false
+	_load_requested = ""
+	_load_mounted = false
+	_load_preloaded = false
+	loading_screen.hide()
+	main_menu.show()
+	loading_progress.value = 0.0
+	if loading_hint != null:
+		loading_hint.text = ""
+	if loading_cancel != null:
+		loading_cancel.hide()
+	set_process(false)
 
 ## Nombre legible de una zona, del catálogo (`C-04 · Contención`).
 func _zone_label(zone_id: StringName) -> String:
@@ -91,32 +236,10 @@ func _zone_label(zone_id: StringName) -> String:
 
 
 func _process(delta: float) -> void:
-	_load_elapsed += delta
 	if _game_started:
 		_tick_session_tips(delta)
 	if _startup_requested and not _game_started:
-		var progress: Array = []
-		var definition := catalog.zone(_startup_zone)
-		var status := ResourceLoader.load_threaded_get_status(definition.scene_path, progress)
-		var reported := float(progress[0]) if not progress.is_empty() else 0.0
-		loading_progress.value = LoadingProgress.value(reported, status, zone_manager.state, _load_elapsed)
-		loading_status.text = LoadingProgress.step_name(status, zone_manager.state)
-		if loading_details != null:
-			loading_details.text = LoadingProgress.details(_startup_zone, definition.scene_path,
-				_load_size_kb, _load_elapsed, reported, zone_manager.state)
-		match status:
-			ResourceLoader.THREAD_LOAD_IN_PROGRESS:
-				pass
-			ResourceLoader.THREAD_LOAD_LOADED:
-				if zone_manager.state == ZoneManager.State.IDLE and not _transition_requested:
-					_transition_requested = zone_manager.transition_to(_startup_zone, &"entry")
-					if not _transition_requested:
-						_on_zone_transition_failed(_startup_zone, "No se pudo iniciar el tránsito")
-			ResourceLoader.THREAD_LOAD_FAILED, ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
-				_startup_requested = false
-				loading_screen.hide()
-				main_menu.show()
-				set_process(false)
+		_tick_loading(delta)
 	if _game_started:
 		_autosave_timer -= delta
 		if _autosave_timer <= 0.0:

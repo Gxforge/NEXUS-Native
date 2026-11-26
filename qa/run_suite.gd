@@ -612,7 +612,7 @@ func _validate_distribution() -> void:
 	var project := ConfigFile.new()
 	project.load("res://project.godot")
 	var version := str(project.get_value("application", "config/version", ""))
-	_check(version == "0.43.0" and str(presets.get_value("preset.2.options", "version/name", "")) == version,
+	_check(version == "0.44.0" and str(presets.get_value("preset.2.options", "version/name", "")) == version,
 		"el APK repite la versión del proyecto (%s)" % version)
 	_check(bool(project.get_value("rendering", "textures/vram_compression/import_etc2_astc", false)),
 		"el proyecto importa ETC2/ASTC, que Android necesita")
@@ -777,25 +777,71 @@ func _validate_larva() -> void:
 	await process_frame
 
 func _validate_loading_progress() -> void:
-	_check(LoadingProgress.value(0.0, ResourceLoader.THREAD_LOAD_IN_PROGRESS, ZoneManager.State.IDLE, 0.5) > 0.0,
-		"loading bar moves even when the loader reports nothing")
-	var early := LoadingProgress.value(0.0, ResourceLoader.THREAD_LOAD_IN_PROGRESS, ZoneManager.State.IDLE, 0.2)
-	var later := LoadingProgress.value(0.0, ResourceLoader.THREAD_LOAD_IN_PROGRESS, ZoneManager.State.IDLE, 3.0)
-	_check(later > early and later <= LoadingProgress.PRELOAD_CEILING,
-		"the preload floor eases towards 60 without passing it")
-	_check(is_equal_approx(LoadingProgress.value(1.0, ResourceLoader.THREAD_LOAD_LOADED, ZoneManager.State.IDLE, 1.0), 100.0),
-		"a mounted zone reads 100 %")
-	var staging := LoadingProgress.value(1.0, ResourceLoader.THREAD_LOAD_LOADED, ZoneManager.State.STAGING, 1.0)
-	_check(staging > 70.0 and staging < 99.0, "mounting stages fill the last thirty percent")
+	var idle := ZoneManager.State.IDLE
+	_check(LoadingProgress.value(0, 6, 0.5, idle, false) > 0.0,
+		"la barra avanza aunque el motor no informe de nada")
+	_check(LoadingProgress.value(3, 6, 0.0, idle, false) > LoadingProgress.value(1, 6, 0.0, idle, false),
+		"cada recurso terminado empuja la barra")
+	_check(LoadingProgress.value(0, 6, 600.0, idle, false) < 15.0,
+		"el arrastre de un recurso lento no infla el total")
+	_check(is_equal_approx(LoadingProgress.value(6, 6, 0.0, idle, false), LoadingProgress.PRELOAD_CEILING),
+		"con todos los recursos cargados la barra queda en el techo de precarga")
+	_check(is_equal_approx(LoadingProgress.value(6, 6, 0.0, idle, true), 100.0),
+		"una zona montada marca 100 %")
+	var staging := LoadingProgress.value(6, 6, 0.0, ZoneManager.State.STAGING, true)
+	_check(staging > LoadingProgress.PRELOAD_CEILING and staging < 99.0,
+		"el montaje llena el ultimo tramo sin pasarse")
 	_check(LoadingProgress.stage_weight(ZoneManager.State.TRANSFERRING) > LoadingProgress.stage_weight(ZoneManager.State.LOADING),
-		"stage weights follow the zone manager order")
-	_check(LoadingProgress.step_name(ResourceLoader.THREAD_LOAD_IN_PROGRESS, ZoneManager.State.IDLE) == "Precargando geometría y recursos",
-		"the loading screen names the preload step")
-	var line := LoadingProgress.details(&"c04", "res://zones/zone_c04_shell.tscn", 12.5, 0.4, 0.5, 0)
-	_check(line.contains("C04") and line.contains("zone_c04_shell.tscn") and line.contains("dependencias"),
-		"the loading screen shows real file data")
-	_check(LoadingProgress.file_kb("res://zones/zone_c04_shell.tscn") > 0.0, "module size is read from disk")
-	_check(LoadingProgress.dependencies("res://zones/zone_c04_shell.tscn") > 0, "module dependencies are counted")
+		"los pesos de montaje siguen el orden del ZoneManager")
+	var plan := LoadingProgress.plan("res://zones/zone_c04_shell.tscn")
+	_check(plan.size() >= 3, "el plan de carga incluye el modulo y sus dependencias")
+	_check(plan.size() > 0 and plan[plan.size() - 1] == "res://zones/zone_c04_shell.tscn",
+		"el modulo se carga el ultimo, con todo lo demas en cache")
+	var unique := {}
+	for path: String in plan:
+		unique[path] = true
+	_check(unique.size() == plan.size(), "el plan no repite recursos")
+	_check(LoadingProgress.plan_megabytes(plan) > 0.0, "el plan sabe cuanto pesa")
+	_check(LoadingProgress.plan("res://zones/no_existe.tscn").is_empty(), "un modulo inexistente no genera plan")
+	var step := LoadingProgress.step_name(idle, 3, 6, false)
+	_check(step.contains("3 de 6"), "el paso en curso cuenta recursos, no estados internos")
+	var line := LoadingProgress.details(&"c04", "res://zones/zone_c04_shell.tscn", 3, 6, 4.5, 72.5, 0.0)
+	_check(line.contains("C04") and line.contains("zone_c04_shell.tscn") and line.contains("3 de 6 recursos")
+		and line.contains("4.5 MB") and line.contains("1:12"),
+		"la linea de datos es legible por el operador")
+	_check(LoadingProgress.format_clock(3725.0) == "1:02:05", "el reloj admite cargas de mas de una hora")
+	_check(not line.contains("IDLE") and not line.contains("informe"),
+		"la linea de datos no filtra enums internos")
+	_check(LoadingProgress.stall_hint(0.0) == "" and LoadingProgress.stall_hint(20.0) != ""
+		and LoadingProgress.stall_hint(90.0).contains("volver al men"),
+		"el aviso de estancamiento aparece y acaba ofreciendo salida")
+	_check(LoadingProgress.details(&"c04", "res://zones/zone_c04_shell.tscn", 1, 6, 4.5, 3.0, 21.0).contains("sin avance"),
+		"la linea de datos marca el tiempo sin avance")
+	for reference: String in LoadingProgress.references("res://zones/zone_c04_shell.tscn"):
+		_check(reference.begins_with("res://") and FileAccess.file_exists(reference),
+			"las dependencias declaradas existen: " + reference)
+	_check(LoadingProgress.file_kb("res://zones/zone_c04_shell.tscn") > 0.0, "el tamano del modulo se lee del disco")
+	var modules := LoadingProgress.manifest_modules()
+	_check(modules.size() >= 10, "el manifiesto de carga cubre las zonas del catalogo")
+	var missing := 0
+	for module: String in modules:
+		if not LoadingProgress.has_resource(module):
+			missing += 1
+		var entries := LoadingProgress.manifest_entries(module)
+		if entries.is_empty() or entries[entries.size() - 1] != module:
+			missing += 1
+		for entry: String in entries:
+			if not LoadingProgress.has_resource(entry):
+				missing += 1
+	_check(missing == 0, "todos los recursos del manifiesto existen y el modulo va al final")
+	_check(LoadingProgress.manifest_entries("res://zones/zone_c04_shell.tscn").size()
+		== LoadingProgress.plan("res://zones/zone_c04_shell.tscn").size(),
+		"el runtime usa el plan del manifiesto, no un escaneo de texto")
+	var heavy := "res://assets/generated/w01_tentacles.glb"
+	_check(LoadingProgress.plan_file_kb(heavy) > 0.0
+		and absf(LoadingProgress.plan_file_kb(heavy) - LoadingProgress.file_kb(heavy)) <= 0.1,
+		"el manifiesto anota el peso de cada recurso (redondeado a 0,1 KB)")
+	_check(LoadingProgress.dependencies("res://zones/zone_c04_shell.tscn") > 0, "las dependencias del modulo se cuentan")
 
 func _validate_w01_arms() -> void:
 	var packed_arms := load("res://assets/generated/w01_tentacles.glb") as PackedScene
