@@ -195,6 +195,11 @@ Actualizado: 2026-11-24. La migración continúa en `/home/user/NEXUS-Native`; l
 - `main.tscn`: panel de carga más alto, `Content/Hint` y `Content/Cancel`; `main.gd`: `_begin_load_plan`, `_request_next_resource`, `_tick_loading`, `cancel_loading`, y dos fotogramas de pausa para que el 92 % se pinte antes del bloqueo del montaje.
 - `qa/run_suite.gd`: bloque de carga de 9 a 25 comprobaciones. Total **455 checks**, 0 fallos. Versión 0.44.0. Medición: 7 % en el primer fotograma, 14 de 14 a los 0,39 s, juego listo en 2,1 s. Detalle en `PHASE_44_LOADING.md`.
 
+## Entrega 0.44.0 (release)
+- Primer paquete de producción para Windows y Android: `tools/build.sh windows android` con `--export-release`, APK firmado con clave de release RSA 4096 (v1/v2/v3 verificadas) y artefactos con versión en el nombre.
+- Publicado como release `v0.44.0` de GitHub (commit `4eaff3d`): Windows 177 327 120 B `d812a05f…142f0a`, Android 105 393 044 B `427d91cd…188156`. Notas en `docs/releases/v0.44.0.md`, proceso y política de clave en `docs/releases/README.md`.
+- El SDK de Android de esta máquina había perdido `build-tools` (sólo quedaba `renderscript`): se reinstalaron build-tools 34.0.0 y platform-tools desde `dl.google.com`. La puerta de calidad ya no exige un informe con dos artefactos cuando se compila un solo destino.
+
 ## Siguiente bloque de trabajo
 0. Ver `docs/migration/PARITY_WEB_NATIVE.md` para la comparación módulo a módulo con la web v15.1.
 1. Verificar y ajustar el HUD/touch y el mapa con el APK en un dispositivo real (checklist en `PHASE_43_DISTRIBUTION.md`).
