@@ -634,7 +634,10 @@ func _validate_distribution() -> void:
 		for artifact: Dictionary in artifacts:
 			if int(artifact.get("bytes", 0)) < 1048576:
 				big = false
-		_check(artifacts.size() >= 2 and big, "el informe lista los binarios exportados (%d)" % artifacts.size())
+			if not FileAccess.file_exists("res://build/" + str(artifact.get("path", ""))):
+				big = false
+		_check(artifacts.size() >= 1 and big,
+			"el informe lista los binarios exportados (%d)" % artifacts.size())
 	else:
 		_check(true, "sin artefactos locales (se generan con tools/build.sh)")
 

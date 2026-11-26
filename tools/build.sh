@@ -35,9 +35,7 @@ if [ ! -x "$GODOT" ]; then
 fi
 echo "-- motor: $("$GODOT" --headless --version 2>/dev/null | tail -1)"
 
-# 1. Importar recursos: deja .godot y los .import al día (y con ETC2/ASTC,
-#    que es lo que exige el export de Android).
-# 1b. Manifiesto de carga: la pantalla de carga necesita saber, ya en el juego
+# 1a. Manifiesto de carga: la pantalla de carga necesita saber, ya en el juego
 #     exportado, qué recursos componen cada zona y cuánto pesan.
 "$GODOT" --headless --path "$ROOT" --script tools/gen_load_plan.gd >"$OUT/load_plan.log" 2>&1 || {
 	echo "falló el manifiesto de carga; ver $OUT/load_plan.log" >&2
@@ -45,6 +43,8 @@ echo "-- motor: $("$GODOT" --headless --version 2>/dev/null | tail -1)"
 }
 tail -1 "$OUT/load_plan.log"
 
+# 1. Importar recursos: deja .godot y los .import al día (y con ETC2/ASTC,
+#    que es lo que exige el export de Android).
 "$GODOT" --headless --path "$ROOT" --import >"$OUT/import.log" 2>&1 || {
 	echo "falló la importación; ver $OUT/import.log" >&2
 	exit 1
